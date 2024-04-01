@@ -47,7 +47,7 @@ class RegisterInteractor(
             if (result != null) {
                 appDataStoreManager.setValue(
                     DataStoreKeys.TOKEN,
-                    AUTHORIZATION_BEARER_TOKEN + result
+                    result
                 )
                 appDataStoreManager.setValue(
                     DataStoreKeys.EMAIL,

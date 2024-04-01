@@ -5,7 +5,7 @@ import business.datasource.network.common.MainGenericResponse
 interface SplashService {
     companion object {
         const val REGISTER = "register"
-        const val LOGIN = "/auth/login"
+        const val LOGIN = "auth/login"
     }
 
     suspend fun login(email: String, password: String): MainGenericResponse<String?>

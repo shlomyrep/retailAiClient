@@ -36,7 +36,7 @@ class LoginInteractor(
             if (token != null) {
                 appDataStoreManager.setValue(
                     DataStoreKeys.TOKEN,
-                    AUTHORIZATION_BEARER_TOKEN + apiResponse.token
+                    apiResponse.token.toString()
                 )
                 appDataStoreManager.setValue(
                     DataStoreKeys.EMAIL,
