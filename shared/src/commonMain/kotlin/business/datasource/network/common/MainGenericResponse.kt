@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MainGenericResponse<T>(
     @SerialName("result") var result: T?,
-    @SerialName("status") var status: Boolean?,
+    @SerialName("token") var token: String?,
+    @SerialName("success") var status: Boolean?,
     @SerialName("alert") var alert: JAlertResponse? = JAlertResponse(),
 )

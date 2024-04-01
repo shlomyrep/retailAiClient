@@ -30,34 +30,30 @@ class LoginInteractor(
             val apiResponse = service.login(email, password)
 
 
+            val token = apiResponse.token
 
-            apiResponse.alert?.let { alert ->
+
+            if (token != null) {
+                appDataStoreManager.setValue(
+                    DataStoreKeys.TOKEN,
+                    AUTHORIZATION_BEARER_TOKEN + apiResponse.token
+                )
+                appDataStoreManager.setValue(
+                    DataStoreKeys.EMAIL,
+                    email
+                )
+            } else {
                 emit(
                     DataState.Response(
                         uiComponent = UIComponent.Dialog(
-                            alert = alert
+                            alert = apiResponse.alert!!
                         )
                     )
                 )
             }
 
 
-            val result = apiResponse.result
-
-
-            if (result != null) {
-                appDataStoreManager.setValue(
-                    DataStoreKeys.TOKEN,
-                    AUTHORIZATION_BEARER_TOKEN + result
-                )
-                appDataStoreManager.setValue(
-                    DataStoreKeys.EMAIL,
-                    email
-                )
-            }
-
-
-            emit(DataState.Data(result, apiResponse.status))
+            emit(DataState.Data(token, apiResponse.status))
 
         } catch (e: Exception) {
             e.printStackTrace()
