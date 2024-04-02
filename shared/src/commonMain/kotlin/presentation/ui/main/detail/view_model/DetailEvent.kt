@@ -30,4 +30,6 @@ sealed class DetailEvent {
     ) : DetailEvent()
 
     data class SelectSize(val sizeSelectableId: String) : DetailEvent()
+    data class SelectColor(val colorSelectableId: String) : DetailEvent()
+
 }

@@ -278,7 +278,7 @@ fun ColorGrid(selections: List<Selection>, events: (DetailEvent) -> Unit) {
                             .clickable {
                                 color._id?.let { it1 ->
                                     selection.selector.selected = color
-//                                    events(DetailEvent.SelectColor(it1))
+                                    events(DetailEvent.SelectColor(it1))
                                 }
                             }
                             .padding(8.dp)

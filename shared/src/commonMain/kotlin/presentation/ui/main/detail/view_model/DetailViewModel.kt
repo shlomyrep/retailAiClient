@@ -47,6 +47,10 @@ class DetailViewModel(
                 selectSize(event.sizeSelectableId)
             }
 
+            is DetailEvent.SelectColor -> {
+                selectSize(event.colorSelectableId)
+            }
+
             is DetailEvent.GetProduct -> {
                 getProduct(event.id)
             }
@@ -72,6 +76,11 @@ class DetailViewModel(
     private fun selectSize(sizeSelectable: String) {
         state.value = sizeSelectable?.let { state.value.copy(sizeSelectable = it) }!!
     }
+
+    private fun selectColor(colorSelectable: String) {
+        state.value = colorSelectable?.let { state.value.copy(colorSelectable = it) }!!
+    }
+
 
     private fun onUpdateSelectedImage(value: String) {
         state.value = state.value.copy(selectedImage = value)

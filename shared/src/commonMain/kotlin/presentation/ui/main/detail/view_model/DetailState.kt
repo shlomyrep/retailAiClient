@@ -11,6 +11,7 @@ data class DetailState(
     val product: Product = Product(),
     val selectedImage: String = "",
     val sizeSelectable: String = "",
+    val colorSelectable: String = "",
     val progressBarState: ProgressBarState = ProgressBarState.Idle,
     val networkState: NetworkState = NetworkState.Good,
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf()),
