@@ -53,7 +53,7 @@ internal fun SplashScreen(
 
 
     LaunchedEffect(state.navigateToMain) {
-        delay(6000L)
+        delay(500L)
         if (state.navigateToMain) {
             navigateToMain()
         } else {
