@@ -2,7 +2,7 @@ package business.domain.main
 
 data class Product(
     val description: String = "",
-    val id: Int = 0,
+    val id: String = "0",
     val image: String = "",
     val isLike: Boolean = false,
     val likes: Int = 0,

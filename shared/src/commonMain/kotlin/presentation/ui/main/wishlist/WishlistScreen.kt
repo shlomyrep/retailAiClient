@@ -31,7 +31,7 @@ import presentation.ui.main.wishlist.view_model.WishlistState
 fun WishlistScreen(
     state: WishlistState,
     events: (WishlistEvent) -> Unit,
-    navigateToDetail: (Int) -> Unit
+    navigateToDetail: (String) -> Unit
 ) {
 
 

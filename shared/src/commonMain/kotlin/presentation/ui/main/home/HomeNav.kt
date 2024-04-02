@@ -77,7 +77,7 @@ fun HomeNav(logout: () -> Unit) {
             }
         }
         scene(route = HomeNavigation.Detail.route.plus(HomeNavigation.Detail.objectPath)) { backStackEntry ->
-            val id: Int? = backStackEntry.path<Int>(HomeNavigation.Detail.objectName)
+            val id: String? = backStackEntry.path<String>(HomeNavigation.Detail.objectName)
             id?.let {
                 DetailNav(it) {
                     navigator.popBackStack()

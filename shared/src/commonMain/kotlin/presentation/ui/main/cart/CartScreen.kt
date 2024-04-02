@@ -60,7 +60,7 @@ import presentation.ui.main.cart.view_model.CartState
 fun CartScreen(
     state: CartState,
     events: (CartEvent) -> Unit,
-    navigateToDetail: (Int) -> Unit,
+    navigateToDetail: (String) -> Unit,
     navigateToCheckout: () -> Unit,
 ) {
 
@@ -155,7 +155,7 @@ fun ProceedButtonBox(totalCost: String, onClick: () -> Unit) {
 @Composable
 fun CartBox(
     basket: Basket,
-    navigateToDetail: (Int) -> Unit,
+    navigateToDetail: (String) -> Unit,
     addMoreProduct: () -> Unit,
     deleteFromBasket: () -> Unit
 ) {
@@ -194,7 +194,7 @@ fun CartBox(
 fun DismissCartContent(
     basket: Basket,
     addMoreProduct: () -> Unit,
-    navigateToDetail: (Int) -> Unit
+    navigateToDetail: (String) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background)) {
         Row(

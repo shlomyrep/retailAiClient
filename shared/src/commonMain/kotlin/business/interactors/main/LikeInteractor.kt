@@ -16,7 +16,7 @@ class LikeInteractor(
 ) {
 
 
-    fun execute(id: Int): Flow<DataState<Boolean>> = flow {
+    fun execute(id: String): Flow<DataState<Boolean>> = flow {
 
         try {
 

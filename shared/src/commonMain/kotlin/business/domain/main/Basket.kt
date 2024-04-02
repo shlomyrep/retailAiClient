@@ -3,7 +3,7 @@ package business.domain.main
  
 data class Basket(
     val id: Int,
-    val productId: Int,
+    val productId: String,
     val category: Category,
     val title: String,
     val description: String,

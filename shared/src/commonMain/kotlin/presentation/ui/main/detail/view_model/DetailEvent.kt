@@ -6,15 +6,15 @@ import business.core.UIComponent
 sealed class DetailEvent {
 
 
-    data class Like(val id: Int) : DetailEvent()
-    data class AddBasket(val id: Int) : DetailEvent()
+    data class Like(val id: String) : DetailEvent()
+    data class AddBasket(val id: String) : DetailEvent()
 
     data class OnUpdateSelectedImage(
         val value: String
     ) : DetailEvent()
 
     data class GetProduct(
-        val id: Int
+        val id: String
     ) : DetailEvent()
 
    data object OnRemoveHeadFromQueue : DetailEvent()

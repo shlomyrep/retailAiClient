@@ -15,7 +15,7 @@ import presentation.ui.main.detail.view_model.DetailEvent
 import presentation.ui.main.detail.view_model.DetailViewModel
 
 @Composable
-fun DetailNav(id: Int, popUp: () -> Unit) {
+fun DetailNav(id: String, popUp: () -> Unit) {
     val navigator = rememberNavigator()
     NavHost(
         navigator = navigator,

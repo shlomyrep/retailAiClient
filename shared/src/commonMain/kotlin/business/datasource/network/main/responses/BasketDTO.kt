@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BasketDTO(
     @SerialName("id") val id: Int?,
-    @SerialName("product_id") val productId: Int?,
+    @SerialName("product_id") val productId: String?,
     @SerialName("category") val category: CategoryDTO?,
     @SerialName("title") val title: String?,
     @SerialName("description") val description: String?,
@@ -20,7 +20,7 @@ data class BasketDTO(
 fun BasketDTO.toBasket() = Basket(
     id = id ?: 0,
     count = count ?: 0,
-    productId = productId ?: 0,
+    productId = productId ?: "0",
     category = category?.toCategory() ?: Category(),
     title = title ?: "",
     description = description ?: "",

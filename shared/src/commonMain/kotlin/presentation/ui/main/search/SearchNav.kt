@@ -42,7 +42,7 @@ fun SearchNav(categoryId: String?, sort: Int?, popUp: () -> Unit) {
             )
         }
         scene(route = SearchNavigation.Detail.route.plus(SearchNavigation.Detail.objectPath)) { backStackEntry ->
-            val id: Int? = backStackEntry.path<Int>(SearchNavigation.Detail.objectName)
+            val id: String? = backStackEntry.path<String>(SearchNavigation.Detail.objectName)
             id?.let {
                 DetailNav(it){
                     navigator.popBackStack()

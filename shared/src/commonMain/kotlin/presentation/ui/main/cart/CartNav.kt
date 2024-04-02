@@ -52,7 +52,7 @@ fun CartNav() {
             )
         }
         scene(route = CartNavigation.Detail.route.plus(CartNavigation.Detail.objectPath)) { backStackEntry ->
-            val id: Int? = backStackEntry.path<Int>(CartNavigation.Detail.objectName)
+            val id: String? = backStackEntry.path<String>(CartNavigation.Detail.objectName)
             id?.let {
                 DetailNav(it) {
                     navigator.popBackStack()

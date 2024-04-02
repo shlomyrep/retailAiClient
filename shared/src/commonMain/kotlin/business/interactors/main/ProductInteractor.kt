@@ -20,7 +20,7 @@ class ProductInteractor(
 ) {
 
 
-    fun execute(id: Int): Flow<DataState<Product>> = flow {
+    fun execute(id: String): Flow<DataState<Product>> = flow {
 
         try {
 

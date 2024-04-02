@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ProductDTO(
     @SerialName("description") val description: String?,
-    @SerialName("id") val id: Int?,
+    @SerialName("id") val id: String?,
     @SerialName("image") val image: String?,
     @SerialName("isLike") val isLike: Boolean?,
     @SerialName("likes") val likes: Int?,
@@ -23,7 +23,7 @@ data class ProductDTO(
 
 fun ProductDTO.toProduct() = Product(
     description = description ?: "",
-    id = id ?: 0,
+    id = id ?: "0",
     image = image ?: "",
     isLike = isLike ?: false,
     likes = likes ?: 0,

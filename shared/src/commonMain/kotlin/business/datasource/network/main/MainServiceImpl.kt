@@ -274,7 +274,7 @@ class MainServiceImpl(
 
     override suspend fun basketAdd(
         token: String,
-        id: Int,
+        id: String,
         count: Int
     ): MainGenericResponse<JRNothing?> {
         return httpClient.post {
@@ -290,7 +290,7 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun basketDelete(token: String, id: Int): MainGenericResponse<JRNothing?> {
+    override suspend fun basketDelete(token: String, id: String): MainGenericResponse<JRNothing?> {
         return httpClient.post {
             url {
                 headers {
@@ -317,7 +317,7 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun product(token: String, id: Int): MainGenericResponse<ProductDTO> {
+    override suspend fun product(token: String, id: String): MainGenericResponse<ProductDTO> {
         return httpClient.get {
             url {
                 headers {
@@ -331,7 +331,7 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun like(token: String, id: Int): MainGenericResponse<JRNothing?> {
+    override suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?> {
         return httpClient.get {
             url {
                 headers {

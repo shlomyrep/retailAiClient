@@ -5,9 +5,9 @@ import business.core.UIComponent
 
 sealed class CartEvent {
 
-    data class DeleteFromBasket(val id: Int) : CartEvent()
+    data class DeleteFromBasket(val id: String) : CartEvent()
 
-    data class AddProduct(val id: Int) : CartEvent()
+    data class AddProduct(val id: String) : CartEvent()
 
    data object OnRemoveHeadFromQueue : CartEvent()
 

@@ -23,7 +23,7 @@ interface MainService {
         const val BASKET_DELETE = "basket/delete"
         const val HOME = "home"
         const val ORDERS = "orders"
-        const val PRODUCT = "product"
+        const val PRODUCT = "search/product"
         const val LIKE = "like"
         const val PROFILE = "profile"
         const val COMMENT = "comment"
@@ -88,11 +88,11 @@ interface MainService {
     ): MainGenericResponse<Boolean>
 
     suspend fun basket(token: String): MainGenericResponse<List<BasketDTO>>
-    suspend fun basketAdd(token: String, id: Int, count: Int): MainGenericResponse<JRNothing?>
-    suspend fun basketDelete(token: String, id: Int): MainGenericResponse<JRNothing?>
+    suspend fun basketAdd(token: String, id: String, count: Int): MainGenericResponse<JRNothing?>
+    suspend fun basketDelete(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun home(token: String): MainGenericResponse<HomeDTO>
-    suspend fun product(token: String, id: Int): MainGenericResponse<ProductDTO>
-    suspend fun like(token: String, id: Int): MainGenericResponse<JRNothing?>
+    suspend fun product(token: String, id: String): MainGenericResponse<ProductDTO>
+    suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun wishlist(
         token: String,
         categoryId: Int?,
