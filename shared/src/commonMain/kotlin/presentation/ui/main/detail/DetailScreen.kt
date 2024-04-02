@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import business.datasource.network.main.responses.ColorSelectable
@@ -302,22 +303,28 @@ fun ColorGrid(selections: List<Selection>, events: (DetailEvent) -> Unit) {
 }
 
 fun String.toColorInt(): Int {
-    if (this[0] == '#') {
-        var color = substring(1).toLong(16)
-        if (length == 7) {
-            color = color or 0x00000000ff000000L
-        } else if (length != 9) {
-            throw IllegalArgumentException("Unknown color")
+    try {
+        if (this[0] == '#') {
+            var color = substring(1).toLong(16)
+            if (length == 7) {
+                color = color or 0x00000000ff000000L
+            } else if (length != 9) {
+                return Color.White.toArgb()
+            }
+            return color.toInt()
         }
-        return color.toInt()
+    } catch (e: Exception) {
+        return Color.White.toArgb()
     }
-    throw IllegalArgumentException("Unknown color")
+    return Color.White.toArgb()
 }
 
 @Composable
 fun ColorBox(colorHex: String?) {
     colorHex?.let {
+
         val composeColor = Color(it.toColorInt())
+
         if (composeColor != Color.Unspecified) {
             Box(
                 modifier = Modifier
@@ -325,6 +332,7 @@ fun ColorBox(colorHex: String?) {
                     .background(composeColor)
             )
         }
+
     }
 }
 
