@@ -9,13 +9,13 @@ import androidx.compose.ui.graphics.Color
 
 
 private val darkColorPalette = darkColorScheme(
-    primary = PrimaryColor,
+    primary = ProgressBarColor,
     primaryContainer = PrimaryVariantColor,
     secondary = AccentColor,
 )
 
 private val lightColorPalette = lightColorScheme(
-    primary = PrimaryColor,
+    primary = ProgressBarColor,
     primaryContainer = PrimaryVariantColor,
     secondary = AccentColor,
     background = Color.White,

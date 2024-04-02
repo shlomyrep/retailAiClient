@@ -43,7 +43,5 @@ sealed class MainNavigation (
         selectedIcon = Res.drawable.profile,
         unSelectedIcon = Res.drawable.profile_border
     )
-
-
 }
 
