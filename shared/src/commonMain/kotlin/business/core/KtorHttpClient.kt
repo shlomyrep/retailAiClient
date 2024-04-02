@@ -1,5 +1,7 @@
 package business.core
 
+import business.datasource.network.main.responses.ProductDTO
+import business.datasource.network.main.responses.Selection
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
@@ -12,8 +14,10 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.modules.SerializersModule
 import presentation.token_manager.TokenEvent
 import presentation.token_manager.TokenManager
+import presentation.ui.main.detail.SelectionSerializer
 
 object KtorHttpClient {
 
@@ -71,6 +75,10 @@ object KtorHttpClient {
                 }
             }
         }
+        val module = SerializersModule {
+            contextual(Selection::class, SelectionSerializer)
+        }
+
         install(ContentNegotiation) {
             json(Json {
                 explicitNulls = false
@@ -79,6 +87,7 @@ object KtorHttpClient {
                 prettyPrint = true
                 encodeDefaults = true
                 classDiscriminator = "#class"
+                serializersModule = module
             })
         }
 
