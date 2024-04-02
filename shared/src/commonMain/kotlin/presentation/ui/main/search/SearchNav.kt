@@ -14,7 +14,7 @@ import presentation.ui.main.search.view_model.SearchEvent
 import presentation.ui.main.search.view_model.SearchViewModel
 
 @Composable
-fun SearchNav(categoryId: Int?, sort: Int?, popUp: () -> Unit) {
+fun SearchNav(categoryId: String?, sort: Int?, popUp: () -> Unit) {
     val navigator = rememberNavigator()
     NavHost(
         navigator = navigator,

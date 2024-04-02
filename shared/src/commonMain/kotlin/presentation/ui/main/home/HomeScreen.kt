@@ -87,7 +87,7 @@ fun HomeScreen(
     navigateToNotifications: () -> Unit = {},
     navigateToSetting: () -> Unit = {},
     navigateToCategories: () -> Unit = {},
-    navigateToSearch: (Int?, Int?) -> Unit = { _, _ -> },
+    navigateToSearch: (String?, Int?) -> Unit = { _, _ -> },
 ) {
 
 

@@ -35,7 +35,7 @@ fun CategoriesNav(popup: () -> Unit) {
             route = CategoriesNavigation.Search.route
                 .plus(CategoriesNavigation.Search.objectPath)
         ) { backStackEntry ->
-            val categoryId: Int? = backStackEntry.path<Int>(CategoriesNavigation.Search.objectName)
+            val categoryId: String? = backStackEntry.path<String>(CategoriesNavigation.Search.objectName)
             SearchNav(categoryId = categoryId, sort = null) {
                 navigator.popBackStack()
             }

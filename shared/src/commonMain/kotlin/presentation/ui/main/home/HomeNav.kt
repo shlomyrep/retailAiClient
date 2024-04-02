@@ -70,7 +70,7 @@ fun HomeNav(logout: () -> Unit) {
                 .plus(HomeNavigation.Search.objectPath)
                 .plus(HomeNavigation.Search.objectPath2)
         ) { backStackEntry ->
-            val categoryId: Int? = backStackEntry.path<Int>(HomeNavigation.Search.objectName)
+            val categoryId: String? = backStackEntry.path<String>(HomeNavigation.Search.objectName)
             val sort: Int? = backStackEntry.path<Int>(HomeNavigation.Search.objectName2)
             SearchNav(categoryId = categoryId, sort = sort) {
                 navigator.popBackStack()

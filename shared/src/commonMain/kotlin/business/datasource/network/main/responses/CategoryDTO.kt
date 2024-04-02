@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CategoryDTO(
     @SerialName("icon") val icon: String?,
-    @SerialName("id") val id: Int?,
+    @SerialName("id") val id: String?,
     @SerialName("name") val name: String?,
     @SerialName("parent") val parent: Int?,
 )
@@ -16,6 +16,6 @@ data class CategoryDTO(
 fun CategoryDTO.toCategory() = Category(
     icon = icon ?: "",
     name = name ?: "",
-    id = id ?: 0,
+    id = id ?: "0",
     parent = parent ?: 0,
 )
