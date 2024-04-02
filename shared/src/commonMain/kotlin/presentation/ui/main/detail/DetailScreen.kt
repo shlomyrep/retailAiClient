@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -104,15 +106,15 @@ fun DetailScreen(
                     }
 
                     Box(
-                        modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()
+                        modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth()
                             .padding(16.dp)
                     ) {
                         Card(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                            modifier = Modifier.wrapContentWidth().padding(vertical = 8.dp),
                             shape = MaterialTheme.shapes.small
                         ) {
                             LazyRow(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.wrapContentWidth(),
                                 contentPadding = PaddingValues(8.dp)
                             ) {
                                 items(state.product.gallery) {
