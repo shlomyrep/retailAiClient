@@ -1,8 +1,9 @@
 package business.domain.main
 
+import business.datasource.network.main.responses.ColorSelectable
+import business.datasource.network.main.responses.PriceType
 import business.datasource.network.main.responses.Selection
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
+import business.datasource.network.main.responses.SizeSelectable
 
 data class Product(
     val description: String = "",
@@ -17,8 +18,34 @@ data class Product(
     val category: Category = Category(),
     val comments: List<Comment> = listOf(),
     val gallery: List<String> = listOf(),
+    val priceType: PriceType = PriceType.SINGLE_PRICE,
+    val sku: String = "",
 ) {
     fun getPrice() = "$ $price"
+
+    fun getCalculatedSku(): String {
+        return when (this.priceType) {
+            PriceType.SINGLE_PRICE -> {
+                this.sku
+            }
+            PriceType.SIZES_PRICE -> {
+                (this.selections.firstOrNull { it.selector?.selectionType == SizeSelectable.type }?.selector?.selected as SizeSelectable).sku
+            }
+            PriceType.COLOR_PRICE,
+            PriceType.COLOR_SIZES_PRICE -> {
+                // Logic for selecting both color and size
+                val colorSelection =
+                    this.selections.firstOrNull { it.selector?.selectionType == ColorSelectable.type }
+
+                val sizeSelection =
+                    this.selections.firstOrNull { it.selector?.selectionType == SizeSelectable.type }
+
+                val idSelectedColor = colorSelection?.selector?.selected?._id
+                (sizeSelection?.selector?.selected as SizeSelectable).colors[idSelectedColor]?.sku
+                    ?: ""
+            }
+        }
+    }
 }
 
 val product_sample = Product(
@@ -28,5 +55,7 @@ val product_sample = Product(
     price = 30,
     rate = 4.4,
     title = "Nike-121",
-    category = Category(name = "Shoes")
+    category = Category(name = "Shoes"),
+    priceType = PriceType.SINGLE_PRICE,
+    sku = "121"
 )

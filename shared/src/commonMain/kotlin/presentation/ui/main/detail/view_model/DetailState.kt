@@ -4,7 +4,7 @@ import business.core.NetworkState
 import business.core.ProgressBarState
 import business.core.Queue
 import business.core.UIComponent
-import business.datasource.network.main.responses.SizeSelectable
+import business.datasource.network.main.responses.PriceType
 import business.domain.main.Product
 
 data class DetailState(

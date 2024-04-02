@@ -11,15 +11,21 @@ const val TYPE_PRODUCT = "product"
 
 @Serializable
 data class ProductDTO(
+
     @SerialName("description") val description: String?,
-    @SerialName("id") val id: String?,
+    @SerialName("_id") override val _id: String?,
+    val id: String? = _id,
     @SerialName("image") val image: String?,
     @SerialName("isLike") val isLike: Boolean?,
     @SerialName("likes") val likes: Int?,
     @SerialName("price") val price: Int?,
+    @SerialName("base_price") override val basePrice: Double = 0.0,
+    @SerialName("upgrade_price") override val upgradePrice: Double = 0.0,
+    @SerialName("price_type") val priceType: String = "",
     @SerialName("selections") val selections: List<@Contextual Selection> = mutableListOf(),
     @SerialName("rate") val rate: Double?,
     @SerialName("title") val title: String?,
+    @SerialName("sku") var sku: String = "",
     @SerialName("category") val category: CategoryDTO?,
     @SerialName("comments") val comments: List<CommentDTO>?,
     @SerialName("gallery") val gallery: List<String>?,
@@ -28,20 +34,15 @@ data class ProductDTO(
         val type = "product"
 
     }
-
-    override val basePrice: Double?
-        get() = TODO("Not yet implemented")
-    override val upgradePrice: Double?
-        get() = TODO("Not yet implemented")
-    override val _id: String?
-        get() = TODO("Not yet implemented")
 }
+
 @Serializable
 data class Selection(
     val selector: Selector?,
     @SerialName("selection_list")
     val selectionList: MutableList<Selectable>?
 )
+
 @Serializable
 data class Selector(
     @SerialName("selected")
@@ -62,6 +63,7 @@ sealed interface Selectable {
     val upgradePrice: Double?
     val _id: String?
 }
+
 @Serializable
 data class SizeSelectable(
     @SerialName("base_price")
@@ -86,6 +88,7 @@ data class SizeSelectable(
         val type = "size"
     }
 }
+
 @Serializable
 class ColorSelectable(
     @SerialName("base_price")
@@ -105,6 +108,7 @@ class ColorSelectable(
         val type = "color"
     }
 }
+
 @Serializable
 enum class FinalSale(val type: Int) {
     ZERO(0),
@@ -130,9 +134,37 @@ data class ColorInfo(
     val isNotAvailable: Boolean = false
 )
 
+enum class PriceType {
+    @SerialName("single_price")
+    SINGLE_PRICE,
+
+    @SerialName("sizes_price")
+    SIZES_PRICE,
+
+    @SerialName("color_sizes_price")
+    COLOR_SIZES_PRICE,
+
+    @SerialName("color_price")
+    COLOR_PRICE;
+
+    companion object {
+        fun fromString(value: String): PriceType {
+            return when (value.lowercase()) {
+                "single_price" -> SINGLE_PRICE
+                "sizes_price" -> SIZES_PRICE
+                "color_sizes_price" -> COLOR_SIZES_PRICE
+                "color_price" -> COLOR_PRICE
+                else -> SINGLE_PRICE
+            }
+        }
+    }
+}
+
 fun ProductDTO.toProduct() = Product(
     description = description ?: "",
     id = id ?: "0",
+    sku= sku,
+    priceType = PriceType.fromString(priceType),
     image = image ?: "",
     isLike = isLike ?: false,
     likes = likes ?: 0,
@@ -144,3 +176,4 @@ fun ProductDTO.toProduct() = Product(
     comments = comments?.map { it.toComment() } ?: listOf(),
     gallery = gallery ?: listOf()
 )
+

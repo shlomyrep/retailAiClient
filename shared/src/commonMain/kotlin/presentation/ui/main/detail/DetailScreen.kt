@@ -348,8 +348,8 @@ fun BuyButtonBox(product: Product, onClick: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text("Total Price", style = MaterialTheme.typography.titleMedium)
-                Text(product.getPrice(), style = MaterialTheme.typography.titleLarge)
+                Text("sku", style = MaterialTheme.typography.titleMedium)
+                Text(product.getCalculatedSku(), style = MaterialTheme.typography.titleLarge)
             }
 
             DefaultButton(
