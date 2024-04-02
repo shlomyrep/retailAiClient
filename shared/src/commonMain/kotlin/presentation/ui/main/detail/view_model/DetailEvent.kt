@@ -2,6 +2,7 @@ package presentation.ui.main.detail.view_model
 
 import business.core.NetworkState
 import business.core.UIComponent
+import business.datasource.network.main.responses.SizeSelectable
 
 sealed class DetailEvent {
 
@@ -27,4 +28,6 @@ sealed class DetailEvent {
     data class OnUpdateNetworkState(
         val networkState: NetworkState
     ) : DetailEvent()
+
+    data class SelectSize(val sizeSelectableId: String) : DetailEvent()
 }

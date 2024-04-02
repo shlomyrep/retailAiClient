@@ -1,6 +1,8 @@
 package presentation.ui.main.detail
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -35,8 +36,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import business.datasource.network.main.responses.ColorSelectable
+import business.datasource.network.main.responses.Selection
+import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.Comment
 import business.domain.main.Product
 import presentation.component.CircleButton
@@ -167,6 +172,11 @@ fun DetailScreen(
                         overflow = TextOverflow.Ellipsis,
                     )
 
+                    // a grid that shows the size selection if exists
+                    SizeGrid(state.product.selections, events)
+
+                    ColorGrid(state.product.selections, events)
+
                     Spacer_16dp()
 
                     Text(
@@ -246,6 +256,74 @@ fun DetailScreen(
                     events(DetailEvent.AddBasket(state.product.id))
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ColorGrid(selections: List<Selection>, events: (DetailEvent) -> Unit) {
+    selections.forEach { selection ->
+
+        if (selection.selector?.selected is ColorSelectable) {
+            Spacer_8dp()
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                selection.selectionList?.forEach { color ->
+                    Box(
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                color._id?.let { it1 ->
+                                    selection.selector.selected = color
+//                                    events(DetailEvent.SelectColor(it1))
+                                }
+                            }
+                            .padding(8.dp)
+                            .border(
+                                width = 1.dp,
+                                color = if ((selection.selector.selected as ColorSelectable)._id == color._id) MaterialTheme.colorScheme.primary else BorderColor,
+                                shape = MaterialTheme.shapes.small
+                            )
+                    ) {
+                        (color as ColorSelectable).hex?.let {
+                            ColorBox(it)
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+
+}
+
+fun String.toColorInt(): Int {
+    if (this[0] == '#') {
+        var color = substring(1).toLong(16)
+        if (length == 7) {
+            color = color or 0x00000000ff000000L
+        } else if (length != 9) {
+            throw IllegalArgumentException("Unknown color")
+        }
+        return color.toInt()
+    }
+    throw IllegalArgumentException("Unknown color")
+}
+
+@Composable
+fun ColorBox(colorHex: String?) {
+    colorHex?.let {
+        val composeColor = Color(it.toColorInt())
+        if (composeColor != Color.Unspecified) {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .background(composeColor)
+            )
         }
     }
 }
@@ -335,6 +413,49 @@ fun CommentBox(comment: Comment, modifier: Modifier = Modifier.width(300.dp)) {
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun SizeGrid(selections: List<Selection>, events: (DetailEvent) -> Unit) {
+    selections.forEach { selection ->
+
+        if (selection.selector?.selected is SizeSelectable) {
+            Spacer_8dp()
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                selection.selectionList?.forEach { size ->
+                    Box(
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                size._id?.let { it1 ->
+                                    selection.selector.selected = size
+                                    events(DetailEvent.SelectSize(it1))
+                                }
+                            }
+                            .padding(8.dp)
+                            .border(
+                                width = 1.dp,
+                                color = if ((selection.selector.selected as SizeSelectable)._id == size._id) MaterialTheme.colorScheme.primary else BorderColor,
+                                shape = MaterialTheme.shapes.small
+                            )
+                    ) {
+                        (size as SizeSelectable).size?.let {
+                            Text(
+                                it,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if ((selection.selector.selected as SizeSelectable)._id == size._id) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

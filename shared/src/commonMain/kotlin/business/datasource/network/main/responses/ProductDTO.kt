@@ -137,6 +137,7 @@ fun ProductDTO.toProduct() = Product(
     isLike = isLike ?: false,
     likes = likes ?: 0,
     price = price ?: 0,
+    selections = selections,
     rate = rate ?: 0.0,
     title = title ?: "",
     category = category?.toCategory() ?: Category(),

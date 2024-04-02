@@ -7,6 +7,7 @@ import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
+import business.datasource.network.main.responses.SizeSelectable
 import business.interactors.main.AddBasketInteractor
 import business.interactors.main.LikeInteractor
 import business.interactors.main.ProductInteractor
@@ -42,6 +43,10 @@ class DetailViewModel(
                 onUpdateSelectedImage(event.value)
             }
 
+            is DetailEvent.SelectSize -> {
+                selectSize(event.sizeSelectableId)
+            }
+
             is DetailEvent.GetProduct -> {
                 getProduct(event.id)
             }
@@ -62,6 +67,10 @@ class DetailViewModel(
                 onUpdateNetworkState(event.networkState)
             }
         }
+    }
+
+    private fun selectSize(sizeSelectable: String) {
+        state.value = sizeSelectable?.let { state.value.copy(sizeSelectable = it) }!!
     }
 
     private fun onUpdateSelectedImage(value: String) {
