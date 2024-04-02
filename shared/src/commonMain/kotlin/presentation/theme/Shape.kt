@@ -71,10 +71,10 @@ fun DefaultCheckBoxTheme() = CheckboxDefaults.colors(
 
 @Composable
 fun DefaultNavigationBarItemTheme() = NavigationBarItemDefaults.colors(
-    selectedIconColor = MaterialTheme.colorScheme.primary,
-    unselectedIconColor = MaterialTheme.colorScheme.primary,
-    unselectedTextColor = MaterialTheme.colorScheme.primary.copy(.7f),
-    selectedTextColor = MaterialTheme.colorScheme.primary,
+    selectedIconColor = ProgressBarColor,
+    unselectedIconColor = ProgressBarColor,
+    unselectedTextColor = ProgressBarColor.copy(.7f),
+    selectedTextColor = ProgressBarColor,
     indicatorColor = MaterialTheme.colorScheme.background,
 )
 
