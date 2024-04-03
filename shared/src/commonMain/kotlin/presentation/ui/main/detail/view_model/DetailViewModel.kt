@@ -48,7 +48,7 @@ class DetailViewModel(
             }
 
             is DetailEvent.SelectColor -> {
-                selectSize(event.colorSelectableId)
+                selectColor(event.colorSelectableId)
             }
 
             is DetailEvent.GetProduct -> {

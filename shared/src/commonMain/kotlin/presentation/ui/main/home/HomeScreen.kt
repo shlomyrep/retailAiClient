@@ -212,10 +212,10 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    Text(
-                        stringResource(Res.string.special_for_you),
-                        style = MaterialTheme.typography.titleLarge
-                    )
+//                    Text(
+//                        stringResource(Res.string.special_for_you),
+//                        style = MaterialTheme.typography.titleLarge
+//                    )
                     /* Text(
                          "See All",
                          style = MaterialTheme.typography.labelMedium,
