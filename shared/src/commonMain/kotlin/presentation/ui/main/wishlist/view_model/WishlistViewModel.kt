@@ -112,7 +112,9 @@ class WishlistViewModel(
                             categories.add(0, category_all)
 
                             state.value =
-                                state.value.copy(wishlist = it.copy(categories = categories))
+                                state.value.copy(wishlist = it.copy(categories = categories, products = it.products.filter { p->
+                                    p.category.id == state.value.selectedCategory.id || state.value.selectedCategory.id == "-1" }
+                                ))
                         }
                     }
 
