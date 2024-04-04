@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -431,40 +434,51 @@ fun SizeGrid(selections: List<Selection>, events: (DetailEvent) -> Unit) {
 
         if (selection.selector?.selected is SizeSelectable) {
             Spacer_8dp()
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                selection.selectionList?.forEach { size ->
-                    Box(
-                        modifier = Modifier
-                            .clip(MaterialTheme.shapes.small)
-                            .clickable {
-                                size._id?.let { it1 ->
-                                    selection.selector.selected = size
-                                    events(DetailEvent.SelectSize(it1))
+            // Calculate the number of rows needed
+            val numRows = (selection.selectionList?.size ?: 0 + 2) / 3
+
+            Column(modifier = Modifier.padding(8.dp)) {
+                for (row in 0 until numRows) {
+                    Row {
+                        for (col in 0..2) {
+                            val index = row * 3 + col
+                            if (index < selection.selectionList?.size ?: 0) {
+                                val size = selection.selectionList?.get(index) as SizeSelectable
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(4.dp)
+                                        .clip(MaterialTheme.shapes.small)
+                                        .clickable {
+                                            size._id?.let { it1 ->
+                                                selection.selector.selected = size
+                                                // Trigger your event here
+                                                events(DetailEvent.SelectSize(it1))
+                                            }
+                                        }
+                                        .border(
+                                            width = 1.dp,
+                                            color = if ((selection.selector.selected as SizeSelectable)._id == size._id) MaterialTheme.colorScheme.primary else BorderColor,
+                                            shape = MaterialTheme.shapes.small
+                                        )
+                                ) {
+                                    Text(
+                                        text = size.size ?: "",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = if ((selection.selector.selected as SizeSelectable)._id == size._id) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.padding(8.dp)
+                                    )
                                 }
+                            } else {
+                                Spacer(modifier = Modifier.weight(1f)) // Empty space for missing items
                             }
-                            .padding(8.dp)
-                            .border(
-                                width = 1.dp,
-                                color = if ((selection.selector.selected as SizeSelectable)._id == size._id) MaterialTheme.colorScheme.primary else BorderColor,
-                                shape = MaterialTheme.shapes.small
-                            )
-                    ) {
-                        (size as SizeSelectable).size?.let {
-                            Text(
-                                it,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = if ((selection.selector.selected as SizeSelectable)._id == size._id) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
-                            )
                         }
                     }
                 }
             }
 
         }
+
     }
 }
 
