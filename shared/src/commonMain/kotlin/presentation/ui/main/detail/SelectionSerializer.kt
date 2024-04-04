@@ -12,7 +12,34 @@ object SelectionSerializer : KSerializer<Selection> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Selection")
 
     override fun serialize(encoder: Encoder, value: Selection) {
-        // Implement serialization logic here if needed.
+        val jsonEncoder = encoder as? JsonEncoder ?: throw SerializationException("This serializer can only be used with JSON")
+        val jsonObj = buildJsonObject {
+            value.selector?.let { selector ->
+                put("selector", buildJsonObject {
+                    put("selected", when (selector.selected) {
+                        is SizeSelectable -> Json.encodeToJsonElement(selector.selected)
+                        is ColorSelectable -> Json.encodeToJsonElement(selector.selected)
+                        is ProductDTO -> Json.encodeToJsonElement(selector.selected)
+                        else -> JsonNull
+                    })
+                    put("default", Json.encodeToJsonElement(selector.default))
+                    put("selection_desc", Json.encodeToJsonElement(selector.selectionDesc))
+                    put("selection_type", Json.encodeToJsonElement(selector.selectionType))
+                    put("category_id", Json.encodeToJsonElement(selector.categoryId))
+                })
+                put("selection_list", buildJsonArray {
+                    value.selectionList?.forEach { selectable ->
+                        when (selectable) {
+                            is SizeSelectable -> add(Json.encodeToJsonElement(selectable))
+                            is ColorSelectable -> add(Json.encodeToJsonElement(selectable))
+                            is ProductDTO -> add(Json.encodeToJsonElement(selectable))
+                            // Add more cases as necessary
+                        }
+                    }
+                })
+            }
+        }
+        jsonEncoder.encodeJsonElement(jsonObj)
     }
 
     override fun deserialize(decoder: Decoder): Selection {
