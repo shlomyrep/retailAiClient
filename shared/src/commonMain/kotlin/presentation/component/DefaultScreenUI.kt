@@ -82,7 +82,7 @@ fun DefaultScreenUI(
             modifier = Modifier.padding(top = it.calculateTopPadding())
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopStart
         ) {
             content()
             // process the queue

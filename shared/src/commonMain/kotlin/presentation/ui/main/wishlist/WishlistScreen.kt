@@ -33,48 +33,49 @@ fun WishlistScreen(
     events: (WishlistEvent) -> Unit,
     navigateToDetail: (String) -> Unit
 ) {
-
-
-    DefaultScreenUI(
-        queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(WishlistEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(WishlistEvent.OnRetryNetwork) }
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(8.dp)
-            ) {
-                items(state.wishlist.categories) {
-                    CategoryChipsBox(category = it, isSelected = it == state.selectedCategory) {
-                        events(WishlistEvent.OnUpdateSelectedCategory(it))
-                    }
+    // Assuming DefaultScreenUI is a wrapper that also includes a progress indicator or similar
+    // Place the LazyRow outside so it's not affected by state changes that DefaultScreenUI responds to.
+    Column(modifier = Modifier.fillMaxSize()) {
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+        ) {
+            items(state.wishlist.categories) { category ->
+                CategoryChipsBox(category = category, isSelected = category == state.selectedCategory) {
+                    events(WishlistEvent.OnUpdateSelectedCategory(category))
                 }
             }
+        }
 
-            Spacer_8dp()
+        // Now we include DefaultScreenUI which contains parts of the UI that react to state changes
+        DefaultScreenUI(
+            queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(WishlistEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(WishlistEvent.OnRetryNetwork) }
 
-
+        ) {
+            // Conditional UI elements or the main content grid that changes with state
             if (state.wishlist.products.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
                     Text(
                         "Wishlist is empty!",
                         style = MaterialTheme.typography.labelLarge,
                         color = BorderColor,
                     )
                 }
-            }
-
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
-                contentPadding = PaddingValues(8.dp),
-                content = {
-                    itemsIndexed(state.wishlist.products){index, product ->
-
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    itemsIndexed(state.wishlist.products) { index, product ->
+                        // Implementation remains the same
                         if ((index + 1) >= (state.page * PAGINATION_PAGE_SIZE) &&
                             state.progressBarState == ProgressBarState.Idle &&
                             state.hasNextPage
@@ -93,8 +94,7 @@ fun WishlistScreen(
                         }
                     }
                 }
-            )
-
+            }
         }
     }
 }
