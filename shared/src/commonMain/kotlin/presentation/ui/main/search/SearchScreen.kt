@@ -149,9 +149,12 @@ fun SearchScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(16.dp)
                 ) {
-                    items(state.search.products, key = {
-                        it.id
-                    }) {
+                    items(
+                        // Implement a better regex find mechanizm
+                        state.search.products.filter { it.title.contains(state.searchText) },
+                        key = {
+                            it.id
+                        }) {
                         ProductSearchBox(
                             it,
                             isLastItem = state.search.products.last() == it,
@@ -204,7 +207,9 @@ private fun ProductSearchBox(product: Product, isLastItem: Boolean, navigateToDe
                 }
             }
 
-            if (!isLastItem) HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp))
+            if (!isLastItem) HorizontalDivider(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)
+            )
         }
     }
 }

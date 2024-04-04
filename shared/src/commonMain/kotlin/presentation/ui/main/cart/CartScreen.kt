@@ -82,7 +82,7 @@ fun CartScreen(
                         },
                         navigateToDetail = navigateToDetail
                     ) {
-                        events(CartEvent.DeleteFromBasket(it.productId))
+                        events(CartEvent.DeleteFromBasket(it.productId.id))
                     }
                 }
             }
@@ -209,7 +209,7 @@ fun DismissCartContent(
                     .weight(.3f)
                     .clip(MaterialTheme.shapes.small)
                     .noRippleClickable {
-                        navigateToDetail(basket.productId)
+                        navigateToDetail(basket.productId.id)
                     }
             ) {
                 Image(

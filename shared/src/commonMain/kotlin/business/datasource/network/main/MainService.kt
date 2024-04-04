@@ -12,22 +12,23 @@ import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
+import business.domain.main.Product
 
 interface MainService {
     companion object {
         const val SEARCH_FILTER = "search/filter"
         const val SEARCH = "search"
-        const val BASKET = "basket"
-        const val BUY = "basket/buy"
-        const val BASKET_ADD = "basket/add"
-        const val BASKET_DELETE = "basket/delete"
+        const val BASKET = "cart"
+        const val BUY = "cart/buy"
+        const val BASKET_ADD = "cart/add"
+        const val BASKET_DELETE = "cart/delete"
         const val HOME = "home"
         const val ORDERS = "orders"
         const val PRODUCT = "search/product"
         const val LIKE = "like"
-        const val PROFILE = "profile"
+        const val PROFILE = "user/profile"
         const val COMMENT = "comment"
-        const val WISHLIST = "product/wishlist"
+        const val WISHLIST = "wishlist"
         const val ADDRESS = "address"
     }
 
@@ -88,7 +89,7 @@ interface MainService {
     ): MainGenericResponse<Boolean>
 
     suspend fun basket(token: String): MainGenericResponse<List<BasketDTO>>
-    suspend fun basketAdd(token: String, id: String, count: Int): MainGenericResponse<JRNothing?>
+    suspend fun basketAdd(token: String, id: Product, count: Int): MainGenericResponse<JRNothing?>
     suspend fun basketDelete(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun home(token: String): MainGenericResponse<HomeDTO>
     suspend fun product(token: String, id: String): MainGenericResponse<ProductDTO>

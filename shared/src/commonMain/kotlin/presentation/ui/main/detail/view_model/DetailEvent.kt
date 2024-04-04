@@ -2,13 +2,13 @@ package presentation.ui.main.detail.view_model
 
 import business.core.NetworkState
 import business.core.UIComponent
-import business.datasource.network.main.responses.SizeSelectable
+import business.domain.main.Product
 
 sealed class DetailEvent {
 
 
     data class Like(val id: String) : DetailEvent()
-    data class AddBasket(val id: String) : DetailEvent()
+    data class AddBasket(val id: Product) : DetailEvent()
 
     data class OnUpdateSelectedImage(
         val value: String

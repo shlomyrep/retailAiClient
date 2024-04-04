@@ -254,7 +254,7 @@ fun DetailScreen(
                 BuyButtonBox(
                     state.product
                 ) {
-                    events(DetailEvent.AddBasket(state.product.id))
+                    events(DetailEvent.AddBasket(state.product))
                 }
             }
         }

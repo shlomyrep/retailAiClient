@@ -7,6 +7,7 @@ import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
+import business.domain.main.Product
 import business.interactors.main.AddBasketInteractor
 import business.interactors.main.BasketListInteractor
 import business.interactors.main.DeleteBasketInteractor
@@ -108,7 +109,7 @@ class CartViewModel(
     }
 
 
-    private fun addProduct(id: String) {
+    private fun addProduct(id: Product) {
         addBasketInteractor.execute(id = id, count = 1).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {}

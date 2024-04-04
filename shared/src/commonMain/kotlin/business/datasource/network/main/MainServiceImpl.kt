@@ -18,6 +18,7 @@ import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
+import business.domain.main.Product
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.FormPart
@@ -274,7 +275,7 @@ class MainServiceImpl(
 
     override suspend fun basketAdd(
         token: String,
-        id: String,
+        id: Product,
         count: Int
     ): MainGenericResponse<JRNothing?> {
         return httpClient.post {
@@ -286,7 +287,7 @@ class MainServiceImpl(
                 encodedPath += MainService.BASKET_ADD
             }
             contentType(ContentType.Application.Json)
-            setBody(BasketAddRequestDTO(count = count, product = id))
+            setBody(BasketAddRequestDTO(count = count, productId = id.id , selections = id.selections))
         }.body()
     }
 

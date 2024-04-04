@@ -2,8 +2,8 @@ package business.domain.main
 
  
 data class Basket(
-    val id: Int,
-    val productId: String,
+    val id: String,
+    val productId: Product,
     val category: Category,
     val title: String,
     val description: String,

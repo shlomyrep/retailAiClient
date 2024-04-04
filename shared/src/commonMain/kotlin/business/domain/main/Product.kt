@@ -4,6 +4,7 @@ import business.datasource.network.main.responses.ColorSelectable
 import business.datasource.network.main.responses.PriceType
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
+import kotlinx.serialization.Contextual
 
 data class Product(
     val description: String = "",
@@ -11,7 +12,7 @@ data class Product(
     val image: String = "",
     val isLike: Boolean = false,
     val likes: Int = 0,
-    val selections: List<Selection> = mutableListOf(),
+    val selections: List<@Contextual Selection> = mutableListOf(),
     val price: Int = 0,
     val rate: Double = 0.0,
     val title: String = "",
@@ -28,9 +29,11 @@ data class Product(
             PriceType.SINGLE_PRICE -> {
                 this.sku
             }
+
             PriceType.SIZES_PRICE -> {
                 (this.selections.firstOrNull { it.selector?.selectionType == SizeSelectable.type }?.selector?.selected as SizeSelectable).sku
             }
+
             PriceType.COLOR_PRICE,
             PriceType.COLOR_SIZES_PRICE -> {
                 // Logic for selecting both color and size

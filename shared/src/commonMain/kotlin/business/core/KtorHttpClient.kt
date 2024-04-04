@@ -1,6 +1,5 @@
 package business.core
 
-import business.datasource.network.main.responses.ProductDTO
 import business.datasource.network.main.responses.Selection
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpResponseValidator

@@ -2,13 +2,15 @@ package business.datasource.network.main.responses
 
 import business.domain.main.Basket
 import business.domain.main.Category
+import business.domain.main.Product
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class BasketDTO(
-    @SerialName("id") val id: Int?,
-    @SerialName("product_id") val productId: String?,
+    @SerialName("id") val id: String?,
+    @SerialName("product") val product: ProductDTO?,
     @SerialName("category") val category: CategoryDTO?,
     @SerialName("title") val title: String?,
     @SerialName("description") val description: String?,
@@ -18,9 +20,9 @@ data class BasketDTO(
 )
 
 fun BasketDTO.toBasket() = Basket(
-    id = id ?: 0,
+    id = id ?: "0",
     count = count ?: 0,
-    productId = productId ?: "0",
+    productId = product?.toProduct() ?: Product(),
     category = category?.toCategory() ?: Category(),
     title = title ?: "",
     description = description ?: "",

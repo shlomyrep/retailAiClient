@@ -7,7 +7,7 @@ import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
-import business.datasource.network.main.responses.SizeSelectable
+import business.domain.main.Product
 import business.interactors.main.AddBasketInteractor
 import business.interactors.main.LikeInteractor
 import business.interactors.main.ProductInteractor
@@ -111,7 +111,7 @@ class DetailViewModel(
     }
 
 
-    private fun addBasket(id: String) {
+    private fun addBasket(id: Product) {
         addBasketInteractor.execute(id = id, 1)
             .onEach { dataState ->
                 when (dataState) {
