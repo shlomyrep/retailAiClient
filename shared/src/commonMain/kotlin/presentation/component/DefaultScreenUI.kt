@@ -47,6 +47,7 @@ fun DefaultScreenUI(
     endIconToolbar: ImageVector? = null,
     onClickStartIconToolbar: () -> Unit = {},
     onClickEndIconToolbar: () -> Unit = {},
+    boxAlignment: Alignment = Alignment.Center,
     content: @Composable () -> Unit,
 ) {
 
@@ -82,7 +83,7 @@ fun DefaultScreenUI(
             modifier = Modifier.padding(top = it.calculateTopPadding())
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.TopStart
+            contentAlignment = boxAlignment
         ) {
             content()
             // process the queue

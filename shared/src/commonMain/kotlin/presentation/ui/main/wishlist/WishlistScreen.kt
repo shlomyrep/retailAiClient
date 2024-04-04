@@ -54,12 +54,13 @@ fun WishlistScreen(
             onRemoveHeadFromQueue = { events(WishlistEvent.OnRemoveHeadFromQueue) },
             progressBarState = state.progressBarState,
             networkState = state.networkState,
+            boxAlignment = Alignment.TopStart,
             onTryAgain = { events(WishlistEvent.OnRetryNetwork) }
 
         ) {
             // Conditional UI elements or the main content grid that changes with state
             if (state.wishlist.products.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         "Wishlist is empty!",
                         style = MaterialTheme.typography.labelLarge,

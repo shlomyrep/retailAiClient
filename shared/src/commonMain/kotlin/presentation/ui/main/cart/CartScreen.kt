@@ -78,7 +78,8 @@ fun CartScreen(
         onTryAgain = { events(CartEvent.OnRetryNetwork) }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            LazyColumn(modifier = Modifier.fillMaxSize().align(Alignment.Center)) {
+            LazyColumn(modifier = Modifier.fillMaxSize().align(Alignment.Center).padding(bottom = 100.dp) // Adjust this value as needed to accommodate the floating button area
+            ) {
                 items(state.baskets) {
                     CartBox(
                         it,
