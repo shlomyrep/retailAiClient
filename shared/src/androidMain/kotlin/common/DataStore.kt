@@ -17,7 +17,7 @@ actual suspend fun Context.getData(key: String): String? {
 }
 
 actual fun Context.openNativeScreen() {
-    val intent = Intent(this, BarcodeScanner::class.java)
+    val intent = Intent(this, ScannerActivity::class.java)
     // add FLAG_ACTIVITY_NEW_TASK  to the intent
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     startActivity(intent)

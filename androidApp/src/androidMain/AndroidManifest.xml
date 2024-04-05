@@ -22,9 +22,6 @@
         <activity
 
             android:name="common.ScannerActivity"
-            android:exported="false" />
-        <activity
-            android:name="common.BarcodeScanner"
             android:exported="true" />
 
         <activity

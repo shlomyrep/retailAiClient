@@ -200,7 +200,7 @@ fun HomeScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            painterResource(Res.drawable.setting),
+                            painterResource(Res.drawable.barcode_scanner),
                             null,
                             tint = MaterialTheme.colorScheme.background
                         )

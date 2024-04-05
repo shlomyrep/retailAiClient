@@ -89,27 +89,6 @@ internal fun App(context: Context) {
                             }
                         }
                     }
-                    // This Box is used for the QR code button
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(end = 16.dp, bottom = 90.dp, start = 16.dp)
-                            .size(56.dp)
-                            .background(
-                                color = Gray,
-                                shape = CircleShape
-                            )
-                            .clickable {
-                                NavigateToScanner(context).navigate()
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.QrCodeScanner,
-                            contentDescription = "Scan QR Code",
-                            tint = ProgressBarColor
-                        )
-                    }
                 }
 
             }
