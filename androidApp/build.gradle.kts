@@ -16,6 +16,7 @@ kotlin {
             dependencies {
                 implementation("androidx.compose.ui:ui-test-junit4-android:1.5.4")
                 debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
+                implementation(libs.zxing.android.embedded)
             }
         }
     }
@@ -37,6 +38,7 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
     }
 
     buildTypes {
@@ -57,5 +59,8 @@ android {
     kotlin {
         jvmToolchain(17)
     }
+}
+dependencies {
+    implementation(libs.androidx.constraintlayout)
 }
 

@@ -26,8 +26,6 @@ class HomeViewModel(
 
     val state: MutableState<HomeState> = mutableStateOf(HomeState())
 
-
-
     fun onTriggerEvent(event: HomeEvent) {
         when (event) {
 

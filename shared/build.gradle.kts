@@ -42,7 +42,6 @@ kotlin {
                 implementation(libs.coroutines.test)
                 implementation(libs.turbine.turbine)
                 implementation(libs.mockk.io)
-
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.uiTest)
 
@@ -72,7 +71,7 @@ kotlin {
                 api(libs.precompose)
                 api(libs.precompose.viewmodel)
                 api(libs.precompose.koin)
-
+                implementation(libs.zxing.android.embedded)
 
             }
         }

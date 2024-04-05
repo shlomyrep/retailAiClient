@@ -7,6 +7,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -67,6 +68,7 @@ import presentation.theme.PagerDotColor
 import presentation.ui.main.home.view_model.HomeEvent
 import presentation.ui.main.home.view_model.HomeState
 import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.barcode_scanner
 import shoping_by_kmp.shared.generated.resources.bell
 import shoping_by_kmp.shared.generated.resources.category
 import shoping_by_kmp.shared.generated.resources.flash_sale
@@ -76,7 +78,7 @@ import shoping_by_kmp.shared.generated.resources.newest_products
 import shoping_by_kmp.shared.generated.resources.search
 import shoping_by_kmp.shared.generated.resources.see_all
 import shoping_by_kmp.shared.generated.resources.setting
-import shoping_by_kmp.shared.generated.resources.special_for_you
+
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalResourceApi::class)
 @Composable
@@ -89,8 +91,6 @@ fun HomeScreen(
     navigateToCategories: () -> Unit = {},
     navigateToSearch: (String?, Int?) -> Unit = { _, _ -> },
 ) {
-
-
     val pagerState = rememberPagerState { state.home.banners.size }
 
 

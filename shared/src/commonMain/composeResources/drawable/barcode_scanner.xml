@@ -1,24 +1,10 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
+    android:tint="#000000"
     android:viewportWidth="24"
     android:viewportHeight="24">
-    <!-- Outline of the scanner body -->
     <path
-        android:fillColor="#00000000"
-    android:strokeColor="#1b6682"
-    android:strokeWidth="1.5"
-    android:pathData="M4,5 H11 V11 H4 V5 M13,5 H20 V11 H13 V5 M4,13 H11 V19 H4 V13 M13,13 H20 V19 H13 V13" />
-    <!-- Detail lines inside the scanner, adjust as needed for the inner design -->
-    <path
-        android:fillColor="#00000000"
-    android:strokeColor="#1b6682"
-    android:strokeWidth="1"
-    android:pathData="M14.5,14.5 H15.5 V15.5 H14.5 V14.5 M16,14.5 H17 V15.5 H16 V14.5 M17.5,14.5 H18.5 V15.5 H17.5 V14.5 M14.5,16 H15.5 V17 H14.5 V16 M16,16 H17 V17 H16 V16 M17.5,16 H18.5 V17 H17.5 V16 M14.5,17.5 H15.5 V18.5 H14.5 V17.5 M16,17.5 H17 V18.5 H16 V17.5 M17.5,17.5 H18.5 V18.5 H17.5 V17.5" />
-    <!-- External frame parts, simulating the scanner's grip and scanning area -->
-    <path
-        android:fillColor="#00000000"
-    android:strokeColor="#1b6682"
-    android:strokeWidth="2"
-    android:pathData="M2,2 H5 V5 H2 V2 M19,2 H22 V5 H19 V2 M2,19 H5 V22 H2 V19 M19,19 H22 V22 H19 V19" />
+        android:fillColor="#ffffffff"
+        android:pathData="M9.5,6.5v3h-3v-3H9.5M11,5H5v6h6V5L11,5zM9.5,14.5v3h-3v-3H9.5M11,13H5v6h6V13L11,13zM17.5,6.5v3h-3v-3H17.5M19,5h-6v6h6V5L19,5zM13,13h1.5v1.5H13V13zM14.5,14.5H16V16h-1.5V14.5zM16,13h1.5v1.5H16V13zM13,16h1.5v1.5H13V16zM14.5,17.5H16V19h-1.5V17.5zM16,16h1.5v1.5H16V16zM17.5,14.5H19V16h-1.5V14.5zM17.5,17.5H19V19h-1.5V17.5zM22,7h-2V4h-3V2h5V7zM22,22v-5h-2v3h-3v2H22zM2,22h5v-2H4v-3H2V22zM2,2v5h2V4h3V2H2z" />
 </vector>
