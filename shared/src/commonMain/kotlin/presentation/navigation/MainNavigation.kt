@@ -3,6 +3,7 @@ package presentation.navigation
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.barcode_scanner
 import shoping_by_kmp.shared.generated.resources.cart
 import shoping_by_kmp.shared.generated.resources.cart_border
 import shoping_by_kmp.shared.generated.resources.heart2
@@ -42,6 +43,12 @@ sealed class MainNavigation (
         route = "Profile", title = "Profile",
         selectedIcon = Res.drawable.profile,
         unSelectedIcon = Res.drawable.profile_border
+    )
+
+    data object Scanner : MainNavigation(
+        route = "Scanner", title = "QR Scanner",
+        selectedIcon = Res.drawable.barcode_scanner,
+        unSelectedIcon = Res.drawable.barcode_scanner
     )
 }
 

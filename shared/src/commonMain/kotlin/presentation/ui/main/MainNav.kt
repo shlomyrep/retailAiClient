@@ -29,6 +29,7 @@ import presentation.theme.DefaultNavigationBarItemTheme
 import presentation.ui.main.cart.CartNav
 import presentation.ui.main.home.HomeNav
 import presentation.ui.main.profile.ProfileNav
+import presentation.ui.main.scanner.ScannerNav
 import presentation.ui.main.wishlist.WishlistNav
 
 @Composable
@@ -57,9 +58,12 @@ fun MainNav(logout: () -> Unit) {
                 scene(route = MainNavigation.Profile.route) {
                     ProfileNav(logout = logout)
                 }
+
+                scene(route = MainNavigation.Scanner.route) {
+                    ScannerNav(logout = logout)
+                }
             }
         }
-
     }
 }
 
@@ -86,6 +90,7 @@ fun BottomNavigationUI(navigator: Navigator) {
                 MainNavigation.Wishlist,
                 MainNavigation.Cart,
                 MainNavigation.Profile,
+                MainNavigation.Scanner,
             )
             items.forEach {
                 NavigationBarItem(label = { Text(text = it.title) },

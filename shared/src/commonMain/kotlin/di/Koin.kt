@@ -48,6 +48,7 @@ import presentation.ui.main.my_orders.view_model.MyOrdersViewModel
 import presentation.ui.main.notifications.view_model.NotificationsViewModel
 import presentation.ui.main.payment_method.view_model.PaymentMethodViewModel
 import presentation.ui.main.profile.view_model.ProfileViewModel
+import presentation.ui.main.scanner.view_model.ScannerViewModel
 import presentation.ui.main.search.view_model.SearchViewModel
 import presentation.ui.main.settings.view_model.SettingsViewModel
 import presentation.ui.main.wishlist.view_model.WishlistViewModel
@@ -65,6 +66,7 @@ fun appModule(context: Context) = module {
     factory { SharedViewModel(get()) }
     factory { LoginViewModel(get(), get(), get()) }
     factory { HomeViewModel(get(), get()) }
+    factory { ScannerViewModel() }
     factory { AddressViewModel(get(), get()) }
     factory { CategoriesViewModel(get()) }
     factory { ProfileViewModel(get()) }
