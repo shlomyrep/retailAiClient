@@ -1,5 +1,7 @@
 package business.core
 
+import common.ScannerResultListener
+
 
 interface AppDataStore {
 
@@ -12,5 +14,5 @@ interface AppDataStore {
         key: String,
     ): String?
 
-    fun openActivity()
+    fun openActivity(barcodeScannerListener: ScannerResultListener)
 }

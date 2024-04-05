@@ -10,6 +10,7 @@ import business.core.Queue
 import business.core.UIComponent
 import business.interactors.main.HomeInteractor
 import business.interactors.main.LikeInteractor
+import common.ScannerResultListener
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.datetime.Instant
@@ -225,7 +226,11 @@ class HomeViewModel(
     }
 
     fun openBarcodeScanner() {
-        appDataStoreManager.openActivity()
+        appDataStoreManager.openActivity(object : ScannerResultListener {
+            override fun onResult(result: String) {
+                println("${CUSTOM_TAG}: HomeViewModel: onResult: $result")
+            }
+        })
     }
 
 }

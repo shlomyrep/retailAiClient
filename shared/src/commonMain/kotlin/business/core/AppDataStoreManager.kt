@@ -1,6 +1,7 @@
 package business.core
 
 import common.Context
+import common.ScannerResultListener
 import common.getData
 import common.openNativeScreen
 import common.putData
@@ -22,7 +23,7 @@ class AppDataStoreManager(val context: Context) : AppDataStore {
         return context.getData(key)
     }
 
-    override fun openActivity() {
-        context.openNativeScreen()
+    override fun openActivity(barcodeScannerListener: ScannerResultListener) {
+        context.openNativeScreen(barcodeScannerListener)
     }
 }

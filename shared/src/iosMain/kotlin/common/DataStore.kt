@@ -14,5 +14,5 @@ actual suspend inline fun Context.getData(key: String): String? {
     return NSUserDefaults.standardUserDefaults().stringForKey(key)
 }
 
-actual fun Context.openNativeScreen() {
+actual fun Context.openNativeScreen(listener: ScannerResultListener) {
 }

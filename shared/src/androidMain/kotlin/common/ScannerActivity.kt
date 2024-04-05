@@ -3,11 +3,19 @@ package common
 import android.Manifest
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
@@ -17,7 +25,9 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -51,6 +61,7 @@ class ScannerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanner)
 
+        val ll = findViewById<LinearLayout>(R.id.barcodeButtonContainer)
         scannerViewModel = ViewModelProvider(this)[ScannerViewModel::class.java]
 
 //        if (allPermissionsGranted()) {
@@ -108,7 +119,7 @@ class ScannerActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         if (isCameraPermissionGranted()) {
-            startCamera()
+            startCamera(ll)
         } else {
             requestCameraPermission()
         }
@@ -137,9 +148,13 @@ class ScannerActivity : AppCompatActivity() {
         when (requestCode) {
             CAMERA_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startCamera()
+//                    startCamera()
                 } else {
-                    Toast.makeText(this, "You must approve camera usage in order to scan products", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this,
+                        "You must approve camera usage in order to scan products",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
@@ -185,7 +200,7 @@ class ScannerActivity : AppCompatActivity() {
     }
 
 
-    private fun startCamera() {
+    private fun startCamera(container: LinearLayout) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
             cameraProvider = cameraProviderFuture.get()
@@ -205,7 +220,7 @@ class ScannerActivity : AppCompatActivity() {
                                 return@Analyzer
                             }
                             processingBarcode = true
-                            processImage(imageProxy)
+                            processImage(container, imageProxy)
                         })
                 }
 
@@ -220,7 +235,7 @@ class ScannerActivity : AppCompatActivity() {
     }
 
     @SuppressLint("UnsafeOptInUsageError")
-    private fun processImage(imageProxy: ImageProxy) {
+    private fun processImage(container: LinearLayout?, imageProxy: ImageProxy) {
         val mediaImage = imageProxy.image
         if (mediaImage != null) {
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
@@ -233,7 +248,7 @@ class ScannerActivity : AppCompatActivity() {
                             Toast.makeText(this, "${it.rawValue}", Toast.LENGTH_LONG).show()
                         }
 
-//                        createBarcodeButtons(barcodes, binding.barcodeButtonContainer)
+                        createBarcodeButtons(barcodes, container)
 //                        binding.scanningLine?.visibility = View.GONE
                         animator?.cancel()
                     }
@@ -268,6 +283,9 @@ class ScannerActivity : AppCompatActivity() {
     private fun handleSelectedBarcode(barcode: Barcode) {
         val rawValue = barcode.rawValue
         if (rawValue != null) {
+            barcode?.rawValue?.let {
+                EventBus.postResult(it)
+            }
             Toast.makeText(this, "$rawValue", Toast.LENGTH_LONG).show()
 
             Log.i("barcode", "barcode: $rawValue")
@@ -284,89 +302,92 @@ class ScannerActivity : AppCompatActivity() {
         }
     }
 
-//    @SuppressLint("SetTextI18n")
-//    private fun createBarcodeButtons(barcodes: List<Barcode>, container: LinearLayout?) {
-////        vibratePhone(requireContext())
-//        isProcessingEnabled = false
-//        val maxButtons = 7
-//        barcodes.take(maxButtons).forEach { barcode ->
-//            if (barcode.rawValue?.length!! > 7) {
-//                // Create a FrameLayout to hold the TextView and ProgressBar
-//                val buttonLayout = FrameLayout(this).apply {
-//                    layoutParams = LinearLayout.LayoutParams(
-//                        ViewGroup.LayoutParams.WRAP_CONTENT,
-//                        ViewGroup.LayoutParams.WRAP_CONTENT
-//                    ).apply {
-//                        val margin = dpToPx(7)
-//                        setMargins(margin, margin, margin, margin)
-//                    }
-//                }
-//
-//                // Create your TextView (barcodeButton)
-//                val barcodeButton = TextView(this).apply {
-//                    layoutParams = FrameLayout.LayoutParams(
-//                        ViewGroup.LayoutParams.WRAP_CONTENT,
-//                        ViewGroup.LayoutParams.WRAP_CONTENT
-//                    ).apply {
-//                        gravity =
-//                            Gravity.CENTER // Ensures the TextView is centered in the FrameLayout
-//                    }
-//                    elevation = 1.5f
-//                    text = "${resources.getString(R.string.open_product)} ${barcode.displayValue}"
-//                    textSize = 18f
-//                    setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
+    @SuppressLint("SetTextI18n")
+    private fun createBarcodeButtons(
+        barcodes: List<Barcode>,
+        container: LinearLayout?
+    ) {
+//        vibratePhone(requireContext())
+        isProcessingEnabled = false
+        val maxButtons = 7
+        barcodes.take(maxButtons).forEach { barcode ->
+            if (barcode.rawValue?.length!! > 7) {
+                // Create a FrameLayout to hold the TextView and ProgressBar
+                val buttonLayout = FrameLayout(this).apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        val margin = dpToPx(7)
+                        setMargins(margin, margin, margin, margin)
+                    }
+                }
+
+                // Create your TextView (barcodeButton)
+                val barcodeButton = TextView(this).apply {
+                    layoutParams = FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        gravity =
+                            Gravity.CENTER // Ensures the TextView is centered in the FrameLayout
+                    }
+                    elevation = 1.5f
+                    text = "${barcode.displayValue}"
+                    textSize = 18f
+//                    setTextColor(ContextCompat.getColor(context, R.color.black))
 //                    typeface = ResourcesCompat.getFont(requireContext(), R.font.heebo_regular)
 //                    setBackgroundResource(R.drawable.button_ripple)
-//                    setPadding(dpToPx(80), dpToPx(15), dpToPx(80), dpToPx(15))
-//                }
-//
-//                // Create a ProgressBar and initially hide it
-//                progressBar = ProgressBar(context).apply {
-//                    layoutParams = FrameLayout.LayoutParams(
-//                        ViewGroup.LayoutParams.WRAP_CONTENT,
-//                        ViewGroup.LayoutParams.WRAP_CONTENT
-//                    ).apply {
-//                        gravity =
-//                            Gravity.CENTER // Ensures the ProgressBar is centered in the FrameLayout
+                    setPadding(dpToPx(80), dpToPx(15), dpToPx(80), dpToPx(15))
+                }
+
+                // Create a ProgressBar and initially hide it
+                progressBar = ProgressBar(this).apply {
+                    layoutParams = FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        gravity =
+                            Gravity.CENTER // Ensures the ProgressBar is centered in the FrameLayout
+                    }
+                    visibility = View.GONE // Initially hide the ProgressBar
+
+                    indeterminateDrawable.setColorFilter(
+                        Color.parseColor("#1b6682"), // Use Color.parseColor to convert hex to an int color
+                        PorterDuff.Mode.SRC_IN
+                    )
+                }
+
+                // Add both the TextView and ProgressBar to the FrameLayout
+                buttonLayout.addView(barcodeButton)
+                buttonLayout.addView(progressBar)
+
+                // Modify the click listener for the barcodeButton to show the ProgressBar
+                barcodeButton.setOnClickListener {
+//                    if (KitcatConnectivityManager.isNetworkAvailable(requireContext())) {
+                    // Show the ProgressBar when the button is clicked
+                    progressBar.visibility = View.VISIBLE
+                    barcodeButton.visibility = View.INVISIBLE
+                    // Optionally hide the text of the barcodeButton or make it look disabled
+                    barcodeButton.isEnabled = false
+
+                    handleBarcodeClick(barcode) // Your click handling logic
+
+                    // After your operation completes (you might need to do this in a callback),
+                    // hide the ProgressBar and show the barcodeButton text again
+                    // For example:
+                    // progressBar.visibility = View.GONE
+                    // barcodeButton.isEnabled = true
+
+                }
+//                else {
+//                        Toast.makeText(this,"יש לבדוק חיבור אינטרנט",Toast.LENGTH_LONG).show()
 //                    }
-//                    visibility = View.GONE // Initially hide the ProgressBar
-//
-//                    indeterminateDrawable.setColorFilter(
-//                        Color.parseColor("#1b6682"), // Use Color.parseColor to convert hex to an int color
-//                        PorterDuff.Mode.SRC_IN
-//                    )
-//                }
-//
-//                // Add both the TextView and ProgressBar to the FrameLayout
-//                buttonLayout.addView(barcodeButton)
-//                buttonLayout.addView(progressBar)
-//
-//                // Modify the click listener for the barcodeButton to show the ProgressBar
-//                barcodeButton.setOnClickListener {
-////                    if (KitcatConnectivityManager.isNetworkAvailable(requireContext())) {
-//                        // Show the ProgressBar when the button is clicked
-//                        progressBar.visibility = View.VISIBLE
-//                        barcodeButton.visibility = View.INVISIBLE
-//                        // Optionally hide the text of the barcodeButton or make it look disabled
-//                        barcodeButton.isEnabled = false
-//
-//                        handleBarcodeClick(barcode) // Your click handling logic
-//
-//                        // After your operation completes (you might need to do this in a callback),
-//                        // hide the ProgressBar and show the barcodeButton text again
-//                        // For example:
-//                        // progressBar.visibility = View.GONE
-//                        // barcodeButton.isEnabled = true
-//
-//                    }
-////                else {
-////                        Toast.makeText(this,"יש לבדוק חיבור אינטרנט",Toast.LENGTH_LONG).show()
-////                    }
-//                }
-//                // Finally, add the buttonLayout to your container instead of the barcodeButton directly
-//                container?.addView(buttonLayout)
-//            }
-//        }
+                // Finally, add the buttonLayout to your container instead of the barcodeButton directly
+                container?.addView(buttonLayout)
+            }
+        }
+    }
 
     private fun dpToPx(dp: Int): Int {
 //        val density = this.resources?.displayMetrics?.density ?: 1f

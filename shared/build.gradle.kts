@@ -127,6 +127,6 @@ dependencies {
     implementation (libs.androidx.camera.camera2)
     implementation (libs.androidx.camera.lifecycle)
     implementation(libs.vision.common)
-    implementation(libs.play.services.mlkit.barcode.scanning)
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
 
 }

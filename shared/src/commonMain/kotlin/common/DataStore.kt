@@ -4,4 +4,4 @@ expect suspend fun Context.putData(key: String, `object`: String)
 
 expect suspend fun Context.getData(key: String): String?
 
-expect fun Context.openNativeScreen()
+expect fun Context.openNativeScreen(listener: ScannerResultListener)
