@@ -13,3 +13,6 @@ actual suspend fun Context.putData(key: String, `object`: String) {
 actual suspend inline fun Context.getData(key: String): String? {
     return NSUserDefaults.standardUserDefaults().stringForKey(key)
 }
+
+actual fun Context.openNativeScreen() {
+}

@@ -12,4 +12,5 @@ interface AppDataStore {
         key: String,
     ): String?
 
+    fun openActivity()
 }

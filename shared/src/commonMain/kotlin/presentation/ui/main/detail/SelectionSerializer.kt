@@ -27,16 +27,6 @@ object SelectionSerializer : KSerializer<Selection> {
                     put("selection_type", Json.encodeToJsonElement(selector.selectionType))
                     put("category_id", Json.encodeToJsonElement(selector.categoryId))
                 })
-                put("selection_list", buildJsonArray {
-                    value.selectionList?.forEach { selectable ->
-                        when (selectable) {
-                            is SizeSelectable -> add(Json.encodeToJsonElement(selectable))
-                            is ColorSelectable -> add(Json.encodeToJsonElement(selectable))
-                            is ProductDTO -> add(Json.encodeToJsonElement(selectable))
-                            // Add more cases as necessary
-                        }
-                    }
-                })
             }
         }
         jsonEncoder.encodeJsonElement(jsonObj)
