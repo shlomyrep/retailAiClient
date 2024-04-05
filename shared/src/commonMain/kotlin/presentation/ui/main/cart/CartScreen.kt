@@ -43,7 +43,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import business.datasource.network.main.responses.ColorSelectable
+import business.datasource.network.main.responses.ProductDTO
+import business.datasource.network.main.responses.Selection
+import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.Basket
+import kotlinx.serialization.Contextual
 import presentation.component.DEFAULT__BUTTON_SIZE
 import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
@@ -73,16 +78,17 @@ fun CartScreen(
         onTryAgain = { events(CartEvent.OnRetryNetwork) }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            LazyColumn(modifier = Modifier.fillMaxSize().align(Alignment.Center)) {
+            LazyColumn(modifier = Modifier.fillMaxSize().align(Alignment.Center).padding(bottom = 100.dp) // Adjust this value as needed to accommodate the floating button area
+            ) {
                 items(state.baskets) {
                     CartBox(
                         it,
                         addMoreProduct = {
-                            events(CartEvent.AddProduct(it.productId))
+                            events(CartEvent.AddProduct(it.product))
                         },
                         navigateToDetail = navigateToDetail
                     ) {
-                        events(CartEvent.DeleteFromBasket(it.productId.id))
+                        events(CartEvent.DeleteFromBasket(it.product.id))
                     }
                 }
             }
@@ -161,7 +167,7 @@ fun CartBox(
 ) {
     var show by remember { mutableStateOf(true) }
 
-    val dismissState = rememberSwipeToDismissBoxState (
+    val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = {
             if (it == SwipeToDismissBoxValue.EndToStart) {
                 deleteFromBasket()
@@ -209,7 +215,7 @@ fun DismissCartContent(
                     .weight(.3f)
                     .clip(MaterialTheme.shapes.small)
                     .noRippleClickable {
-                        navigateToDetail(basket.productId.id)
+                        navigateToDetail(basket.product.id)
                     }
             ) {
                 Image(
@@ -238,7 +244,7 @@ fun DismissCartContent(
                 )
                 Spacer_4dp()
                 Text(
-                    basket.getPrice(),
+                    constructSelections(basket.product.selections),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.labelMedium
@@ -287,29 +293,55 @@ fun DismissCartContent(
     }
 }
 
+fun constructSelections(selections: List<Selection>): String {
+    selections.forEach { selection ->
+        when (selection.selector?.selected) {
+            is ColorSelectable -> {
+                selection.selector.selected?.let {
+                    return (it as ColorSelectable).name ?: ""
+                }
+            }
 
+            is ProductDTO -> {
+                selection.selector.selected?.let {
+                    return (it as ProductDTO).title ?: ""
+                }
+            }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DismissBackground(dismissState: SwipeToDismissBoxState) {
-    val color = MaterialTheme.colorScheme.primary.copy(alpha = .2f)
-    val direction = dismissState.dismissDirection
+            is SizeSelectable -> {
+                selection.selector.selected?.let {
+                    return (it as SizeSelectable).size ?: ""
+                }
+            }
 
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color)
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.End
-    ) {
-        if (direction == SwipeToDismissBoxValue.EndToStart) Icon(
-            Icons.Default.Delete,
-            tint = MaterialTheme.colorScheme.primary,
-            contentDescription = "delete"
-        )
-        Spacer(modifier = Modifier)
+            else -> return ""
+        }
     }
+    return ""
 }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun DismissBackground(dismissState: SwipeToDismissBoxState) {
+        val color = MaterialTheme.colorScheme.primary.copy(alpha = .2f)
+        val direction = dismissState.dismissDirection
+
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color)
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            if (direction == SwipeToDismissBoxValue.EndToStart) Icon(
+                Icons.Default.Delete,
+                tint = MaterialTheme.colorScheme.primary,
+                contentDescription = "delete"
+            )
+            Spacer(modifier = Modifier)
+        }
+    }
+
 
 

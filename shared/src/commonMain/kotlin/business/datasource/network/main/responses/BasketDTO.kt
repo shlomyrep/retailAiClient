@@ -3,7 +3,6 @@ package business.datasource.network.main.responses
 import business.domain.main.Basket
 import business.domain.main.Category
 import business.domain.main.Product
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -22,7 +21,7 @@ data class BasketDTO(
 fun BasketDTO.toBasket() = Basket(
     id = id ?: "0",
     count = count ?: 0,
-    productId = product?.toProduct() ?: Product(),
+    product = product?.toProduct() ?: Product(),
     category = category?.toCategory() ?: Category(),
     title = title ?: "",
     description = description ?: "",

@@ -133,7 +133,7 @@ data class ColorInfo(
     @SerialName("not_available")
     val isNotAvailable: Boolean = false
 )
-
+@Serializable
 enum class PriceType {
     @SerialName("single_price")
     SINGLE_PRICE,
