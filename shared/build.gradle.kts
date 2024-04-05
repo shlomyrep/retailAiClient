@@ -121,3 +121,10 @@ android {
         jvmToolchain(17)
     }
 }
+dependencies {
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.camera.view)
+    implementation (libs.androidx.camera.camera2)
+    implementation (libs.androidx.camera.lifecycle)
+
+}

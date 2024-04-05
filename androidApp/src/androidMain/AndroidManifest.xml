@@ -20,7 +20,7 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ScannerActivity"
+            android:name="common.ScannerActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

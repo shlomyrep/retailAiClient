@@ -17,6 +17,7 @@ kotlin {
                 implementation("androidx.compose.ui:ui-test-junit4-android:1.5.4")
                 debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
                 implementation(libs.zxing.android.embedded)
+                implementation(libs.androidx.constraintlayout)
             }
         }
     }
@@ -60,7 +61,5 @@ android {
         jvmToolchain(17)
     }
 }
-dependencies {
-    implementation(libs.androidx.constraintlayout)
-}
+
 
