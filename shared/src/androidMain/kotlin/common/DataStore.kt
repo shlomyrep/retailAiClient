@@ -1,5 +1,6 @@
 package common
 
+import android.content.Intent
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -13,6 +14,13 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(APP_DATAST
 
 actual suspend fun Context.getData(key: String): String? {
     return dataStore.data.first()[stringPreferencesKey(key)] ?: ""
+}
+
+actual fun Context.openNativeScreen() {
+    val intent = Intent(this, BarcodeScanner::class.java)
+    // add FLAG_ACTIVITY_NEW_TASK  to the intent
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    startActivity(intent)
 }
 
 actual suspend fun Context.putData(key: String, `object`: String) {

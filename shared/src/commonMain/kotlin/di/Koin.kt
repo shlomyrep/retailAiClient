@@ -64,7 +64,7 @@ fun appModule(context: Context) = module {
     single<AppDataStore> { AppDataStoreManager(context) }
     factory { SharedViewModel(get()) }
     factory { LoginViewModel(get(), get(), get()) }
-    factory { HomeViewModel(get(), get()) }
+    factory { HomeViewModel(get(), get(), get()) }
     factory { AddressViewModel(get(), get()) }
     factory { CategoriesViewModel(get()) }
     factory { ProfileViewModel(get()) }

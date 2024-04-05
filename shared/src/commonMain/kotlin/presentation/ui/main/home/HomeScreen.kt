@@ -48,8 +48,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import business.constants.Sort
+import business.core.AppDataStore
 import business.domain.main.Category
 import coil3.compose.AsyncImage
+import common.Context
+import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -82,6 +85,7 @@ import shoping_by_kmp.shared.generated.resources.special_for_you
 @Composable
 fun HomeScreen(
     navigateToDetail: (String) -> Unit = {},
+    getBarcode: () -> Unit = {},
     state: HomeState,
     events: (HomeEvent) -> Unit = {},
     navigateToNotifications: () -> Unit = {},
@@ -190,7 +194,9 @@ fun HomeScreen(
                             .background(
                                 MaterialTheme.colorScheme.primary,
                                 MaterialTheme.shapes.small
-                            ).noRippleClickable { navigateToSetting() },
+                            ).noRippleClickable {
+                                getBarcode()
+                            },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(

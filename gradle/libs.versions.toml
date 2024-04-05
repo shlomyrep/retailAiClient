@@ -27,6 +27,8 @@ turbine = "1.0.0"
 mockk = "1.8.13.kotlin13"
 accompanist-version = "0.33.2-alpha"
 accompanist-permissions = "0.32.0"
+material = "1.11.0"
+constraintlayout = "2.1.4"
 
 
 [libraries]
@@ -98,6 +100,8 @@ coil3-video = { module = "io.coil-kt.coil3:coil-video", version.ref = "coil3-io"
 coil3-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil3-io" }
 coil3-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coil3-io" }
 coil3-core = { module = "io.coil-kt.coil3:coil-core", version.ref = "coil3-io" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 
 
 [bundles]

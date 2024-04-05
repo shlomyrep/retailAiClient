@@ -26,6 +26,7 @@ fun HomeNav(logout: () -> Unit) {
             val viewModel: HomeViewModel = koinInject()
             HomeScreen(
                 state = viewModel.state.value,
+                getBarcode = viewModel::openBarcodeScanner,
                 events = viewModel::onTriggerEvent,
                 navigateToNotifications = {
                     navigator.navigate(HomeNavigation.Notification.route)

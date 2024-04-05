@@ -245,7 +245,7 @@ fun DismissCartContent(
                 Spacer_4dp()
                 Text(
                     constructSelections(basket.product.selections),
-                    maxLines = 1,
+                    maxLines = 5,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.labelMedium
                 )
@@ -294,31 +294,17 @@ fun DismissCartContent(
 }
 
 fun constructSelections(selections: List<Selection>): String {
-    selections.forEach { selection ->
-        when (selection.selector?.selected) {
-            is ColorSelectable -> {
-                selection.selector.selected?.let {
-                    return (it as ColorSelectable).name ?: ""
-                }
-            }
-
-            is ProductDTO -> {
-                selection.selector.selected?.let {
-                    return (it as ProductDTO).title ?: ""
-                }
-            }
-
-            is SizeSelectable -> {
-                selection.selector.selected?.let {
-                    return (it as SizeSelectable).size ?: ""
-                }
-            }
-
-            else -> return ""
+    val selectionDescriptions = selections.mapNotNull { selection ->
+        when (val selected = selection.selector?.selected) {
+            is ColorSelectable -> selected.name
+            is ProductDTO -> selected.name
+            is SizeSelectable -> if (selected.size == "0") "" else selected.size
+            else -> null
         }
     }
-    return ""
+    return selectionDescriptions.joinToString("\n")
 }
+
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable

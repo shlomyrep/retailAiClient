@@ -3,6 +3,7 @@ package presentation.ui.main.home.view_model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import business.constants.CUSTOM_TAG
+import business.core.AppDataStore
 import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
@@ -20,6 +21,7 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 class HomeViewModel(
     private val homeInteractor: HomeInteractor,
     private val likeInteractor: LikeInteractor,
+    private val appDataStoreManager: AppDataStore,
 ) : ViewModel() {
 
 
@@ -224,5 +226,8 @@ class HomeViewModel(
         state.value = state.value.copy(networkState = networkState)
     }
 
+    fun openBarcodeScanner() {
+        appDataStoreManager.openActivity()
+    }
 
 }
