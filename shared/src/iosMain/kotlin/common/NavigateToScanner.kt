@@ -1,6 +1,9 @@
 package common
 
-actual class NavigateToScanner actual constructor(context: Context)  {
-    actual fun navigate(){}
+import androidx.compose.runtime.Composable
+
+@Composable
+actual fun NavigateToScanner(){
+
 }
 
