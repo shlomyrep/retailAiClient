@@ -19,13 +19,9 @@ fun ScannerScreen(
     navigateToSearch: (String?, Int?) -> Unit = { _, _ -> },
 ) {
 
-//     Obtain the LocalContext
-//    val context = LocalContext.current
-
-
-    // This LaunchedEffect will execute when the ScannerScreen enters composition
     LaunchedEffect(key1 = Unit) {
-        NavigateToScanner().navigate()
+        // val context = LocalContext.current
+        // NavigateToScanner()
     }
 
     DefaultScreenUI(
@@ -37,7 +33,6 @@ fun ScannerScreen(
     ) {
         // Your UI here
     }
-
 
 
 }

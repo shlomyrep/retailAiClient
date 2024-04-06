@@ -1,16 +1,16 @@
 package common
 
 import android.content.Intent
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 
 
-actual class NavigateToScanner actual constructor(context: Context) {
+@Composable
+actual fun NavigateToScanner() {
+    val context = LocalContext.current
 
-    private val mContext = context
-    actual fun navigate() {
-        val intent = Intent(mContext, ScannerActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
-        mContext.startActivity(intent)
+    val intent = Intent(context, ScannerActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
     }
+    context.startActivity(intent)
 }
-

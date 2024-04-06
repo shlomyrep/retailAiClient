@@ -1,6 +1,7 @@
 package common
 
-expect class NavigateToScanner(context: Context) {
-    fun navigate()
-}
+import androidx.compose.runtime.Composable
+
+@Composable
+expect fun NavigateToScanner()
 
