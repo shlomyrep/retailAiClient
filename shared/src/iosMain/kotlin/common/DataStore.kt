@@ -2,7 +2,6 @@ package common
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import platform.Foundation.NSUserDefaults
-import platform.UIKit.UIViewController
 
 
 actual suspend fun Context.putData(key: String, `object`: String) {
@@ -15,12 +14,44 @@ actual suspend inline fun Context.getData(key: String): String? {
     return NSUserDefaults.standardUserDefaults().stringForKey(key)
 }
 
-// Inside iosMain source set
 actual fun Context.openNativeScreen(listener: ScannerResultListener) {
-//    val vc = ScannerViewController() // Initialize your ScannerViewController
-//    vc.didFindCode = { result ->
-//        listener.onResult(result)
+
+//    println("1 TAMIR TEST")
+//    val scanner2 = ScannerViewController().apply{}
+
+//    val scanner = UIImagePickerController().apply {
+//        println("2 TAMIR TEST")
+//        sourceType =  UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypeCamera
+//        cameraCaptureMode = UIImagePickerControllerCameraCaptureMode.UIImagePickerControllerCameraCaptureModePhoto
+//        delegate = object : NSObject(), UIImagePickerControllerDelegateProtocol,
+//            UINavigationControllerDelegateProtocol {
+//            override fun imagePickerController(
+//                picker: UIImagePickerController,
+//                didFinishPickingMediaWithInfo: Map<Any?, *>
+//            ) {
+//                val originalImage = didFinishPickingMediaWithInfo.getValue(
+//                    UIImagePickerControllerOriginalImage
+//                ) as? UIImage
+//
+//                originalImage?.let { image ->
+//                    // Convert image to JPEG data
+//                    val data = UIImageJPEGRepresentation(image, 1.0)
+//
+//                    // Save to documents directory
+//                    val path = NSSearchPathForDirectoriesInDomains(
+//                        NSDocumentDirectory,
+//                        NSUserDomainMask,
+//                        true
+//                    ).first().toString()
+//                    val filePath = "$path/" + NSUUID.UUID().UUIDString + ".jpg"
+//
+//                }
+//                picker.dismissViewControllerAnimated(true, null)
+//            }
+//        }
 //    }
-//    // You need to present the view controller from the current context
-//    (this as? UIViewController)?.presentingViewController()
+//    UIApplication.sharedApplication.keyWindow?.rootViewController?.presentViewController(
+//        scanner, true, null
+//    )
+//    println("3 TAMIR TEST")
 }

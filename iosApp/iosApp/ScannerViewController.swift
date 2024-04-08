@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 import AVFoundation
 
-@objc  class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
+@objc class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
     var didFindCode: ((String) -> Void)?
@@ -16,7 +16,7 @@ import AVFoundation
         setupCaptureDevice()
     }
     
-    private func setupCaptureDevice() {
+    @objc private func setupCaptureDevice() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized: // The user has previously granted access to the camera.
             setupScanningSession()
@@ -37,7 +37,7 @@ import AVFoundation
         }
     }
     
-    private func setupScanningSession() {
+    @objc private func setupScanningSession() {
         guard let videoCaptureDevice = AVCaptureDevice.default(for: .video),
               let videoInput = try? AVCaptureDeviceInput(device: videoCaptureDevice),
               captureSession.canAddInput(videoInput) else {
@@ -49,7 +49,7 @@ import AVFoundation
         configureMetadataOutput()
     }
 
-    private func configureMetadataOutput() {
+    @objc  private func configureMetadataOutput() {
         let metadataOutput = AVCaptureMetadataOutput()
 
         if captureSession.canAddOutput(metadataOutput) {
@@ -65,7 +65,7 @@ import AVFoundation
         }
     }
 
-    private func addPreviewLayer() {
+    @objc private func addPreviewLayer() {
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.frame = view.layer.bounds
         previewLayer.videoGravity = .resizeAspectFill
@@ -74,7 +74,7 @@ import AVFoundation
         captureSession.startRunning()
     }
 
-    func failed() {
+    @objc func failed() {
         let ac = UIAlertController(title: "Scanning not supported", message: "Your device does not support scanning a code from an item. Please use a device with a camera.", preferredStyle: .alert)
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
@@ -97,7 +97,7 @@ import AVFoundation
         }
     }
 
-    func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+    @objc func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
         if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
            let stringValue = metadataObject.stringValue {
             AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
@@ -105,7 +105,7 @@ import AVFoundation
         }
     }
 
-    func found(code: String) {
+    @objc func found(code: String) {
         didFindCode?(code)
     }
 
