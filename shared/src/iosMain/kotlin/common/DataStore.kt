@@ -14,11 +14,29 @@ actual suspend inline fun Context.getData(key: String): String? {
     return NSUserDefaults.standardUserDefaults().stringForKey(key)
 }
 
-actual fun Context.openNativeScreen(listener: ScannerResultListener) {
+actual fun Context.openNativeScreen() {
+//    val scanner2 = ScannerViewController().apply{}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //    println("1 TAMIR TEST")
-//    val scanner2 = ScannerViewController().apply{}
-
 //    val scanner = UIImagePickerController().apply {
 //        println("2 TAMIR TEST")
 //        sourceType =  UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypeCamera
@@ -54,4 +72,3 @@ actual fun Context.openNativeScreen(listener: ScannerResultListener) {
 //        scanner, true, null
 //    )
 //    println("3 TAMIR TEST")
-}

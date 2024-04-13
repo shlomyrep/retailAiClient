@@ -22,6 +22,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
+            freeCompilerArgs += "-Xbinary=bundleId=orgIdentifier.iosApp.retailaii"
             baseName = "shared"
             isStatic = true
         }
