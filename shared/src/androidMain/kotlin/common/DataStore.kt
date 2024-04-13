@@ -17,7 +17,6 @@ actual suspend fun Context.getData(key: String): String? {
 }
 
 actual fun Context.openNativeScreen() {
-//    EventBus.setListener(listener)
     val intent = Intent(this, ScannerActivity::class.java)
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     startActivity(intent)
