@@ -14,26 +14,19 @@ actual suspend inline fun Context.getData(key: String): String? {
     return NSUserDefaults.standardUserDefaults().stringForKey(key)
 }
 
+
 actual fun Context.openNativeScreen() {
+
+    ScannerOpenerBridge.openScannerScreenFunc?.invoke()
+
 //    val scanner2 = ScannerViewController().apply{}
 }
 
+object ScannerOpenerBridge {
 
+    var openScannerScreenFunc: (() -> Unit)? = null
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 //    println("1 TAMIR TEST")
