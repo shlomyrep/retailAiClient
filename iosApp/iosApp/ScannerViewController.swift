@@ -51,14 +51,15 @@ import AVFoundation
         configureMetadataOutput()
     }
     
-    @objc  private func configureMetadataOutput() {
+    @objc private func configureMetadataOutput() {
         let metadataOutput = AVCaptureMetadataOutput()
         
         if captureSession.canAddOutput(metadataOutput) {
             captureSession.addOutput(metadataOutput)
             
             metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
-            metadataOutput.metadataObjectTypes = [.qr]
+            // Include .code128 if you expect to scan Code128 barcodes like the one in the image
+            metadataOutput.metadataObjectTypes = [.qr, .code128, .ean8, .ean13, .upce]
             
             addPreviewLayer()
         } else {
@@ -66,28 +67,33 @@ import AVFoundation
             return
         }
     }
+
+
     
     @objc private func addPreviewLayer() {
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         
         // Adjust this frame to match your desired camera preview size.
-        let cameraPreviewFrame = CGRect(x: view.bounds.width * 0.05,
-                                        y: 50,
-                                        width: view.bounds.width * 0.9,
+        let cameraPreviewFrame = CGRect(x: view.bounds.width * 0.03,
+                                        y: 20,
+                                        width: view.bounds.width * 0.95,
                                         height: view.bounds.height * 0.45)
         previewLayer.frame = cameraPreviewFrame
         previewLayer.videoGravity = .resizeAspectFill
         view.layer.addSublayer(previewLayer)
         
         // Add the scanning line view
-        let scanningLine = UIView(frame: CGRect(x: 0,
+        let scanningLine = UIView(frame: CGRect(x: 10,
                                                 y: cameraPreviewFrame.height / 2,
                                                 width: cameraPreviewFrame.width,
                                                 height: 2))
-        scanningLine.backgroundColor = .red  // Set the color of your scanning line here
+        scanningLine.backgroundColor = .red
+        
         view.addSubview(scanningLine)
         
-        captureSession.startRunning()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+              self?.captureSession.startRunning()
+          }
         
         DispatchQueue.main.async {
                   self.captureSession.startRunning()
@@ -135,6 +141,7 @@ import AVFoundation
     
     @objc func found(code: String) {
         didFindCode?(code)
+        showScanResult("Scanned: \(code)")
     }
     
     override var prefersStatusBarHidden: Bool {
@@ -163,4 +170,39 @@ import AVFoundation
             lastScannedBarcodeLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 50) // Adjust the height as needed
         ])
     }
+    
+    func showScanResult(_ result: String) {
+        let scanResultLabel = UILabel()
+        scanResultLabel.backgroundColor = UIColor.black.withAlphaComponent(0.75)
+        scanResultLabel.textColor = .white
+        scanResultLabel.textAlignment = .center
+        scanResultLabel.text = result
+        scanResultLabel.numberOfLines = 0
+        scanResultLabel.alpha = 0
+        scanResultLabel.layer.cornerRadius = 8
+        scanResultLabel.clipsToBounds = true
+        scanResultLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(scanResultLabel)
+        
+        // Constraints
+        NSLayoutConstraint.activate([
+            scanResultLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            scanResultLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            scanResultLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+            scanResultLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20)
+        ])
+        
+        UIView.animate(withDuration: 0.5, animations: {
+            scanResultLabel.alpha = 1
+        }) { _ in
+            UIView.animate(withDuration: 0.5, delay: 2.0, options: [], animations: {
+                scanResultLabel.alpha = 0
+            }, completion: { _ in
+                scanResultLabel.removeFromSuperview()
+            })
+        }
+    }
+
+    
 }
