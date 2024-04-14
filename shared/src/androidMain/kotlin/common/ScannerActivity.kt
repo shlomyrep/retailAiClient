@@ -3,7 +3,6 @@ package common
 import android.Manifest
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -25,9 +24,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -36,7 +33,7 @@ import com.razzaghi.shopingbykmp.R
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class ScannerActivity : AppCompatActivity() {
+class ScannerActivity : AppCompatActivity(), ScanResultListener {
 
     private lateinit var cameraProvider: ProcessCameraProvider
     private lateinit var preview: Preview
@@ -162,7 +159,7 @@ class ScannerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        cameraExecutor.shutdown()
+        cameraExecutor.shutdownNow()
     }
 
     private fun setObserver() {
@@ -244,17 +241,18 @@ class ScannerActivity : AppCompatActivity() {
             scanner.process(image)
                 .addOnSuccessListener { barcodes ->
                     if (barcodes.isNotEmpty()) {
-                        barcodes.forEach {
-                            Toast.makeText(this, "${it.rawValue}", Toast.LENGTH_LONG).show()
+                        for (barcode in barcodes) {
+                            val scanResult = barcode.rawValue ?: "No barcode detected"
+                            // Use ScannerOpenerBridge to handle the result
+                            ScannerOpenerBridge.handleScanResult?.invoke(scanResult)
+                            Toast.makeText(this, scanResult, Toast.LENGTH_LONG).show()
                         }
-
                         createBarcodeButtons(barcodes, container)
-//                        binding.scanningLine?.visibility = View.GONE
                         animator?.cancel()
                     }
                 }
                 .addOnFailureListener {
-                    // Handle any errors
+                    Log.e("ScannerActivity", "Error processing image", it)
                 }
                 .addOnCompleteListener {
                     processingBarcode = false
@@ -264,6 +262,9 @@ class ScannerActivity : AppCompatActivity() {
             imageProxy.close()
         }
     }
+
+
+
 
 
 //    private fun navigateToPagerFragment(id: String, sku: String) {
@@ -279,6 +280,9 @@ class ScannerActivity : AppCompatActivity() {
         handleSelectedBarcode(barcode)
     }
 
+    override fun onScanResult(result: String) {
+        Log.i("TAMIR", "onScanResult: $result")
+    }
 
     private fun handleSelectedBarcode(barcode: Barcode) {
         val rawValue = barcode.rawValue
@@ -417,6 +421,8 @@ class ScannerActivity : AppCompatActivity() {
 //        animator?.start()
 
     }
+
+
 }
 
 

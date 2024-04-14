@@ -1,6 +1,7 @@
 package common
 
 import android.content.Intent
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -17,6 +18,10 @@ actual suspend fun Context.getData(key: String): String? {
 }
 
 actual fun Context.openNativeScreen() {
+    ScannerOpenerBridge.handleScanResult = { result ->
+        Log.i("TAMIR", "ANDROID תמיר --> Scan result: $result")
+    }
+
     val intent = Intent(this, ScannerActivity::class.java)
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     startActivity(intent)
