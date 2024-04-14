@@ -1,7 +1,7 @@
 package common
 
 import android.content.Intent
-import android.util.Log
+import android.widget.Toast
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -19,7 +19,7 @@ actual suspend fun Context.getData(key: String): String? {
 
 actual fun Context.openNativeScreen() {
     ScannerOpenerBridge.handleScanResult = { result ->
-        Log.i("TAMIR", "ANDROID תמיר --> Scan result: $result")
+        Toast.makeText(this, "Android scanned successfully --> $result", Toast.LENGTH_LONG).show()
     }
 
     val intent = Intent(this, ScannerActivity::class.java)

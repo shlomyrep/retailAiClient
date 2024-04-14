@@ -1,13 +1,9 @@
 package common
 
-import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ScannerViewModel: ViewModel() {
 
@@ -20,35 +16,12 @@ class ScannerViewModel: ViewModel() {
     var tempSku = ""
 
 
-
-//    fun getStoreSkuData() {
-//        try {
-//            viewModelScope.launch(Dispatchers.IO) {
-//                val call =
-//                    AppRetrofitService.getRetrofit(BuildConfig.KITCAT_URL_BASE)
-//                        .create(KitCatApi::class.java).getStoreSkus()
-//                val response: Response<StoreSku> = call.execute()
-//                if (response.isSuccessful) {
-//                    if (response.body()?.storeSkuData.isNullOrEmpty().not()) {
-//                        response.body()?.let { storeSku ->
-//                            storeSkuLiveData.postValue(storeSku)
-//                            repo.setSku(storeSku)
-//                            repo.setSupplierToStoreSku(storeSku)
-//                        }
-//                    }
-//                }
-//            }
-//        } catch (t: Throwable) {
-//            Log.e("getStoreSkuData", "Error in get Store Sku Data: ${t.message}", t)
-//        }
-//    }
-
-//    fun loadSkuStore() {
-//        viewModelScope.launch {
+    fun loadSkuStore() {
+        viewModelScope.launch {
 //            val storeSkus = repo.getStoreSku()
 //            storeSkuLiveData.postValue(storeSkus)
-//        }
-//    }
+        }
+    }
 
 //    fun sendSkuToServer(sku: String) {
 //        try {

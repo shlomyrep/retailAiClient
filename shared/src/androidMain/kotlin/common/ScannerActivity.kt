@@ -25,6 +25,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.allViews
 import androidx.lifecycle.ViewModelProvider
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -33,7 +34,7 @@ import com.razzaghi.shopingbykmp.R
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class ScannerActivity : AppCompatActivity(), ScanResultListener {
+class ScannerActivity : AppCompatActivity() {
 
     private lateinit var cameraProvider: ProcessCameraProvider
     private lateinit var preview: Preview
@@ -49,6 +50,7 @@ class ScannerActivity : AppCompatActivity(), ScanResultListener {
     private var animator: ObjectAnimator? = null
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var previewView: PreviewView
+    private lateinit var barcodeBtnLl: LinearLayout
 
     companion object {
         const val CAMERA_PERMISSION_REQUEST_CODE = 101
@@ -58,68 +60,18 @@ class ScannerActivity : AppCompatActivity(), ScanResultListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanner)
 
-        val ll = findViewById<LinearLayout>(R.id.barcodeButtonContainer)
+        barcodeBtnLl = findViewById(R.id.barcodeButtonContainer)
         scannerViewModel = ViewModelProvider(this)[ScannerViewModel::class.java]
-
-//        if (allPermissionsGranted()) {
-//            startCamera()
-//        } else {
-//            ActivityCompat.requestPermissions(
-//                requireActivity(), arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE
-//            )
-//        }
-//        scannerViewModel.loadSkuStore()
-//        setObserver()
-
-//        val scanningLine = binding.scanningLine as View
-//        val parentView = scanningLine.parent as View
-//        parentView.viewTreeObserver.addOnGlobalLayoutListener(object :
-//            ViewTreeObserver.OnGlobalLayoutListener {
-//            override fun onGlobalLayout() {
-//                // Ensure we only call this once by removing the listener after the first call
-//                parentView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-//                binding.scanningLine?.let {
-//                    startScanningAnimation(
-//                        it,
-//                        3000
-//                    )
-//                } // Duration of 3000 milliseconds (3 seconds)
-//
-//                // Now we can safely start the animation
-//                startScanningAnimation(
-//                    scanningLine,
-//                    3000
-//                ) // Duration of 3000 milliseconds (3 seconds)
-//            }
-//        })
-
-//        scannerViewModel.failedFallbackState.observe(viewLifecycleOwner) {
-//            for (allView in binding.barcodeButtonContainer.allViews) {
-//                if (allView is ViewGroup && allView.childCount > 0) {
-//                    // Check if the first child of this ViewGroup is also a ViewGroup
-//                    val firstChild = allView.getChildAt(0)
-//                    if (firstChild is ViewGroup && firstChild.childCount > 0) {
-//                        // Now, safely cast the first child of the inner ViewGroup, checking if it's a TextView
-//                        val textView = firstChild.getChildAt(0)
-//                        val progressBar = firstChild.getChildAt(1)
-//                        if (textView is TextView && textView.text.contains(it)) {
-//                            textView.visibility = View.VISIBLE
-//                            textView.isEnabled = true
-//                            progressBar.visibility = View.GONE
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
+        scannerViewModel.loadSkuStore()
         previewView = findViewById(R.id.previewView)
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         if (isCameraPermissionGranted()) {
-            startCamera(ll)
+            startCamera(barcodeBtnLl)
         } else {
             requestCameraPermission()
         }
+        setObserver()
     }
 
     private fun requestCameraPermission() {
@@ -164,36 +116,37 @@ class ScannerActivity : AppCompatActivity(), ScanResultListener {
 
     private fun setObserver() {
         resetButtonGeneration()
-//        binding.backBtn.setOnClickListener {
-//            findNavController().popBackStack()
-//            vibratePhone(this)
-//        }
-//        scannerViewModel.storeSkuLiveData.observe(viewLifecycleOwner) { storeSku ->
-//            Log.i("barcode", "storeSku: ${storeSku?.storeSkuData?.size}")
-//            if (storeSku?.storeSkuData.isNullOrEmpty()) {
-//                if (KitcatConnectivityManager.isNetworkAvailable(MainApplication.appContext)) {
-//                    scanQrViewModel.getStoreSkuData()
-//                    storeSkuData = storeSku?.storeSkuData ?: mapOf()
-//                    Log.i("barcode", "storeSkuData: ${storeSkuData.size}")
-//                }
-//            } else {
-//                storeSkuData = storeSku?.storeSkuData ?: mapOf()
-//                Log.i("barcode", "storeSkuData: ${storeSkuData.size}")
-//            }
-//        }
 
-//        scannerViewModel.isFallbackProductAdded.observe(viewLifecycleOwner) {
-//            if (it) {
+        scannerViewModel.failedFallbackState.observe(this) {
+            for (allView in barcodeBtnLl.allViews) {
+                if (allView is ViewGroup && allView.childCount > 0) {
+                    // Check if the first child of this ViewGroup is also a ViewGroup
+                    val firstChild = allView.getChildAt(0)
+                    if (firstChild is ViewGroup && firstChild.childCount > 0) {
+                        // Now, safely cast the first child of the inner ViewGroup, checking if it's a TextView
+                        val textView = firstChild.getChildAt(0)
+                        val progressBar = firstChild.getChildAt(1)
+                        if (textView is TextView && textView.text.contains(it)) {
+                            textView.visibility = View.VISIBLE
+                            textView.isEnabled = true
+                            progressBar.visibility = View.GONE
+                        }
+                    }
+                }
+            }
+        }
+
+        scannerViewModel.isFallbackProductAdded.observe(this) {
+            if (it) {
 //                navigateToPagerFragment(scanQrViewModel.tempProductId, scanQrViewModel.tempSku)
-//            }
-//        }
-
-//        scannerViewModel.fetchFallbackSuccessfully.observe(viewLifecycleOwner) {
-//            if (!it) {
-//                showToast("Failed to fetch fallback product")
-//                progressBar.visibility = View.GONE
-//            }
-//        }
+            }
+        }
+        scannerViewModel.fetchFallbackSuccessfully.observe(this) {
+            if (!it) {
+                Toast.makeText(this, "Failed to fetch fallback product", Toast.LENGTH_SHORT).show()
+                progressBar.visibility = View.GONE
+            }
+        }
     }
 
 
@@ -201,9 +154,7 @@ class ScannerActivity : AppCompatActivity(), ScanResultListener {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
             cameraProvider = cameraProviderFuture.get()
-            // Unbind all use cases before binding
             cameraProvider.unbindAll()
-
             preview = Preview.Builder().build()
             imageAnalysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -241,12 +192,6 @@ class ScannerActivity : AppCompatActivity(), ScanResultListener {
             scanner.process(image)
                 .addOnSuccessListener { barcodes ->
                     if (barcodes.isNotEmpty()) {
-                        for (barcode in barcodes) {
-                            val scanResult = barcode.rawValue ?: "No barcode detected"
-                            // Use ScannerOpenerBridge to handle the result
-                            ScannerOpenerBridge.handleScanResult?.invoke(scanResult)
-                            Toast.makeText(this, scanResult, Toast.LENGTH_LONG).show()
-                        }
                         createBarcodeButtons(barcodes, container)
                         animator?.cancel()
                     }
@@ -263,46 +208,15 @@ class ScannerActivity : AppCompatActivity(), ScanResultListener {
         }
     }
 
-
-
-
-
-//    private fun navigateToPagerFragment(id: String, sku: String) {
-//        val action = ScanQrFragmentDirections.actionScanQrToViewPagerFragment(
-//            id,
-//            sku,
-//            this::class.java.simpleName
-//        )
-//        findNavController().safeNavigate(action)
-//    }
-
     private fun handleBarcodeClick(barcode: Barcode) {
         handleSelectedBarcode(barcode)
-    }
-
-    override fun onScanResult(result: String) {
-        Log.i("TAMIR", "onScanResult: $result")
     }
 
     private fun handleSelectedBarcode(barcode: Barcode) {
         val rawValue = barcode.rawValue
         if (rawValue != null) {
-            barcode?.rawValue?.let {
-                EventBus.postResult(it)
-            }
-            Toast.makeText(this, "$rawValue", Toast.LENGTH_LONG).show()
-
-            Log.i("barcode", "barcode: $rawValue")
-//            val product = storeSkuData[rawValue]
-//            if (product != null) {
-//                navigateToPagerFragment(product.productId, product.sku)
-//            } else {
-//                if (!listOfScanBarcodes.contains(rawValue)) {
-//                    scannerViewModel.fetchFallbackProduct(rawValue)
-//                    listOfScanBarcodes.add(rawValue)
-//                }
-//                Log.i("barcode", "Barcode not found in storeSkuData: $rawValue")
-//            }
+            ScannerOpenerBridge.handleScanResult?.invoke(rawValue)
+            finish()
         }
     }
 
@@ -394,35 +308,14 @@ class ScannerActivity : AppCompatActivity(), ScanResultListener {
     }
 
     private fun dpToPx(dp: Int): Int {
-//        val density = this.resources?.displayMetrics?.density ?: 1f
-//        return (dp * density).toInt()
-        return 0
+        val density = this.resources?.displayMetrics?.density ?: 1f
+        return (dp * density).toInt()
     }
 
     private fun resetButtonGeneration() {
-//        binding.barcodeButtonContainer.removeAllViews()
-//        isProcessingEnabled = true
+        barcodeBtnLl.removeAllViews()
+        isProcessingEnabled = true
     }
-
-    private fun startScanningAnimation(view: View, duration: Long) {
-//        // Assuming the scanning line should move within the bounds of its parent (e.g., FrameLayout)
-//        val parentHeight = (view.parent as View).height
-//        val startY = 0f
-//        val endY = parentHeight - view.height.toFloat()
-//
-//
-//        animator = ObjectAnimator.ofFloat(view, "translationY", startY, endY).apply {
-//            this.duration = duration
-//            repeatMode = ValueAnimator.REVERSE
-//            repeatCount = ValueAnimator.INFINITE
-//            interpolator = LinearInterpolator()
-//        }
-//
-//        animator?.start()
-
-    }
-
-
 }
 
 
