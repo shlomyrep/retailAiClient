@@ -1,6 +1,7 @@
 package common
 
 import kotlinx.coroutines.flow.MutableSharedFlow
+import platform.Foundation.NSLog
 import platform.Foundation.NSUserDefaults
 
 
@@ -17,8 +18,14 @@ actual suspend inline fun Context.getData(key: String): String? {
 
 actual fun Context.openNativeScreen() {
     ScannerOpenerBridge.openScannerScreenFunc?.invoke()
+
+    NSLog("TAMIR --> openNativeScreen")
+    println("TAMIR --> openNativeScreen")
 }
 
 object ScannerOpenerBridge {
     var openScannerScreenFunc: (() -> Unit)? = null
+    var handleScanResult: ((String) -> Unit)? = { result ->
+        NSLog("TAMIR  תמיר--> Scan result יש לנו תשובה חזרה: $result")
+    }
 }

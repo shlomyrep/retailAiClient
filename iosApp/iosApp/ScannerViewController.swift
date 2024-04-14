@@ -1,12 +1,15 @@
 import Foundation
 import UIKit
 import AVFoundation
+import shared
 
 @objc class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
     var lastScannedBarcodeLabel: UILabel! // Label to show last scanned barcode
     var didFindCode: ((String) -> Void)?
+    var lastScannedCode: String?
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -140,9 +143,24 @@ import AVFoundation
     }
     
     @objc func found(code: String) {
-        didFindCode?(code)
-        showScanResult("Scanned: \(code)")
+        // Swift side verification and avoid processing if it's a duplicate
+        if code != lastScannedCode {
+            print("Barcode Found: \(code)") // Swift side verification
+            lastScannedCode = code
+            didFindCode?(code)
+            showScanResult("Scanned: \(code)")
+            
+            DispatchQueue.main.async { [unowned self] in
+                self.lastScannedBarcodeLabel.text = code
+                ScannerOpenerBridge.shared.handleScanResult?(code)
+                NSLog("TAMIR --> found --> Scanned Code: \(code)")
+                
+                // Stop the capture session to prevent further scanning
+//                self.captureSession?.stopRunning()
+            }
+        }
     }
+
     
     override var prefersStatusBarHidden: Bool {
         return true
