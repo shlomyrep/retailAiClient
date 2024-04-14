@@ -25,6 +25,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.allViews
 import androidx.lifecycle.ViewModelProvider
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -253,9 +254,9 @@ class ScannerActivity : AppCompatActivity() {
                     elevation = 1.5f
                     text = "${barcode.displayValue}"
                     textSize = 18f
-//                    setTextColor(ContextCompat.getColor(context, R.color.black))
-//                    typeface = ResourcesCompat.getFont(requireContext(), R.font.heebo_regular)
-//                    setBackgroundResource(R.drawable.button_ripple)
+                    setTextColor(Color.BLACK)
+                    typeface = ResourcesCompat.getFont(this@ScannerActivity, R.font.lato_regular)
+                    setBackgroundResource(R.drawable.button_ripple)
                     setPadding(dpToPx(80), dpToPx(15), dpToPx(80), dpToPx(15))
                 }
 
@@ -275,34 +276,16 @@ class ScannerActivity : AppCompatActivity() {
                         PorterDuff.Mode.SRC_IN
                     )
                 }
-
-                // Add both the TextView and ProgressBar to the FrameLayout
                 buttonLayout.addView(barcodeButton)
                 buttonLayout.addView(progressBar)
-
-                // Modify the click listener for the barcodeButton to show the ProgressBar
                 barcodeButton.setOnClickListener {
-//                    if (KitcatConnectivityManager.isNetworkAvailable(requireContext())) {
-                    // Show the ProgressBar when the button is clicked
                     progressBar.visibility = View.VISIBLE
                     barcodeButton.visibility = View.INVISIBLE
                     // Optionally hide the text of the barcodeButton or make it look disabled
                     barcodeButton.isEnabled = false
-
                     handleBarcodeClick(barcode) // Your click handling logic
-
-                    // After your operation completes (you might need to do this in a callback),
-                    // hide the ProgressBar and show the barcodeButton text again
-                    // For example:
-                    // progressBar.visibility = View.GONE
-                    // barcodeButton.isEnabled = true
-
+                    container?.addView(buttonLayout)
                 }
-//                else {
-//                        Toast.makeText(this,"יש לבדוק חיבור אינטרנט",Toast.LENGTH_LONG).show()
-//                    }
-                // Finally, add the buttonLayout to your container instead of the barcodeButton directly
-                container?.addView(buttonLayout)
             }
         }
     }
