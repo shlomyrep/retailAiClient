@@ -2,24 +2,41 @@ import Foundation
 import UIKit
 import AVFoundation
 import shared
+import AudioToolbox
+
 
 @objc class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
-    var lastScannedBarcodeLabel: UILabel! // Label to show last scanned barcode
+    var lastScannedBarcodeLabel: UILabel!
     var didFindCode: ((String) -> Void)?
     var lastScannedCode: String?
+    var isProcessingEnabled = true // to control processing
+    var buttonsContainer: UIView!
 
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        view.backgroundColor = UIColor.white
-        captureSession = AVCaptureSession()
-        
-        setupCaptureDevice()
-        setupLastScannedBarcodeLabel() // Setup label for last scanned barcode
-    }
+           super.viewDidLoad()
+           
+           view.backgroundColor = UIColor.white
+           captureSession = AVCaptureSession()
+           setupCaptureDevice()
+           setupLastScannedBarcodeLabel()
+           setupButtonsContainer()
+       }
+    
+    private func setupButtonsContainer() {
+           buttonsContainer = UIView()
+           buttonsContainer.translatesAutoresizingMaskIntoConstraints = false
+           view.addSubview(buttonsContainer)
+           
+           NSLayoutConstraint.activate([
+               buttonsContainer.topAnchor.constraint(equalTo: lastScannedBarcodeLabel.bottomAnchor, constant: 20),
+               buttonsContainer.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+               buttonsContainer.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+               buttonsContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+           ])
+       }
     
     @objc private func setupCaptureDevice() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -112,35 +129,82 @@ import shared
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         if !captureSession.isRunning {
             captureSession.startRunning()
         }
     }
-    
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
         if captureSession.isRunning {
             captureSession.stopRunning()
         }
     }
     
-    @objc func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
-        if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
-           let stringValue = metadataObject.stringValue {
-            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-            found(code: stringValue)
-            
-            DispatchQueue.main.async { [unowned self] in
-                      if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
-                         let stringValue = metadataObject.stringValue {
-                          // Update the last scanned barcode label with the raw value
-                          self.lastScannedBarcodeLabel.text = stringValue
-                      }
-                  }
+    func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+         guard let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
+               let stringValue = metadataObject.stringValue, isProcessingEnabled else {
+             return
+         }
+
+         DispatchQueue.main.async { [unowned self] in
+             if stringValue != lastScannedCode {
+                 lastScannedCode = stringValue
+                 createBarcodeButton(barcode: stringValue)
+             }
+         }
+     }
+
+     private func createBarcodeButton(barcode: String) {
+         let barcodeButton = UIButton()
+         barcodeButton.setTitle(barcode, for: .normal)
+         barcodeButton.backgroundColor = .lightGray
+         barcodeButton.setTitleColor(.black, for: .normal)
+         barcodeButton.layer.cornerRadius = 5
+         barcodeButton.clipsToBounds = true
+         barcodeButton.translatesAutoresizingMaskIntoConstraints = false
+         barcodeButton.addTarget(self, action: #selector(barcodeButtonTapped(_:)), for: .touchUpInside)
+         
+         buttonsContainer.addSubview(barcodeButton)
+
+         // Set constraints
+         NSLayoutConstraint.activate([
+             barcodeButton.topAnchor.constraint(equalTo: (buttonsContainer.subviews.last?.bottomAnchor ?? buttonsContainer.topAnchor), constant: 10),
+             barcodeButton.leftAnchor.constraint(equalTo: buttonsContainer.leftAnchor),
+             barcodeButton.rightAnchor.constraint(equalTo: buttonsContainer.rightAnchor),
+             barcodeButton.heightAnchor.constraint(equalToConstant: 50)
+         ])
+         
+         isProcessingEnabled = false // Stop processing further until the button is tapped
+     }
+
+     @objc func barcodeButtonTapped(_ sender: UIButton) {
+         guard let barcode = sender.title(for: .normal) else { return }
+         handleSelectedBarcode(barcode)
+         
+         sender.removeFromSuperview() // Optionally remove the button or disable it
+         isProcessingEnabled = true // Allow barcode scanning again
+     }
+
+     private func handleSelectedBarcode(_ barcode: String) {
+         print("Barcode Selected: \(barcode)")
+         didFindCode?(barcode)
+         ScannerOpenerBridge.shared.handleScanResult?(barcode)
+         closeViewController()
+//         lastScannedBarcodeLabel.text = barcode 
+     }
+    
+    @objc func closeViewController() {
+        if let navController = self.navigationController, navController.viewControllers.first != self {
+            // The view controller is in a navigation controller and it's not the root view controller
+            navController.popViewController(animated: true)
+        } else {
+            // The view controller was presented modally or it's the root of a navigation controller
+            self.dismiss(animated: true, completion: nil)
         }
     }
+
+
     
     @objc func found(code: String) {
         // Swift side verification and avoid processing if it's a duplicate
@@ -154,9 +218,8 @@ import shared
                 self.lastScannedBarcodeLabel.text = code
                 ScannerOpenerBridge.shared.handleScanResult?(code)
                 NSLog("TAMIR --> found --> Scanned Code: \(code)")
-                
-                // Stop the capture session to prevent further scanning
-//                self.captureSession?.stopRunning()
+                createBarcodeButton(barcode: code)
+                self.captureSession?.stopRunning()
             }
         }
     }

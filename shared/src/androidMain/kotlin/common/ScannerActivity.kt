@@ -43,10 +43,6 @@ class ScannerActivity : AppCompatActivity() {
     private var processingBarcode = false
     private lateinit var scannerViewModel: ScannerViewModel
     private lateinit var progressBar: ProgressBar
-
-    //    private var storeSkuData = mapOf<String, SupplierSku>()
-    private val listOfPlayedSound = mutableListOf<String>()
-    private val listOfScanBarcodes = mutableListOf<String>()
     private var isProcessingEnabled = true
     private var animator: ObjectAnimator? = null
     private lateinit var cameraExecutor: ExecutorService
@@ -139,7 +135,7 @@ class ScannerActivity : AppCompatActivity() {
 
         scannerViewModel.isFallbackProductAdded.observe(this) {
             if (it) {
-//                navigateToPagerFragment(scanQrViewModel.tempProductId, scanQrViewModel.tempSku)
+
             }
         }
         scannerViewModel.fetchFallbackSuccessfully.observe(this) {
