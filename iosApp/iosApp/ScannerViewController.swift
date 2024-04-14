@@ -13,6 +13,8 @@ import AudioToolbox
     var lastScannedCode: String?
     var isProcessingEnabled = true // to control processing
     var buttonsContainer: UIView!
+    private var seenBarcodes = Set<String>()  // To track barcodes and prevent duplicates
+    private let buttonsStackView = UIStackView()
 
     
     override func viewDidLoad() {
@@ -26,17 +28,33 @@ import AudioToolbox
        }
     
     private func setupButtonsContainer() {
-           buttonsContainer = UIView()
-           buttonsContainer.translatesAutoresizingMaskIntoConstraints = false
-           view.addSubview(buttonsContainer)
-           
-           NSLayoutConstraint.activate([
-               buttonsContainer.topAnchor.constraint(equalTo: lastScannedBarcodeLabel.bottomAnchor, constant: 20),
-               buttonsContainer.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-               buttonsContainer.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-               buttonsContainer.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
-           ])
-       }
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+
+        // Constraints for the ScrollView
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: lastScannedBarcodeLabel.bottomAnchor, constant: 20),
+            scrollView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+            scrollView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+        ])
+
+        buttonsStackView.axis = .vertical
+        buttonsStackView.spacing = 10
+        buttonsStackView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(buttonsStackView)
+
+        // Constraints for the StackView inside the ScrollView
+        NSLayoutConstraint.activate([
+            buttonsStackView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            buttonsStackView.leftAnchor.constraint(equalTo: scrollView.leftAnchor),
+            buttonsStackView.rightAnchor.constraint(equalTo: scrollView.rightAnchor),
+            buttonsStackView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            buttonsStackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor) // Ensures the stack is as wide as the scrollView
+        ])
+    }
+
     
     @objc private func setupCaptureDevice() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -142,48 +160,76 @@ import AudioToolbox
     }
     
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
-         guard let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
-               let stringValue = metadataObject.stringValue, isProcessingEnabled else {
-             return
-         }
+        DispatchQueue.main.async { [unowned self] in
+            for metadataObject in metadataObjects {
+                guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject,
+                      let stringValue = readableObject.stringValue else {
+                    continue
+                }
+                
+                // Create a button for each unique barcode detected
+                createBarcodeButton(barcode: stringValue)
+            }
+        }
+    }
 
-         DispatchQueue.main.async { [unowned self] in
-             if stringValue != lastScannedCode {
-                 lastScannedCode = stringValue
-                 createBarcodeButton(barcode: stringValue)
-             }
-         }
-     }
 
-     private func createBarcodeButton(barcode: String) {
-         let barcodeButton = UIButton()
-         barcodeButton.setTitle(barcode, for: .normal)
-         barcodeButton.backgroundColor = .lightGray
-         barcodeButton.setTitleColor(.black, for: .normal)
-         barcodeButton.layer.cornerRadius = 5
-         barcodeButton.clipsToBounds = true
-         barcodeButton.translatesAutoresizingMaskIntoConstraints = false
-         barcodeButton.addTarget(self, action: #selector(barcodeButtonTapped(_:)), for: .touchUpInside)
-         
-         buttonsContainer.addSubview(barcodeButton)
 
-         // Set constraints
-         NSLayoutConstraint.activate([
-             barcodeButton.topAnchor.constraint(equalTo: (buttonsContainer.subviews.last?.bottomAnchor ?? buttonsContainer.topAnchor), constant: 10),
-             barcodeButton.leftAnchor.constraint(equalTo: buttonsContainer.leftAnchor),
-             barcodeButton.rightAnchor.constraint(equalTo: buttonsContainer.rightAnchor),
-             barcodeButton.heightAnchor.constraint(equalToConstant: 50)
-         ])
-         
-         isProcessingEnabled = false // Stop processing further until the button is tapped
-     }
+    private func createBarcodeButton(barcode: String) {
+        guard !seenBarcodes.contains(barcode) else { return }
+        seenBarcodes.insert(barcode)
+
+        let barcodeButton = createStyledButton()
+        barcodeButton.setTitle(barcode, for: .normal)
+        barcodeButton.translatesAutoresizingMaskIntoConstraints = false
+        barcodeButton.addTarget(self, action: #selector(barcodeButtonTapped(_:)), for: .touchUpInside)
+
+        buttonsStackView.addArrangedSubview(barcodeButton)
+        barcodeButton.heightAnchor.constraint(equalToConstant: 50).isActive = true
+
+        isProcessingEnabled = false
+    }
+    
+    private func createStyledButton() -> UIButton {
+        let button = UIButton(type: .system)
+        button.backgroundColor = UIColor.white
+        button.setTitleColor(.black, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
+        button.layer.cornerRadius = 25 // Half of your 80dp corner radius
+        button.layer.borderWidth = 1.5
+        button.layer.borderColor = UIColor.lightGray.cgColor
+        button.layer.masksToBounds = true
+
+        // Adding padding equivalent
+        button.contentEdgeInsets = UIEdgeInsets(top: 15, left: 80, bottom: 15, right: 80)
+
+        // Touch down inside effect
+        button.addTarget(self, action: #selector(handleTouchDown(_:)), for: .touchDown)
+        // Touch up inside effect
+        button.addTarget(self, action: #selector(handleTouchUp(_:)), for: .touchUpInside)
+        button.addTarget(self, action: #selector(handleTouchUp(_:)), for: .touchUpOutside)
+        button.addTarget(self, action: #selector(handleTouchUp(_:)), for: .touchCancel)
+
+        return button
+    }
+
+    @objc func handleTouchDown(_ sender: UIButton) {
+        UIView.animate(withDuration: 0.5) {
+            sender.alpha = 0.5
+        }
+    }
+
+    @objc func handleTouchUp(_ sender: UIButton) {
+        UIView.animate(withDuration: 0.5) {
+            sender.alpha = 1.0
+        }
+    }
+
+
 
      @objc func barcodeButtonTapped(_ sender: UIButton) {
          guard let barcode = sender.title(for: .normal) else { return }
          handleSelectedBarcode(barcode)
-         
-         sender.removeFromSuperview() // Optionally remove the button or disable it
-         isProcessingEnabled = true // Allow barcode scanning again
      }
 
      private func handleSelectedBarcode(_ barcode: String) {
@@ -191,7 +237,7 @@ import AudioToolbox
          didFindCode?(barcode)
          ScannerOpenerBridge.shared.handleScanResult?(barcode)
          closeViewController()
-//         lastScannedBarcodeLabel.text = barcode 
+//         lastScannedBarcodeLabel.text = barcode
      }
     
     @objc func closeViewController() {
