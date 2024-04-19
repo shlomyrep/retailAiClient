@@ -129,5 +129,6 @@ dependencies {
     implementation (libs.androidx.camera.lifecycle)
     implementation(libs.vision.common)
     implementation("com.google.mlkit:barcode-scanning:17.2.0")
+    implementation("com.google.mlkit:text-recognition:16.0.0")
 
 }

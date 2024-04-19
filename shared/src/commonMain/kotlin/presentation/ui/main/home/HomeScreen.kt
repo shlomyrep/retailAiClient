@@ -7,7 +7,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,11 +48,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import business.constants.Sort
-import business.core.AppDataStore
 import business.domain.main.Category
 import coil3.compose.AsyncImage
-import common.Context
-import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -80,7 +76,6 @@ import shoping_by_kmp.shared.generated.resources.most_sale
 import shoping_by_kmp.shared.generated.resources.newest_products
 import shoping_by_kmp.shared.generated.resources.search
 import shoping_by_kmp.shared.generated.resources.see_all
-import shoping_by_kmp.shared.generated.resources.setting
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalResourceApi::class)

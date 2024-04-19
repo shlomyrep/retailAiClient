@@ -1,13 +1,10 @@
 package common
 
 import android.Manifest
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +12,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -26,28 +22,23 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.allViews
-import androidx.lifecycle.ViewModelProvider
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.razzaghi.shopingbykmp.R
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 class ScannerActivity : AppCompatActivity() {
-
     private lateinit var cameraProvider: ProcessCameraProvider
     private lateinit var preview: Preview
     private lateinit var imageAnalysis: ImageAnalysis
-    private var processingBarcode = false
-    private lateinit var scannerViewModel: ScannerViewModel
-    private lateinit var progressBar: ProgressBar
     private var isProcessingEnabled = true
-    private var animator: ObjectAnimator? = null
-    private lateinit var cameraExecutor: ExecutorService
+    private var numberOccurrencesMap = mutableMapOf<String, Int>()
     private lateinit var previewView: PreviewView
-    private lateinit var barcodeBtnLl: LinearLayout
+    private lateinit var barcodeButtonContainer: LinearLayout
+    private lateinit var progressBar: ProgressBar
+
 
     companion object {
         const val CAMERA_PERMISSION_REQUEST_CODE = 101
@@ -57,147 +48,83 @@ class ScannerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanner)
 
-        barcodeBtnLl = findViewById(R.id.barcodeButtonContainer)
-        scannerViewModel = ViewModelProvider(this)[ScannerViewModel::class.java]
-        scannerViewModel.loadSkuStore()
         previewView = findViewById(R.id.previewView)
-        cameraExecutor = Executors.newSingleThreadExecutor()
+        barcodeButtonContainer = findViewById(R.id.barcodeButtonContainer)
+        progressBar = findViewById(R.id.progressBar)
 
-        if (isCameraPermissionGranted()) {
-            startCamera(barcodeBtnLl)
+        if (allPermissionsGranted()) {
+            startCamera()
         } else {
-            requestCameraPermission()
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_REQUEST_CODE
+            )
         }
-        setObserver()
+        setObservers()
     }
 
-    private fun requestCameraPermission() {
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(Manifest.permission.CAMERA),
-            CAMERA_PERMISSION_REQUEST_CODE
-        )
-    }
+    private fun setObservers() {
 
-    private fun isCameraPermissionGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            this, Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            CAMERA_PERMISSION_REQUEST_CODE -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    startCamera()
-                } else {
-                    Toast.makeText(
-                        this,
-                        "You must approve camera usage in order to scan products",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        cameraExecutor.shutdownNow()
-    }
-
-    private fun setObserver() {
-        resetButtonGeneration()
-
-        scannerViewModel.failedFallbackState.observe(this) {
-            for (allView in barcodeBtnLl.allViews) {
-                if (allView is ViewGroup && allView.childCount > 0) {
-                    // Check if the first child of this ViewGroup is also a ViewGroup
-                    val firstChild = allView.getChildAt(0)
-                    if (firstChild is ViewGroup && firstChild.childCount > 0) {
-                        // Now, safely cast the first child of the inner ViewGroup, checking if it's a TextView
-                        val textView = firstChild.getChildAt(0)
-                        val progressBar = firstChild.getChildAt(1)
-                        if (textView is TextView && textView.text.contains(it)) {
-                            textView.visibility = View.VISIBLE
-                            textView.isEnabled = true
-                            progressBar.visibility = View.GONE
-                        }
-                    }
-                }
-            }
-        }
-
-        scannerViewModel.isFallbackProductAdded.observe(this) {
-            if (it) {
-
-            }
-        }
-        scannerViewModel.fetchFallbackSuccessfully.observe(this) {
-            if (!it) {
-                Toast.makeText(this, "Failed to fetch fallback product", Toast.LENGTH_SHORT).show()
-                progressBar.visibility = View.GONE
-            }
-        }
     }
 
 
-    private fun startCamera(container: LinearLayout) {
+    private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
             cameraProvider = cameraProviderFuture.get()
             cameraProvider.unbindAll()
-            preview = Preview.Builder().build()
-            imageAnalysis = ImageAnalysis.Builder()
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
-                .also {
-                    it.setAnalyzer(
-                        ContextCompat.getMainExecutor(this),
-                        ImageAnalysis.Analyzer { imageProxy ->
-                            if (processingBarcode || !isProcessingEnabled) {
-                                imageProxy.close()
-                                return@Analyzer
-                            }
-                            processingBarcode = true
-                            processImage(container, imageProxy)
-                        })
-                }
 
             val cameraSelector = CameraSelector.Builder()
                 .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                 .build()
 
-            cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
+            preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(previewView.surfaceProvider)
+            }
 
-            preview.setSurfaceProvider(previewView.surfaceProvider)
+            imageAnalysis = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+
+            setupImageAnalysis()
+
+            cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
         }, ContextCompat.getMainExecutor(this))
     }
 
+    private fun setupImageAnalysis() {
+        imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(this)) { imageProxy ->
+            if (isProcessingEnabled) {
+                processImage(imageProxy)
+            }
+        }
+    }
+
     @SuppressLint("UnsafeOptInUsageError")
-    private fun processImage(container: LinearLayout?, imageProxy: ImageProxy) {
+    private fun processImage(imageProxy: ImageProxy) {
         val mediaImage = imageProxy.image
         if (mediaImage != null) {
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-            val scanner = BarcodeScanning.getClient()
 
-            scanner.process(image)
-                .addOnSuccessListener { barcodes ->
-                    if (barcodes.isNotEmpty()) {
-                        createBarcodeButtons(barcodes, container)
-                        animator?.cancel()
+            val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+            val barcodeScanner = BarcodeScanning.getClient()
+
+            textRecognizer.process(image)
+                .addOnSuccessListener { texts ->
+                    if (texts.textBlocks.isNotEmpty()) {
+                        handleTextRecognitionResult(texts)
+                    } else {
+                        barcodeScanner.process(image)
+                            .addOnSuccessListener { barcodes ->
+                                if (barcodes.isNotEmpty()) {
+                                    createBarcodeButtons(barcodes)
+                                }
+                            }
                     }
                 }
                 .addOnFailureListener {
-                    Log.e("ScannerActivity", "Error processing image", it)
+                    // Handle any errors
                 }
                 .addOnCompleteListener {
-                    processingBarcode = false
                     imageProxy.close()
                 }
         } else {
@@ -205,85 +132,114 @@ class ScannerActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleBarcodeClick(barcode: Barcode) {
-        handleSelectedBarcode(barcode)
+    private fun resetButtonGeneration() {
+        barcodeButtonContainer.removeAllViews()
+        isProcessingEnabled = true
     }
 
-    private fun handleSelectedBarcode(barcode: Barcode) {
-        val rawValue = barcode.rawValue
-        if (rawValue != null) {
-            ScannerOpenerBridge.handleScanResult?.invoke(rawValue)
-            finish()
+    private fun handleTextRecognitionResult(texts: com.google.mlkit.vision.text.Text) {
+        val nineDigitPattern = Regex("^\\d{9}$")
+        val matchedTexts = texts.textBlocks.mapNotNull { it.text }
+            .filter { nineDigitPattern.matches(it) }
+
+        matchedTexts.forEach { matchedText ->
+            // Update the occurrences count for the matched text
+            val count = numberOccurrencesMap[matchedText] ?: 0
+            numberOccurrencesMap[matchedText] = count + 1
+
+            // If the number is seen at least three times, create the button
+            if (numberOccurrencesMap[matchedText] ?: 0 >= 3) {
+                createTextButton(matchedText)
+                // Reset the count after creating the button
+                numberOccurrencesMap[matchedText] = 0
+            }
         }
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun createBarcodeButtons(
-        barcodes: List<Barcode>,
-        container: LinearLayout?
-    ) {
-//        vibratePhone(requireContext())
-        isProcessingEnabled = false
-        val maxButtons = 7
-        barcodes.take(maxButtons).forEach { barcode ->
-            if (barcode.rawValue?.length!! > 7) {
-                // Create a FrameLayout to hold the TextView and ProgressBar
-                val buttonLayout = FrameLayout(this).apply {
-                    layoutParams = LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    ).apply {
-                        val margin = dpToPx(7)
-                        setMargins(margin, margin, margin, margin)
-                    }
-                }
+    private fun createTextButton(text: String) {
+        val existingButton = barcodeButtonContainer.findViewWithTag<TextView>(text)
+        if (existingButton != null) {
+            return
+        }
 
-                // Create your TextView (barcodeButton)
+        val buttonLayout = createButtonLayout()
+
+        val textButton = TextView(this).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                gravity = Gravity.CENTER
+            }
+            elevation = 1.5f
+            val newText = "${"פתח מוצר"} $text"
+            setText(newText)
+            textSize = 18f
+            setTextColor(Color.BLACK)
+            typeface = ResourcesCompat.getFont(this@ScannerActivity, R.font.lato_regular)
+            setBackgroundResource(R.drawable.button_ripple)
+            setPadding(dpToPx(80), dpToPx(15), dpToPx(80), dpToPx(15))
+            tag = text
+
+            setOnClickListener {
+                handleBarcodeClick(text)
+            }
+        }
+        buttonLayout.addView(textButton)
+        barcodeButtonContainer.addView(buttonLayout)
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun createBarcodeButtons(barcodes: List<Barcode>) {
+        isProcessingEnabled = false
+
+        barcodes.forEach { barcode ->
+            if (barcode.rawValue?.length!! > 7) {
+                val buttonLayout = createButtonLayout()
+
                 val barcodeButton = TextView(this).apply {
                     layoutParams = FrameLayout.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT
                     ).apply {
-                        gravity =
-                            Gravity.CENTER // Ensures the TextView is centered in the FrameLayout
+                        gravity = Gravity.CENTER
                     }
                     elevation = 1.5f
-                    text = "${barcode.displayValue}"
+                    text = " פתח מוצר ${barcode.displayValue}"
                     textSize = 18f
                     setTextColor(Color.BLACK)
                     typeface = ResourcesCompat.getFont(this@ScannerActivity, R.font.lato_regular)
                     setBackgroundResource(R.drawable.button_ripple)
                     setPadding(dpToPx(80), dpToPx(15), dpToPx(80), dpToPx(15))
                 }
-
-                // Create a ProgressBar and initially hide it
-                progressBar = ProgressBar(this).apply {
-                    layoutParams = FrameLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    ).apply {
-                        gravity =
-                            Gravity.CENTER // Ensures the ProgressBar is centered in the FrameLayout
-                    }
-                    visibility = View.GONE // Initially hide the ProgressBar
-
-                    indeterminateDrawable.setColorFilter(
-                        Color.parseColor("#1b6682"), // Use Color.parseColor to convert hex to an int color
-                        PorterDuff.Mode.SRC_IN
-                    )
+                barcodeButton.setOnClickListener {
+                    barcodeButton.visibility = View.INVISIBLE
+                    barcodeButton.isEnabled = false
+                    handleBarcodeClick(barcode.rawValue ?: "")
                 }
                 buttonLayout.addView(barcodeButton)
-                buttonLayout.addView(progressBar)
-                barcodeButton.setOnClickListener {
-                    progressBar.visibility = View.VISIBLE
-                    barcodeButton.visibility = View.INVISIBLE
-                    // Optionally hide the text of the barcodeButton or make it look disabled
-                    barcodeButton.isEnabled = false
-                    handleBarcodeClick(barcode) // Your click handling logic
-                    container?.addView(buttonLayout)
-                }
+                barcodeButtonContainer.addView(buttonLayout)
             }
         }
+    }
+
+
+    private fun createButtonLayout(): FrameLayout {
+        return FrameLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                val margin = dpToPx(7)
+                setMargins(margin, margin, margin, margin)
+            }
+        }
+    }
+
+    private fun handleBarcodeClick(barcode: String) {
+        ScannerOpenerBridge.handleScanResult?.invoke(barcode)
+        resetButtonGeneration()
+        finish()
     }
 
     private fun dpToPx(dp: Int): Int {
@@ -291,9 +247,17 @@ class ScannerActivity : AppCompatActivity() {
         return (dp * density).toInt()
     }
 
-    private fun resetButtonGeneration() {
-        barcodeBtnLl.removeAllViews()
-        isProcessingEnabled = true
+    private fun showProgressBar() {
+        progressBar.visibility = View.VISIBLE
+        resetButtonGeneration()
+    }
+
+    private fun hideProgressBar() {
+        progressBar.visibility = View.GONE
+    }
+
+    private fun allPermissionsGranted() = arrayOf(Manifest.permission.CAMERA).all {
+        ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
     }
 }
 
