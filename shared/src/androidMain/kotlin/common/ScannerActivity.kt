@@ -105,18 +105,18 @@ class ScannerActivity : AppCompatActivity() {
         if (mediaImage != null) {
             val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
 
-            val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
             val barcodeScanner = BarcodeScanning.getClient()
+            val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
-            textRecognizer.process(image)
-                .addOnSuccessListener { texts ->
-                    if (texts.textBlocks.isNotEmpty()) {
-                        handleTextRecognitionResult(texts)
+            barcodeScanner.process(image)
+                .addOnSuccessListener { barcodes ->
+                    if (barcodes.isNotEmpty()) {
+                        createBarcodeButtons(barcodes)
                     } else {
-                        barcodeScanner.process(image)
-                            .addOnSuccessListener { barcodes ->
-                                if (barcodes.isNotEmpty()) {
-                                    createBarcodeButtons(barcodes)
+                        textRecognizer.process(image)
+                            .addOnSuccessListener { texts ->
+                                if (texts.textBlocks.isNotEmpty()) {
+                                    handleTextRecognitionResult(texts)
                                 }
                             }
                     }
@@ -148,7 +148,7 @@ class ScannerActivity : AppCompatActivity() {
             numberOccurrencesMap[matchedText] = count + 1
 
             // If the number is seen at least three times, create the button
-            if (numberOccurrencesMap[matchedText] ?: 0 >= 3) {
+            if ((numberOccurrencesMap[matchedText] ?: 0) >= 3) {
                 createTextButton(matchedText)
                 // Reset the count after creating the button
                 numberOccurrencesMap[matchedText] = 0
