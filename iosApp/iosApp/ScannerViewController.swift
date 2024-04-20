@@ -1,6 +1,7 @@
 import UIKit
 import AVFoundation
 import Vision
+import shared
 
 @objc class ScannerViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureMetadataOutputObjectsDelegate {
     var captureSession: AVCaptureSession!
@@ -206,9 +207,16 @@ import Vision
 
     @objc func barcodeButtonTapped(_ sender: UIButton) {
         guard let barcode = sender.title(for: .normal) else { return }
+        handleSelectedBarcode(barcode)
+    }
+    
+    private func handleSelectedBarcode(_ barcode: String) {
+        print("Barcode Selected: \(barcode)")
         didFindCode?(barcode)
+        ScannerOpenerBridge.shared.handleScanResult?(barcode)
         closeViewController()
     }
+
     
     private func closeViewController() {
         if let navigationController = navigationController, navigationController.viewControllers.first != self {
