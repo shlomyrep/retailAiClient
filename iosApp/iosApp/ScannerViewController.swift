@@ -2,6 +2,8 @@ import UIKit
 import AVFoundation
 import Vision
 import shared
+import Foundation
+
 
 @objc class ScannerViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureMetadataOutputObjectsDelegate {
     var captureSession: AVCaptureSession!
@@ -168,18 +170,12 @@ import shared
         try? imageRequestHandler.perform([textRecognitionRequest])
     }
 
-    func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
-        DispatchQueue.main.async { [unowned self] in
-            for metadataObject in metadataObjects {
-                guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject,
-                      let stringValue = readableObject.stringValue else {
-                    continue
-                }
-                if !seenBarcodes.contains(stringValue) {
-                    seenBarcodes.insert(stringValue)
-                    createBarcodeButton(barcode: stringValue)
-                }
-            }
+    @objc func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+     
+        if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
+           let stringValue = metadataObject.stringValue {
+            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+            createBarcodeButton(barcode: stringValue)
         }
     }
 
