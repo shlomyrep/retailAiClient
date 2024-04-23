@@ -1,5 +1,6 @@
 package presentation.ui.main.detail
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -586,20 +587,22 @@ fun BatchItemRow(batchItem: BatchItem, index: Int) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BatchListDialog(batches: List<BatchItem>, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(12.dp),
             modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .fillMaxHeight(0.5f)
+                .fillMaxWidth(1f)
+                .fillMaxHeight(0.6f)
         ) {
             LazyColumn {
-                // Header as a separate item
-                item {
+                // Define the sticky header
+                stickyHeader {
                     BatchListHeader()
                 }
+                // List items
                 itemsIndexed(batches) { index, batch ->
                     BatchItemRow(batch, index)
                 }
@@ -607,6 +610,7 @@ fun BatchListDialog(batches: List<BatchItem>, onDismiss: () -> Unit) {
         }
     }
 }
+
 
 
 
