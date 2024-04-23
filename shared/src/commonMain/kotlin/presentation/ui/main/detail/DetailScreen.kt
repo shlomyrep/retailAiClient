@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,12 +34,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.datasource.network.main.responses.ColorSelectable
 import business.datasource.network.main.responses.Selection
@@ -76,188 +77,190 @@ fun DetailScreen(
     events: (DetailEvent) -> Unit
 ) {
 
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
 
-    DefaultScreenUI(
-        queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(DetailEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(DetailEvent.OnRetryNetwork) }
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier.fillMaxSize().align(Alignment.TopCenter)
-                    .verticalScroll(rememberScrollState())
-                    .padding(bottom = 75.dp)
-            ) {
+        DefaultScreenUI(
+            queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(DetailEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(DetailEvent.OnRetryNetwork) }
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier.fillMaxSize().align(Alignment.TopCenter)
+                        .verticalScroll(rememberScrollState())
+                        .padding(bottom = 75.dp)
+                ) {
 
-                Box(modifier = Modifier.fillMaxWidth().height(400.dp)) {
+                    Box(modifier = Modifier.fillMaxWidth().height(400.dp)) {
 
-                    Image(
-                        painter = rememberCustomImagePainter(state.selectedImage),
-                        null, modifier = Modifier.fillMaxSize()
-                    )
+                        Image(
+                            painter = rememberCustomImagePainter(state.selectedImage),
+                            null, modifier = Modifier.fillMaxSize()
+                        )
 
-                    Box(modifier = Modifier.padding(16.dp).align(Alignment.TopStart)) {
-                        CircleButton(
-                            modifier = Modifier.padding(4.dp),
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            onClick = { popup() })
-                    }
+                        Box(modifier = Modifier.padding(16.dp).align(Alignment.TopStart)) {
+                            CircleButton(
+                                modifier = Modifier.padding(4.dp),
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                onClick = { popup() })
+                        }
 
-                    Box(modifier = Modifier.padding(16.dp).align(Alignment.TopEnd)) {
-                        CircleButton(
-                            modifier = Modifier.padding(4.dp),
-                            imageVector = if (state.product.isLike) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                            onClick = {
-                                events(DetailEvent.Like(state.product.id))
-                            })
-                    }
+                        Box(modifier = Modifier.padding(16.dp).align(Alignment.TopEnd)) {
+                            CircleButton(
+                                modifier = Modifier.padding(4.dp),
+                                imageVector = if (state.product.isLike) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                onClick = {
+                                    events(DetailEvent.Like(state.product.id))
+                                })
+                        }
 
-                    Box(
-                        modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth()
-                            .padding(16.dp)
-                    ) {
-                        Card(
-                            modifier = Modifier.wrapContentWidth().padding(vertical = 8.dp),
-                            shape = MaterialTheme.shapes.small
+                        Box(
+                            modifier = Modifier.align(Alignment.BottomCenter).wrapContentWidth()
+                                .padding(16.dp)
                         ) {
-                            LazyRow(
-                                modifier = Modifier.wrapContentWidth(),
-                                contentPadding = PaddingValues(8.dp)
+                            Card(
+                                modifier = Modifier.wrapContentWidth().padding(vertical = 8.dp),
+                                shape = MaterialTheme.shapes.small
                             ) {
-                                items(state.product.gallery) {
-                                    ImageSliderBox(it) {
-                                        events(DetailEvent.OnUpdateSelectedImage(it))
+                                LazyRow(
+                                    modifier = Modifier.wrapContentWidth(),
+                                    contentPadding = PaddingValues(8.dp)
+                                ) {
+                                    items(state.product.gallery) {
+                                        ImageSliderBox(it) {
+                                            events(DetailEvent.OnUpdateSelectedImage(it))
+                                        }
                                     }
                                 }
                             }
                         }
+
+
                     }
 
+                    Spacer_32dp()
 
-                }
-
-                Spacer_32dp()
-
-                Column(modifier = Modifier.padding(vertical = 16.dp)) {
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            state.product.category.name,
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                    Column(modifier = Modifier.padding(vertical = 16.dp)) {
 
                         Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Icon(Icons.Filled.Star, null, tint = orange_400)
                             Text(
-                                state.product.rate.toString(),
+                                state.product.category.name,
                                 style = MaterialTheme.typography.titleMedium
                             )
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(Icons.Filled.Star, null, tint = orange_400)
+                                Text(
+                                    state.product.rate.toString(),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            }
                         }
-                    }
 
 
-                    Spacer_16dp()
+                        Spacer_16dp()
 
 
-                    Text(
-                        state.product.title,
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        style = MaterialTheme.typography.headlineLarge,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-
-                    // a grid that shows the size selection if exists
-                    SizeGrid(state.product.selections, events)
-
-                    ColorGrid(state.product.selections, events)
-
-                    Spacer_16dp()
-
-                    Text(
-                        "Product Details",
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-
-                    Spacer_8dp()
-
-                    ExpandingText(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        text = state.product.description,
-                        style = MaterialTheme.typography.bodySmall,
-                    ) {}
-
-
-                    Spacer_16dp()
-
-                    HorizontalDivider(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        thickness = 1.dp,
-                        color = BackgroundContent
-                    )
-
-                    Spacer_16dp()
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
                         Text(
-                            text = "Read some comments",
-                            style = MaterialTheme.typography.titleLarge,
-                        )
-                        Text(
-                            text = "More",
-                            modifier = Modifier
-                                .clickable {
-                                    navigateToMoreComment(state.product.id)
-                                },
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary
+                            state.product.title,
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            style = MaterialTheme.typography.headlineLarge,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
                         )
 
-                    }
+                        // a grid that shows the size selection if exists
+                        SizeGrid(state.product.selections, events)
 
-                    Spacer_8dp()
+                        ColorGrid(state.product.selections, events)
 
-                    if (state.product.comments.isEmpty()) {
+                        Spacer_16dp()
+
                         Text(
-                            "No Comments!",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = BorderColor,
-                            modifier = Modifier.padding(horizontal = 32.dp)
+                            "Product Details",
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            style = MaterialTheme.typography.titleLarge
                         )
-                    }
 
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(horizontal = 24.dp)
-                    ) {
-                        items(state.product.comments, key = { it.createAt }) {
-                            CommentBox(comment = it)
+                        Spacer_8dp()
+
+                        ExpandingText(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            text = state.product.description,
+                            style = MaterialTheme.typography.bodySmall,
+                        ) {}
+
+
+                        Spacer_16dp()
+
+                        HorizontalDivider(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            thickness = 1.dp,
+                            color = BackgroundContent
+                        )
+
+                        Spacer_16dp()
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Read some comments",
+                                style = MaterialTheme.typography.titleLarge,
+                            )
+                            Text(
+                                text = "More",
+                                modifier = Modifier
+                                    .clickable {
+                                        navigateToMoreComment(state.product.id)
+                                    },
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+
                         }
+
+                        Spacer_8dp()
+
+                        if (state.product.comments.isEmpty()) {
+                            Text(
+                                "No Comments!",
+                                style = MaterialTheme.typography.titleLarge,
+                                color = BorderColor,
+                                modifier = Modifier.padding(horizontal = 32.dp)
+                            )
+                        }
+
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentPadding = PaddingValues(horizontal = 24.dp)
+                        ) {
+                            items(state.product.comments, key = { it.createAt }) {
+                                CommentBox(comment = it)
+                            }
+                        }
+
+                        Spacer_16dp()
+
                     }
-
-                    Spacer_16dp()
-
                 }
-            }
-            Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
-                BuyButtonBox(
-                    state.product
-                ) {
-                    events(DetailEvent.AddBasket(state.product))
+                Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
+                    BuyButtonBox(
+                        state.product
+                    ) {
+                        events(DetailEvent.AddBasket(state.product))
+                    }
                 }
             }
         }
