@@ -18,6 +18,11 @@ sealed class DetailEvent {
         val id: String
     ) : DetailEvent()
 
+    data class GetProductInventory(
+        val supplierId: String,
+        val sku: String
+    ) : DetailEvent()
+
    data object OnRemoveHeadFromQueue : DetailEvent()
 
     data class Error(

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,8 +18,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -41,12 +44,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import business.datasource.network.main.responses.ColorSelectable
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
+import business.domain.main.BatchItem
 import business.domain.main.Comment
 import business.domain.main.Product
 import presentation.component.CircleButton
@@ -66,6 +72,7 @@ import presentation.theme.BorderColor
 import presentation.theme.orange_400
 import presentation.ui.main.detail.view_model.DetailEvent
 import presentation.ui.main.detail.view_model.DetailState
+import presentation.ui.main.detail.view_model.DetailViewModel
 import presentation.util.convertDate
 
 
@@ -74,11 +81,12 @@ fun DetailScreen(
     popup: () -> Unit,
     navigateToMoreComment: (String) -> Unit,
     state: DetailState,
-    events: (DetailEvent) -> Unit
+    events: (DetailEvent) -> Unit,
+    viewModel: DetailViewModel
 ) {
+    val showDialog = viewModel.showDialog
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-
         DefaultScreenUI(
             queue = state.errorQueue,
             onRemoveHeadFromQueue = { events(DetailEvent.OnRemoveHeadFromQueue) },
@@ -143,7 +151,7 @@ fun DetailScreen(
                     Spacer_32dp()
 
                     Column(modifier = Modifier.padding(vertical = 16.dp)) {
-
+                        val batches = viewModel.state.value.productInventoryBatch.batchesList
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -158,14 +166,16 @@ fun DetailScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                Icon(Icons.Filled.Star, null, tint = orange_400)
-                                Text(
-                                    state.product.rate.toString(),
-                                    style = MaterialTheme.typography.titleMedium
-                                )
+                                InventoryStatusText(viewModel = viewModel, onDialogRequest = viewModel::show)
+                                if (showDialog) {
+                                    BatchListDialog(
+                                        batches = state.productInventoryBatch.batchesList,
+                                        onDismiss = viewModel::dismiss
+                                    )
+                                }
                             }
-                        }
 
+                        }
 
                         Spacer_16dp()
 
@@ -497,3 +507,107 @@ fun ImageSliderBox(it: String, onClick: () -> Unit) {
         )
     }
 }
+
+@Composable
+fun InventoryStatusText(viewModel: DetailViewModel, onDialogRequest: () -> Unit) {
+    val inventoryStatus = viewModel.inventoryStatusText.value
+    val inventoryColor = viewModel.inventoryStatusColor.value
+    val isClickable = viewModel.inventoryClickable.value
+
+    Text(
+        text = inventoryStatus,
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier
+            .clickable(enabled = isClickable, onClick = onDialogRequest)
+            .padding(16.dp),
+        color = inventoryColor
+    )
+}
+
+@Composable
+fun BatchListHeader() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Black)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "אצווה",
+            color = Color.White,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = "מלאי",
+            color = Color.White,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = "זמין",
+            color = Color.White,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun BatchItemRow(batchItem: BatchItem, index: Int) {
+    val backgroundColor = if (index % 2 == 0) Color.LightGray else Color.White
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(backgroundColor)
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = batchItem.batch,
+            color = Color.Black,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center,
+
+        )
+        Text(
+            text = "${batchItem.quantity}",
+            color = Color.Black,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = "${batchItem.freeQuantity}",
+            color = Color.Black,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun BatchListDialog(batches: List<BatchItem>, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
+                .fillMaxHeight(0.5f)
+        ) {
+            LazyColumn {
+                // Header as a separate item
+                item {
+                    BatchListHeader()
+                }
+                itemsIndexed(batches) { index, batch ->
+                    BatchItemRow(batch, index)
+                }
+            }
+        }
+    }
+}
+
+
+
+

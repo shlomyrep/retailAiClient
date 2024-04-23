@@ -33,7 +33,8 @@ fun DetailNav(id: String, popUp: () -> Unit) {
                     popUp()
                 }, navigateToMoreComment = {
                     navigator.navigate(DetailNavigation.Comment.route.plus("/$it"))
-                })
+                }, viewModel = viewModel
+            )
         }
         scene(route = DetailNavigation.Comment.route.plus(DetailNavigation.Comment.objectPath)) { backStackEntry ->
             backStackEntry.path<Int>(DetailNavigation.Comment.objectName)?.let {

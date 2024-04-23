@@ -1,12 +1,16 @@
 package presentation.ui.main.detail.view_model
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import business.constants.CUSTOM_TAG
 import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
+import business.domain.main.BatchItem
 import business.domain.main.Product
 import business.interactors.main.AddBasketInteractor
 import business.interactors.main.LikeInteractor
@@ -23,9 +27,17 @@ class DetailViewModel(
 ) : ViewModel() {
 
 
-
-
     val state: MutableState<DetailState> = mutableStateOf(DetailState())
+    val inventoryStatusText = mutableStateOf("")
+    val inventoryStatusColor = mutableStateOf(Color.Black)
+    val inventoryClickable = mutableStateOf(false)
+    var showDialog by mutableStateOf(false)
+    fun show() {
+        showDialog = true
+    }
+    fun dismiss() {
+        showDialog = false
+    }
 
 
     fun onTriggerEvent(event: DetailEvent) {
@@ -53,6 +65,10 @@ class DetailViewModel(
 
             is DetailEvent.GetProduct -> {
                 getProduct(event.id)
+            }
+
+            is DetailEvent.GetProductInventory -> {
+                getProductInventory(event.supplierId, event.sku)
             }
 
             is DetailEvent.OnRemoveHeadFromQueue -> {
@@ -143,6 +159,7 @@ class DetailViewModel(
                 is DataState.NetworkStatus -> {
                     onTriggerEvent(DetailEvent.OnUpdateNetworkState(dataState.networkState))
                 }
+
                 is DataState.Response -> {
                     onTriggerEvent(DetailEvent.Error(dataState.uiComponent))
                 }
@@ -152,6 +169,35 @@ class DetailViewModel(
                         state.value = state.value.copy(product = it)
                         state.value =
                             state.value.copy(selectedImage = it.gallery.firstOrNull() ?: "")
+
+                        getProductInventory("6358ea2f19992d304ce3821a", it.sku)
+
+                    }
+                }
+
+                is DataState.Loading -> {
+                    state.value =
+                        state.value.copy(progressBarState = dataState.progressBarState)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun getProductInventory(supplierId: String, sku: String) {
+        productInteractor.getProductInventory(supplierId = supplierId, sku = sku).onEach { dataState ->
+            when (dataState) {
+                is DataState.NetworkStatus -> {
+                    onTriggerEvent(DetailEvent.OnUpdateNetworkState(dataState.networkState))
+                }
+
+                is DataState.Response -> {
+                    handleInventoryResponse(null)
+                }
+
+                is DataState.Data -> {
+                    dataState.data?.let { batchItems ->
+                        handleInventoryResponse(batchItems.batchesList)
+                        state.value = state.value.copy(productInventoryBatch = batchItems)
                     }
                 }
 
@@ -197,5 +243,32 @@ class DetailViewModel(
         state.value = state.value.copy(networkState = networkState)
     }
 
+    private fun handleInventoryResponse(batchItemList: List<BatchItem>?) {
+        when {
+            batchItemList.isNullOrEmpty() -> {
+                inventoryStatusText.value = "לא קיים מלאי עבור פריט זה"
+                inventoryStatusColor.value = Color.Black
+                inventoryClickable.value = false
+            }
+
+            batchItemList.size == 1 -> {
+                val quantity = batchItemList[0].quantity
+                val freeQuantity = batchItemList[0].freeQuantity
+
+                val roundedOnHand = if (quantity % 1.0 == 0.0) quantity.toInt() else quantity
+                val roundedFreeQty = if (freeQuantity % 1.0 == 0.0) freeQuantity.toInt() else freeQuantity
+
+                inventoryStatusText.value = " מלאי : $roundedOnHand, זמין : $roundedFreeQty"
+                inventoryStatusColor.value = Color.Black
+                inventoryClickable.value = false
+            }
+
+            else -> {
+                inventoryStatusText.value = "רשימת מלאי"
+                inventoryStatusColor.value = Color.Blue
+                inventoryClickable.value = true
+            }
+        }
+    }
 
 }

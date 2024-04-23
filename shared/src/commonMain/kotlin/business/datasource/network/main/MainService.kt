@@ -5,6 +5,7 @@ import business.datasource.network.common.MainGenericResponse
 import business.datasource.network.main.responses.AddressDTO
 import business.datasource.network.main.responses.BasketDTO
 import business.datasource.network.main.responses.CommentDTO
+import business.datasource.network.main.responses.HeldInventoryBatchDTO
 import business.datasource.network.main.responses.HomeDTO
 import business.datasource.network.main.responses.OrderDTO
 import business.datasource.network.main.responses.ProductDTO
@@ -30,6 +31,7 @@ interface MainService {
         const val COMMENT = "comment"
         const val WISHLIST = "wishlist"
         const val ADDRESS = "address"
+        const val PRODUCT_INVENTORY = "inventory"
     }
 
     suspend fun getOrders(
@@ -93,14 +95,11 @@ interface MainService {
     suspend fun basketDelete(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun home(token: String): MainGenericResponse<HomeDTO>
     suspend fun product(token: String, id: String): MainGenericResponse<ProductDTO>
+    suspend fun productInventory(token: String, supplierId :String,sku: String): HeldInventoryBatchDTO
     suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun wishlist(
         token: String,
         categoryId: Int?,
         page: Int
     ): MainGenericResponse<WishlistDTO>
-
-
-
-
 }

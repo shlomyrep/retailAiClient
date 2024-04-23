@@ -11,6 +11,7 @@ import business.datasource.network.main.responses.BasketDeleteRequestDTO
 import business.datasource.network.main.responses.BuyRequestDTO
 import business.datasource.network.main.responses.CommentDTO
 import business.datasource.network.main.responses.CommentRequestDTO
+import business.datasource.network.main.responses.HeldInventoryBatchDTO
 import business.datasource.network.main.responses.HomeDTO
 import business.datasource.network.main.responses.OrderDTO
 import business.datasource.network.main.responses.ProductDTO
@@ -287,7 +288,7 @@ class MainServiceImpl(
                 encodedPath += MainService.BASKET_ADD
             }
             contentType(ContentType.Application.Json)
-            setBody(BasketAddRequestDTO(count = count, productId = id.id , selections = id.selections))
+            setBody(BasketAddRequestDTO(count = count, productId = id.id, selections = id.selections))
         }.body()
     }
 
@@ -327,6 +328,20 @@ class MainServiceImpl(
                 takeFrom(BASE_URL)
                 encodedPath += MainService.PRODUCT
                 encodedPath += "/$id"
+            }
+            contentType(ContentType.Application.Json)
+        }.body()
+    }
+
+    override suspend fun productInventory(token: String, supplierId: String, sku: String): HeldInventoryBatchDTO {
+        return httpClient.get {
+            url {
+                takeFrom(BASE_URL + MainService.PRODUCT_INVENTORY) // Assuming PRODUCT_INVENTORY is the endpoint
+                parameters.append("supplierId", supplierId)
+                parameters.append("sku", sku)
+                headers {
+                    append(HttpHeaders.Authorization, token)
+                }
             }
             contentType(ContentType.Application.Json)
         }.body()

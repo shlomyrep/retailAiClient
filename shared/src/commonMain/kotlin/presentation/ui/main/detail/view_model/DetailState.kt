@@ -4,7 +4,7 @@ import business.core.NetworkState
 import business.core.ProgressBarState
 import business.core.Queue
 import business.core.UIComponent
-import business.datasource.network.main.responses.PriceType
+import business.domain.main.HeldInventoryBatch
 import business.domain.main.Product
 
 data class DetailState(
@@ -15,4 +15,6 @@ data class DetailState(
     val progressBarState: ProgressBarState = ProgressBarState.Idle,
     val networkState: NetworkState = NetworkState.Good,
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf()),
+    val productInventoryBatch: HeldInventoryBatch = HeldInventoryBatch(),
+    val productInventoryBatchText: String = ""
 )
