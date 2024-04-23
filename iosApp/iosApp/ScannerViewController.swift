@@ -100,7 +100,7 @@ import Foundation
         view.addSubview(scrollView)
 
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: lastScannedBarcodeLabel.bottomAnchor, constant: 20),
+            scrollView.topAnchor.constraint(equalTo: lastScannedBarcodeLabel.bottomAnchor, constant: -60),
             scrollView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
             scrollView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
             scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
