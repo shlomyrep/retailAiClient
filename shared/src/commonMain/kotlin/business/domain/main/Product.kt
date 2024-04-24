@@ -21,6 +21,7 @@ data class Product(
     val gallery: List<String> = listOf(),
     val priceType: PriceType = PriceType.SINGLE_PRICE,
     val sku: String = "",
+    val supplier: Supplier = Supplier()
 ) {
     fun getPrice() = "$ $price"
 

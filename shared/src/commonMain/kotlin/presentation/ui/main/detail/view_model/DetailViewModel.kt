@@ -31,10 +31,14 @@ class DetailViewModel(
     val inventoryStatusText = mutableStateOf("")
     val inventoryStatusColor = mutableStateOf(Color.Black)
     val inventoryClickable = mutableStateOf(false)
+    val inventoryUnderLine = mutableStateOf(false)
     var showDialog by mutableStateOf(false)
+    val isLoading = mutableStateOf(false)
+
     fun show() {
         showDialog = true
     }
+
     fun dismiss() {
         showDialog = false
     }
@@ -170,7 +174,9 @@ class DetailViewModel(
                         state.value =
                             state.value.copy(selectedImage = it.gallery.firstOrNull() ?: "")
 
-                        getProductInventory("6358ea2f19992d304ce3821a", it.sku)
+//                        getProductInventory(it.supplier.supplierId, it.sku)
+                        getProductInventory("6358ea2f19992d304ce3821a", "117011212")
+
 
                     }
                 }
@@ -184,6 +190,7 @@ class DetailViewModel(
     }
 
     private fun getProductInventory(supplierId: String, sku: String) {
+        isLoading.value = true
         productInteractor.getProductInventory(supplierId = supplierId, sku = sku).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {
@@ -202,12 +209,13 @@ class DetailViewModel(
                 }
 
                 is DataState.Loading -> {
-                    state.value =
-                        state.value.copy(progressBarState = dataState.progressBarState)
+                    state.value = state.value.copy(progressBarState = dataState.progressBarState)
                 }
             }
+            isLoading.value = false
         }.launchIn(viewModelScope)
     }
+
 
 
     private fun appendToMessageQueue(uiComponent: UIComponent) {
@@ -249,6 +257,7 @@ class DetailViewModel(
                 inventoryStatusText.value = "לא קיים מלאי עבור פריט זה"
                 inventoryStatusColor.value = Color.Black
                 inventoryClickable.value = false
+                inventoryUnderLine.value = false
             }
 
             batchItemList.size == 1 -> {
@@ -261,12 +270,15 @@ class DetailViewModel(
                 inventoryStatusText.value = " מלאי : $roundedOnHand, זמין : $roundedFreeQty"
                 inventoryStatusColor.value = Color.Black
                 inventoryClickable.value = false
+                inventoryUnderLine.value = false
             }
 
             else -> {
                 inventoryStatusText.value = "רשימת מלאי"
                 inventoryStatusColor.value = Color.Blue
                 inventoryClickable.value = true
+                inventoryUnderLine.value = true
+
             }
         }
     }

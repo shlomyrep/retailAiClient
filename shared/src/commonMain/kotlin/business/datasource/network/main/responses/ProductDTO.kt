@@ -2,6 +2,7 @@ package business.datasource.network.main.responses
 
 import business.domain.main.Category
 import business.domain.main.Product
+import business.domain.main.Supplier
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -11,7 +12,6 @@ const val TYPE_PRODUCT = "product"
 
 @Serializable
 data class ProductDTO(
-
     @SerialName("description") val description: String?,
     @SerialName("_id") override val _id: String?,
     val id: String? = _id,
@@ -30,6 +30,7 @@ data class ProductDTO(
     @SerialName("category") val category: CategoryDTO?,
     @SerialName("comments") val comments: List<CommentDTO>?,
     @SerialName("gallery") val gallery: List<String>?,
+    @SerialName("supplier") val supplier: SupplierDto?,
 ) : Selectable {
     companion object {
         val type = "product"
@@ -134,6 +135,7 @@ data class ColorInfo(
     @SerialName("not_available")
     val isNotAvailable: Boolean = false
 )
+
 @Serializable
 enum class PriceType {
     @SerialName("single_price")
@@ -164,7 +166,7 @@ enum class PriceType {
 fun ProductDTO.toProduct() = Product(
     description = description ?: "",
     id = id ?: "0",
-    sku= sku,
+    sku = sku ?: "",
     priceType = PriceType.fromString(priceType),
     image = image ?: "",
     isLike = isLike ?: false,
@@ -175,6 +177,7 @@ fun ProductDTO.toProduct() = Product(
     title = title ?: "",
     category = category?.toCategory() ?: Category(),
     comments = comments?.map { it.toComment() } ?: listOf(),
-    gallery = gallery ?: listOf()
+    gallery = gallery ?: listOf(),
+    supplier = supplier?.toSupplier() ?: Supplier(),
 )
 

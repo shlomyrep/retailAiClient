@@ -45,8 +45,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -514,14 +519,24 @@ fun InventoryStatusText(viewModel: DetailViewModel, onDialogRequest: () -> Unit)
     val inventoryStatus = viewModel.inventoryStatusText.value
     val inventoryColor = viewModel.inventoryStatusColor.value
     val isClickable = viewModel.inventoryClickable.value
+    val isUnderline = viewModel.inventoryUnderLine.value
+
+    val text = if (isUnderline) {
+        buildAnnotatedString {
+            withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
+                append(inventoryStatus)
+            }
+        }
+    } else {
+        AnnotatedString(inventoryStatus)
+    }
 
     Text(
-        text = inventoryStatus,
-        style = MaterialTheme.typography.titleMedium,
+        text = text,
+        style = MaterialTheme.typography.titleMedium.copy(color = inventoryColor),
         modifier = Modifier
             .clickable(enabled = isClickable, onClick = onDialogRequest)
-            .padding(16.dp),
-        color = inventoryColor
+            .padding(16.dp)
     )
 }
 
