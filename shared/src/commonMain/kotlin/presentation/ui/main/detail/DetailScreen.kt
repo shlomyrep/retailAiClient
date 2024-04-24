@@ -39,6 +39,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +66,7 @@ import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.BatchItem
 import business.domain.main.Comment
 import business.domain.main.Product
+import kotlinx.coroutines.delay
 import presentation.component.CircleButton
 import presentation.component.CircleImage
 import presentation.component.DEFAULT__BUTTON_SIZE
@@ -520,15 +526,33 @@ fun InventoryStatusText(viewModel: DetailViewModel, onDialogRequest: () -> Unit)
     val inventoryColor = viewModel.inventoryStatusColor.value
     val isClickable = viewModel.inventoryClickable.value
     val isUnderline = viewModel.inventoryUnderLine.value
+    val isLoading = viewModel.isLoading.value
+
+    var dots by remember { mutableStateOf("") }
+    LaunchedEffect(isLoading) {
+        while (isLoading) {
+            dots = when (dots) {
+                "    " -> ".   "
+                ".   " -> "..  "
+                "..  " -> "... "
+                "...  " -> ".... "
+                else -> "    "
+            }
+            delay(200) // Pause for half a second between updates
+        }
+        dots = "    "
+    }
+
+    val displayText = if (isLoading) " מעדכן מלאי $dots " else inventoryStatus
 
     val text = if (isUnderline) {
         buildAnnotatedString {
             withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
-                append(inventoryStatus)
+                append(displayText)
             }
         }
     } else {
-        AnnotatedString(inventoryStatus)
+        AnnotatedString(displayText)
     }
 
     Text(
@@ -586,7 +610,7 @@ fun BatchItemRow(batchItem: BatchItem, index: Int) {
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center,
 
-        )
+            )
         Text(
             text = "${batchItem.quantity}",
             color = Color.Black,

@@ -28,11 +28,12 @@ class DetailViewModel(
 
 
     val state: MutableState<DetailState> = mutableStateOf(DetailState())
-    val inventoryStatusText = mutableStateOf("מעדכן מלאי...")
+    val inventoryStatusText = mutableStateOf("מעדכן מלאי")
     val inventoryStatusColor = mutableStateOf(Color.Black)
     val inventoryClickable = mutableStateOf(false)
     val inventoryUnderLine = mutableStateOf(false)
     var showDialog by mutableStateOf(false)
+    val isLoading = mutableStateOf(false)
 
 
     fun show() {
@@ -176,8 +177,6 @@ class DetailViewModel(
 
                         getProductInventory(it.supplier.supplierId, it.sku)
 //                        getProductInventory("6358ea2f19992d304ce3821a", "117011212")
-
-
                     }
                 }
 
@@ -190,7 +189,8 @@ class DetailViewModel(
     }
 
     private fun getProductInventory(supplierId: String, sku: String) {
-        inventoryStatusText.value = "מעדכן מלאי..."
+        isLoading.value = true
+        inventoryStatusText.value = "מעדכן מלאי"
         productInteractor.getProductInventory(supplierId = supplierId, sku = sku).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {
@@ -214,7 +214,6 @@ class DetailViewModel(
             }
         }.launchIn(viewModelScope)
     }
-
 
 
     private fun appendToMessageQueue(uiComponent: UIComponent) {
@@ -277,8 +276,8 @@ class DetailViewModel(
                 inventoryStatusColor.value = Color.Blue
                 inventoryClickable.value = true
                 inventoryUnderLine.value = true
-
             }
         }
+        isLoading.value = false
     }
 }
