@@ -28,12 +28,12 @@ class DetailViewModel(
 
 
     val state: MutableState<DetailState> = mutableStateOf(DetailState())
-    val inventoryStatusText = mutableStateOf("")
+    val inventoryStatusText = mutableStateOf("מעדכן מלאי...")
     val inventoryStatusColor = mutableStateOf(Color.Black)
     val inventoryClickable = mutableStateOf(false)
     val inventoryUnderLine = mutableStateOf(false)
     var showDialog by mutableStateOf(false)
-    val isLoading = mutableStateOf(false)
+
 
     fun show() {
         showDialog = true
@@ -174,8 +174,8 @@ class DetailViewModel(
                         state.value =
                             state.value.copy(selectedImage = it.gallery.firstOrNull() ?: "")
 
-//                        getProductInventory(it.supplier.supplierId, it.sku)
-                        getProductInventory("6358ea2f19992d304ce3821a", "117011212")
+                        getProductInventory(it.supplier.supplierId, it.sku)
+//                        getProductInventory("6358ea2f19992d304ce3821a", "117011212")
 
 
                     }
@@ -190,7 +190,7 @@ class DetailViewModel(
     }
 
     private fun getProductInventory(supplierId: String, sku: String) {
-        isLoading.value = true
+        inventoryStatusText.value = "מעדכן מלאי..."
         productInteractor.getProductInventory(supplierId = supplierId, sku = sku).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {
@@ -212,7 +212,6 @@ class DetailViewModel(
                     state.value = state.value.copy(progressBarState = dataState.progressBarState)
                 }
             }
-            isLoading.value = false
         }.launchIn(viewModelScope)
     }
 
@@ -282,5 +281,4 @@ class DetailViewModel(
             }
         }
     }
-
 }
