@@ -14,7 +14,7 @@ data class OrderDTO(
     @SerialName("shipping_type") val shippingType: Int?,
     @SerialName("status") val status: Int?,
     @SerialName("address") val address: AddressDTO?,
-    @SerialName("products") val products: List<ProductDTO>?,
+    @SerialName("products") val products: List<ProductSelectable>?,
 )
 
 fun OrderDTO.toOrder() = Order(

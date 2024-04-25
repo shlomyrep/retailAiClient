@@ -10,8 +10,8 @@ import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
+import business.datasource.network.main.responses.ProductSelectable
 import business.domain.main.BatchItem
-import business.domain.main.Product
 import business.interactors.main.AddBasketInteractor
 import business.interactors.main.LikeInteractor
 import business.interactors.main.ProductInteractor
@@ -132,7 +132,7 @@ class DetailViewModel(
     }
 
 
-    private fun addBasket(id: Product) {
+    private fun addBasket(id: ProductSelectable) {
         addBasketInteractor.execute(id = id, 1)
             .onEach { dataState ->
                 when (dataState) {
@@ -175,7 +175,7 @@ class DetailViewModel(
                         state.value =
                             state.value.copy(selectedImage = it.gallery.firstOrNull() ?: "")
 
-                        getProductInventory(it.supplier.supplierId, it.sku)
+                        it.supplier.supplierId?.let { it1 -> getProductInventory(it1, it.sku) }
 //                        getProductInventory("6358ea2f19992d304ce3821a", "117011212")
                     }
                 }

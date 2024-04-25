@@ -27,15 +27,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.core.UIComponentState
 import business.domain.main.Product
@@ -77,92 +79,93 @@ fun SearchScreen(
         SortDialog(state = state, events = events)
     }
 
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        DefaultScreenUI(
+            queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(SearchEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(SearchEvent.OnRetryNetwork) }
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
 
-    DefaultScreenUI(
-        queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(SearchEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(SearchEvent.OnRetryNetwork) }
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
 
-
-            Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-                CircleButton(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    onClick = { popUp() }
-                )
-                Spacer_8dp()
-                SearchBox(
-                    value = state.searchText,
-                    onValueChange = { events(SearchEvent.OnUpdateSearchText(it)) },
-                    onSearchExecute = { events(SearchEvent.Search()) })
-            }
-            Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                TextButton(onClick = {
-                    events(
-                        SearchEvent.OnUpdateSortDialogState(
-                            UIComponentState.Show
-                        )
+                Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                    CircleButton(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        onClick = { popUp() }
                     )
-                }, modifier = Modifier.weight(5f)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            painterResource(Res.drawable.sort),
-                            null,
-                            modifier = Modifier.size(24.dp)
+                    Spacer_8dp()
+                    SearchBox(
+                        value = state.searchText,
+                        onValueChange = { events(SearchEvent.OnUpdateSearchText(it)) },
+                        onSearchExecute = { events(SearchEvent.Search()) })
+                }
+                Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                    TextButton(onClick = {
+                        events(
+                            SearchEvent.OnUpdateSortDialogState(
+                                UIComponentState.Show
+                            )
                         )
-                        Text("Sort")
+                    }, modifier = Modifier.weight(5f)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                painterResource(Res.drawable.sort),
+                                null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text("מיון")
+                        }
+                    }
+                    TextButton(onClick = {
+                        events(
+                            SearchEvent.OnUpdateFilterDialogState(
+                                UIComponentState.Show
+                            )
+                        )
+                    }, modifier = Modifier.weight(5f)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                painterResource(Res.drawable.filter),
+                                null,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text("פילטר")
+                        }
                     }
                 }
-                TextButton(onClick = {
-                    events(
-                        SearchEvent.OnUpdateFilterDialogState(
-                            UIComponentState.Show
-                        )
-                    )
-                }, modifier = Modifier.weight(5f)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            painterResource(Res.drawable.filter),
-                            null,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        Text("Filter")
-                    }
-                }
-            }
 
-            Column(
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
-            ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(16.dp)
+                Column(
+                    modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                 ) {
-                    items(
-                        // Implement a better regex find mechanizm
-                        state.search.products.filter { it.title.contains(state.searchText) },
-                        key = {
-                            it.id
-                        }) {
-                        ProductSearchBox(
-                            it,
-                            isLastItem = state.search.products.last() == it,
-                            navigateToDetail = { navigateToDetailScreen(it.id) })
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp)
+                    ) {
+                        items(
+                            // Implement a better regex find mechanizm
+                            state.search.products.filter { it.title.contains(state.searchText) },
+                            key = {
+                                it.id
+                            }) {
+                            ProductSearchBox(
+                                it,
+                                isLastItem = state.search.products.last() == it,
+                                navigateToDetail = { navigateToDetailScreen(it.id) })
+                        }
                     }
                 }
-            }
 
+            }
         }
     }
 }
@@ -246,7 +249,7 @@ private fun SearchBox(
             )
             TextField(
                 placeholder = {
-                    Text("Search...")
+                    Text("חפש...")
                 },
                 value = value,
                 onValueChange = onValueChange,

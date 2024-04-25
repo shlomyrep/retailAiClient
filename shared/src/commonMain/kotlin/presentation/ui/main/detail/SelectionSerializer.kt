@@ -19,7 +19,7 @@ object SelectionSerializer : KSerializer<Selection> {
                     put("selected", when (selector.selected) {
                         is SizeSelectable -> Json.encodeToJsonElement(selector.selected)
                         is ColorSelectable -> Json.encodeToJsonElement(selector.selected)
-                        is ProductDTO -> Json.encodeToJsonElement(selector.selected)
+                        is ProductSelectable -> Json.encodeToJsonElement(selector.selected)
                         else -> JsonNull
                     })
                     put("default", Json.encodeToJsonElement(selector.default))
@@ -55,7 +55,7 @@ object SelectionSerializer : KSerializer<Selection> {
                         sel
                     )
                     // Assuming ProductSelectable is the correct class instead of ProductDTO
-                    ProductDTO.type -> jsonDecoder.json.decodeFromJsonElement<ProductDTO>(sel)
+                    ProductSelectable.type -> jsonDecoder.json.decodeFromJsonElement<ProductSelectable>(sel)
                     else -> null
                 }
             }
@@ -72,7 +72,7 @@ object SelectionSerializer : KSerializer<Selection> {
                         jsonArray
                     )
                     // Assuming ProductSelectable is the correct class instead of ProductDTO
-                    ProductDTO.type -> jsonDecoder.json.decodeFromJsonElement<List<ProductDTO>>(
+                    ProductSelectable.type -> jsonDecoder.json.decodeFromJsonElement<List<ProductSelectable>>(
                         jsonArray
                     )
 

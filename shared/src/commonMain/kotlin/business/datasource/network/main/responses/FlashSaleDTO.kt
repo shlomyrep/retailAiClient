@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FlashSaleDTO(
     @SerialName("expired_at") val expiredAt: String? = null,
-    @SerialName("products") val products: List<ProductDTO>? = listOf()
+    @SerialName("products") val products: List<ProductSelectable>? = listOf()
 )
 
 fun FlashSaleDTO.toFlashSale() = FlashSale(

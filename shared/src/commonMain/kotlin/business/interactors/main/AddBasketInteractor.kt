@@ -7,7 +7,7 @@ import business.core.DataState
 import business.core.ProgressBarState
 import business.core.UIComponent
 import business.datasource.network.main.MainService
-import business.domain.main.Product
+import business.datasource.network.main.responses.ProductSelectable
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -18,7 +18,7 @@ class AddBasketInteractor(
 ) {
 
 
-    fun execute(id: Product, count: Int): Flow<DataState<Boolean>> = flow {
+    fun execute(id: ProductSelectable, count: Int): Flow<DataState<Boolean>> = flow {
 
         try {
 

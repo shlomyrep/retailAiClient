@@ -1,9 +1,11 @@
 package business.domain.main
 
- 
+import business.datasource.network.main.responses.ProductSelectable
+
+
 data class Basket(
     val id: String,
-    val product: Product,
+    val product: ProductSelectable,
     val category: Category,
     val title: String,
     val description: String,

@@ -31,6 +31,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +42,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.constants.SHIPPING_ACTIVE
 import business.constants.SHIPPING_FAILED
@@ -80,83 +83,84 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
 
 
     val pagerState = rememberPagerState { tabList.size }
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        DefaultScreenUI(
+            queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(MyOrdersEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(MyOrdersEvent.OnRetryNetwork) },
+            titleToolbar = "My Orders",
+            startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
+            onClickStartIconToolbar = popup
+        ) {
 
-    DefaultScreenUI(
-        queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(MyOrdersEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(MyOrdersEvent.OnRetryNetwork) },
-        titleToolbar = "My Orders",
-        startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
-        onClickStartIconToolbar = popup
-    ) {
-
-        Column(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize()) {
 
 
-            TabRow(modifier = Modifier.height(50.dp).fillMaxWidth(),
-                selectedTabIndex = pagerState.currentPage,
-                contentColor = Color.Transparent,
-                containerColor = Color.Transparent,
-                divider = {},
-                indicator = { tabPositions ->
-                    Box(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                            .height(4.dp).padding(horizontal = 28.dp).background(
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = MaterialTheme.shapes.medium
-                            )
-                    )
-                }) {
-                tabList.forEachIndexed { index, _ ->
-                    Tab(
-                        unselectedContentColor = Color.Transparent,
-                        selectedContentColor = Color.Transparent,
-                        text = {
-                            Text(
-                                tabList[index],
-                                style = MaterialTheme.typography.labelLarge,
-                                color = if (pagerState.currentPage == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                            )
-                        }, selected = pagerState.currentPage == index, onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        })
+                TabRow(modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    selectedTabIndex = pagerState.currentPage,
+                    contentColor = Color.Transparent,
+                    containerColor = Color.Transparent,
+                    divider = {},
+                    indicator = { tabPositions ->
+                        Box(
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                                .height(4.dp).padding(horizontal = 28.dp).background(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                        )
+                    }) {
+                    tabList.forEachIndexed { index, _ ->
+                        Tab(
+                            unselectedContentColor = Color.Transparent,
+                            selectedContentColor = Color.Transparent,
+                            text = {
+                                Text(
+                                    tabList[index],
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = if (pagerState.currentPage == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+                                )
+                            }, selected = pagerState.currentPage == index, onClick = {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            })
+                    }
                 }
-            }
 
 
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize(),
-                verticalAlignment = Alignment.Top
-            ) { index ->
-                Box(
-                    contentAlignment = Alignment.TopCenter,
-                    modifier = Modifier.fillMaxSize()
-                ) {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.Top
+                ) { index ->
+                    Box(
+                        contentAlignment = Alignment.TopCenter,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
 
 
-                    when (index) {
+                        when (index) {
 
-                        SHIPPING_ACTIVE -> {
-                            MyOrdersList(list = state.orders.filter { it.status == SHIPPING_ACTIVE })
-                        }
+                            SHIPPING_ACTIVE -> {
+                                MyOrdersList(list = state.orders.filter { it.status == SHIPPING_ACTIVE })
+                            }
 
-                        SHIPPING_SUCCESS -> {
-                            MyOrdersList(list = state.orders.filter { it.status == SHIPPING_SUCCESS })
-                        }
+                            SHIPPING_SUCCESS -> {
+                                MyOrdersList(list = state.orders.filter { it.status == SHIPPING_SUCCESS })
+                            }
 
-                        SHIPPING_FAILED -> {
-                            MyOrdersList(list = state.orders.filter { it.status == SHIPPING_FAILED })
+                            SHIPPING_FAILED -> {
+                                MyOrdersList(list = state.orders.filter { it.status == SHIPPING_FAILED })
+                            }
                         }
                     }
                 }
+
+
             }
-
-
         }
     }
 }

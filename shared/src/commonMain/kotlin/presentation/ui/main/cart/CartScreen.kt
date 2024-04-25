@@ -33,6 +33,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,14 +42,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.datasource.network.main.responses.ColorSelectable
-import business.datasource.network.main.responses.ProductDTO
+import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.Basket
-import kotlinx.serialization.Contextual
 import presentation.component.DEFAULT__BUTTON_SIZE
 import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
@@ -69,55 +71,58 @@ fun CartScreen(
     navigateToCheckout: () -> Unit,
 ) {
 
-
-    DefaultScreenUI(
-        queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(CartEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(CartEvent.OnRetryNetwork) }
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            LazyColumn(modifier = Modifier.fillMaxSize().align(Alignment.Center).padding(bottom = 100.dp) // Adjust this value as needed to accommodate the floating button area
-            ) {
-                items(state.baskets) {
-                    CartBox(
-                        it,
-                        addMoreProduct = {
-                            events(CartEvent.AddProduct(it.product))
-                        },
-                        navigateToDetail = navigateToDetail
-                    ) {
-                        events(CartEvent.DeleteFromBasket(it.product.id))
-                    }
-                }
-            }
-
-            if (state.baskets.isNotEmpty()) {
-                Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
-                    ProceedButtonBox(
-                        state.totalCost
-                    ) {
-                        navigateToCheckout()
-                    }
-                }
-            }
-
-
-            if (state.baskets.isEmpty()) {
-                Box(
-                    modifier = Modifier.align(Alignment.Center).fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        DefaultScreenUI(
+            queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(CartEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(CartEvent.OnRetryNetwork) }
+        ) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize().align(Alignment.Center)
+                        .padding(bottom = 100.dp) // Adjust this value as needed to accommodate the floating button area
                 ) {
-                    Text(
-                        "Basket is empty!",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = BorderColor,
-                    )
+                    items(state.baskets) {
+                        CartBox(
+                            it,
+                            addMoreProduct = {
+                                events(CartEvent.AddProduct(it.product))
+                            },
+                            navigateToDetail = navigateToDetail
+                        ) {
+                            events(CartEvent.DeleteFromBasket(it.product.id))
+                        }
+                    }
                 }
+
+                if (state.baskets.isNotEmpty()) {
+                    Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
+                        ProceedButtonBox(
+                            state.totalCost
+                        ) {
+                            navigateToCheckout()
+                        }
+                    }
+                }
+
+
+                if (state.baskets.isEmpty()) {
+                    Box(
+                        modifier = Modifier.align(Alignment.Center).fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "Basket is empty!",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = BorderColor,
+                        )
+                    }
+                }
+
+
             }
-
-
         }
     }
 }
@@ -297,7 +302,7 @@ fun constructSelections(selections: List<Selection>): String {
     val selectionDescriptions = selections.mapNotNull { selection ->
         when (val selected = selection.selector?.selected) {
             is ColorSelectable -> selected.name
-            is ProductDTO -> selected.name
+            is ProductSelectable -> selected.name
             is SizeSelectable -> if (selected.size == "0") "" else selected.size
             else -> null
         }

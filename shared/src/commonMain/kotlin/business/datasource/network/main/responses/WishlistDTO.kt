@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WishlistDTO(
     @SerialName("categories") val categories: List<CategoryDTO>?,
-    @SerialName("products") val products: List<ProductDTO>?,
+    @SerialName("products") val products: List<ProductSelectable>?,
 )
 
 fun WishlistDTO.toWishlist() = Wishlist(

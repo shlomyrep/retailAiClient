@@ -18,9 +18,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.core.UIComponentState
 import business.domain.main.Address
@@ -65,38 +68,39 @@ fun AddressScreen(state: AddressState, events: (AddressEvent) -> Unit, popup: ()
                 )
             })
     }
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        DefaultScreenUI(queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(AddressEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(AddressEvent.OnRetryNetwork) },
+            titleToolbar = stringResource(Res.string.address),
+            startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
+            onClickStartIconToolbar = popup,
+            endIconToolbar = Icons.Filled.Add,
+            onClickEndIconToolbar = { events(AddressEvent.OnUpdateAddAddressDialogState(UIComponentState.Show)) }) {
 
-    DefaultScreenUI(queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(AddressEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(AddressEvent.OnRetryNetwork) },
-        titleToolbar = stringResource(Res.string.address),
-        startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
-        onClickStartIconToolbar = popup,
-        endIconToolbar = Icons.Filled.Add,
-        onClickEndIconToolbar = { events(AddressEvent.OnUpdateAddAddressDialogState(UIComponentState.Show)) }) {
-
-        Column(modifier = Modifier.fillMaxSize()) {
-
-
-            if (state.addresses.isEmpty()) {
-                Text(
-                    stringResource(Res.string.no_address),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = BorderColor,
-                    modifier = Modifier.fillMaxSize(),
-                    textAlign = TextAlign.Center
-                )
-            }
+            Column(modifier = Modifier.fillMaxSize()) {
 
 
-            LazyColumn {
-                items(state.addresses, key = { it.id }) {
-                    AddressBox(address = it, modifier = Modifier.fillMaxWidth())
+                if (state.addresses.isEmpty()) {
+                    Text(
+                        stringResource(Res.string.no_address),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = BorderColor,
+                        modifier = Modifier.fillMaxSize(),
+                        textAlign = TextAlign.Center
+                    )
                 }
-            }
 
+
+                LazyColumn {
+                    items(state.addresses, key = { it.id }) {
+                        AddressBox(address = it, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+
+            }
         }
     }
 }

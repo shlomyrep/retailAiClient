@@ -48,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
@@ -61,11 +62,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import business.datasource.network.main.responses.ColorSelectable
+import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.BatchItem
 import business.domain.main.Comment
-import business.domain.main.Product
 import kotlinx.coroutines.delay
 import presentation.component.CircleButton
 import presentation.component.CircleImage
@@ -178,7 +179,10 @@ fun DetailScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                InventoryStatusText(viewModel = viewModel, onDialogRequest = viewModel::show)
+                                InventoryStatusText(
+                                    viewModel = viewModel,
+                                    onDialogRequest = viewModel::show
+                                )
                                 if (showDialog) {
                                     BatchListDialog(
                                         batches = state.productInventoryBatch.batchesList,
@@ -201,9 +205,7 @@ fun DetailScreen(
                         )
 
                         // a grid that shows the size selection if exists
-                        SizeGrid(state.product.selections, events)
-
-                        ColorGrid(state.product.selections, events)
+                        Selections(state.product.selections, events)
 
                         Spacer_16dp()
 
@@ -255,7 +257,7 @@ fun DetailScreen(
 
                         Spacer_8dp()
 
-                        if (state.product.comments.isEmpty()) {
+                        if (state.product.comments?.isEmpty() == true) {
                             Text(
                                 "No Comments!",
                                 style = MaterialTheme.typography.titleLarge,
@@ -268,9 +270,9 @@ fun DetailScreen(
                             modifier = Modifier.fillMaxWidth(),
                             contentPadding = PaddingValues(horizontal = 24.dp)
                         ) {
-                            items(state.product.comments, key = { it.createAt }) {
-                                CommentBox(comment = it)
-                            }
+//                            items(state.product.comments, key = { it.createAt }) {
+//                                CommentBox(comment = it)
+//                            }
                         }
 
                         Spacer_16dp()
@@ -290,45 +292,107 @@ fun DetailScreen(
 }
 
 @Composable
-fun ColorGrid(selections: List<Selection>, events: (DetailEvent) -> Unit) {
-    selections.forEach { selection ->
-
-        if (selection.selector?.selected is ColorSelectable) {
-            Spacer_8dp()
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                selection.selectionList?.forEach { color ->
-                    Box(
-                        modifier = Modifier
-                            .clip(MaterialTheme.shapes.small)
-                            .clickable {
-                                color._id?.let { it1 ->
-                                    selection.selector.selected = color
-                                    events(DetailEvent.SelectColor(it1))
-                                }
+fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit) {
+    if (selection.selector?.selected is ColorSelectable) {
+        Spacer_8dp()
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            selection.selectionList?.forEach { color ->
+                Box(
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable {
+                            color._id?.let { it1 ->
+                                selection.selector.selected = color
+                                events(DetailEvent.SelectColor(it1))
                             }
-                            .padding(8.dp)
-                            .border(
-                                width = 1.dp,
-                                color = if ((selection.selector.selected as ColorSelectable)._id == color._id) MaterialTheme.colorScheme.primary else BorderColor,
-                                shape = MaterialTheme.shapes.small
-                            )
-                    ) {
-                        (color as ColorSelectable).hex?.let {
-                            ColorBox(it)
                         }
+                        .padding(8.dp)
+                        .border(
+                            width = 1.dp,
+                            color = if ((selection.selector.selected as ColorSelectable)._id == color._id) MaterialTheme.colorScheme.primary else BorderColor,
+                            shape = MaterialTheme.shapes.small
+                        )
+                ) {
+                    (color as ColorSelectable).hex?.let {
+                        ColorBox(it)
                     }
                 }
             }
-
         }
-
     }
-
 }
+
+@Composable
+fun ProductGrid(selection: Selection, events: (DetailEvent) -> Unit) {
+    if (selection.selector?.selected is ProductSelectable) {
+        selection.selector?.selectionDesc?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+
+            items(selection.selectionList ?: listOf()) { selectable ->
+                val product = selectable as ProductSelectable
+                ProductCard(product, selection, events)
+            }
+        }
+    }
+}
+
+@Composable
+fun ProductCard(product: ProductSelectable, selection: Selection, events: (DetailEvent) -> Unit) {
+    Card(
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .width(150.dp)
+            .clickable {
+                product._id?.let { productId ->
+                    selection.selector?.selected = product
+//                    events(DetailEvent.SelectProduct(productId))
+                }
+            }
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            // Image handling
+            val imageUrl = product.images.firstOrNull()?.url ?: ""
+            Image(
+                painter = rememberCustomImagePainter(imageUrl),
+                contentDescription = "Product Image",
+                modifier = Modifier
+                    .height(100.dp)
+                    .fillMaxWidth(),
+            )
+            Text(
+                text = product.name,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+    }
+}
+
 
 fun String.toColorInt(): Int {
     try {
@@ -365,7 +429,7 @@ fun ColorBox(colorHex: String?) {
 }
 
 @Composable
-fun BuyButtonBox(product: Product, onClick: () -> Unit) {
+fun BuyButtonBox(product: ProductSelectable, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(8.dp),
@@ -454,56 +518,62 @@ fun CommentBox(comment: Comment, modifier: Modifier = Modifier.width(300.dp)) {
 }
 
 @Composable
-fun SizeGrid(selections: List<Selection>, events: (DetailEvent) -> Unit) {
-    selections.forEach { selection ->
+fun Selections(selections: List<Selection>, events: (DetailEvent) -> Unit) {
+    selections.forEach {
+        SizeGrid(it, events)
+        ColorGrid(it, events)
+        ProductGrid(it, events)
+    }
+}
 
-        if (selection.selector?.selected is SizeSelectable) {
-            Spacer_8dp()
-            // Calculate the number of rows needed
-            val numRows = (selection.selectionList?.size ?: 0 + 2) / 3
+@Composable
+fun SizeGrid(selection: Selection, events: (DetailEvent) -> Unit) {
 
-            Column(modifier = Modifier.padding(8.dp)) {
-                for (row in 0 until numRows) {
-                    Row {
-                        for (col in 0..2) {
-                            val index = row * 3 + col
-                            if (index < selection.selectionList?.size ?: 0) {
-                                val size = selection.selectionList?.get(index) as SizeSelectable
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(4.dp)
-                                        .clip(MaterialTheme.shapes.small)
-                                        .clickable {
-                                            size._id?.let { it1 ->
-                                                selection.selector.selected = size
-                                                // Trigger your event here
-                                                events(DetailEvent.SelectSize(it1))
-                                            }
+
+    if (selection.selector?.selected is SizeSelectable) {
+        Spacer_8dp()
+        // Calculate the number of rows needed
+        val numRows = (selection.selectionList?.size ?: 0 + 2) / 3
+
+        Column(modifier = Modifier.padding(8.dp)) {
+            for (row in 0 until numRows) {
+                Row {
+                    for (col in 0..2) {
+                        val index = row * 3 + col
+                        if (index < selection.selectionList?.size ?: 0) {
+                            val size = selection.selectionList?.get(index) as SizeSelectable
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(4.dp)
+                                    .clip(MaterialTheme.shapes.small)
+                                    .clickable {
+                                        size._id?.let { it1 ->
+                                            selection.selector.selected = size
+                                            // Trigger your event here
+                                            events(DetailEvent.SelectSize(it1))
                                         }
-                                        .border(
-                                            width = 1.dp,
-                                            color = if ((selection.selector.selected as SizeSelectable)._id == size._id) MaterialTheme.colorScheme.primary else BorderColor,
-                                            shape = MaterialTheme.shapes.small
-                                        )
-                                ) {
-                                    Text(
-                                        text = size.size ?: "",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = if ((selection.selector.selected as SizeSelectable)._id == size._id) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                        modifier = Modifier.padding(8.dp)
+                                    }
+                                    .border(
+                                        width = 1.dp,
+                                        color = if ((selection.selector.selected as SizeSelectable)._id == size._id) MaterialTheme.colorScheme.primary else BorderColor,
+                                        shape = MaterialTheme.shapes.small
                                     )
-                                }
-                            } else {
-                                Spacer(modifier = Modifier.weight(1f)) // Empty space for missing items
+                            ) {
+                                Text(
+                                    text = size.size ?: "",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = if ((selection.selector.selected as SizeSelectable)._id == size._id) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.padding(8.dp)
+                                )
                             }
+                        } else {
+                            Spacer(modifier = Modifier.weight(1f)) // Empty space for missing items
                         }
                     }
                 }
             }
-
         }
-
     }
 }
 

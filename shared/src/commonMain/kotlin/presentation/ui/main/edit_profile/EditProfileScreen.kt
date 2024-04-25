@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,8 +22,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.core.UIComponentState
 import common.PermissionCallback
@@ -148,108 +151,109 @@ fun EditProfileScreen(
     }
 
 
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        DefaultScreenUI(
+            queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(EditProfileEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(EditProfileEvent.OnRetryNetwork) },
+            titleToolbar = "Edit Profile",
+            startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
+            onClickStartIconToolbar = popup
+        ) {
+            Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
 
-    DefaultScreenUI(
-        queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(EditProfileEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(EditProfileEvent.OnRetryNetwork) },
-        titleToolbar = "Edit Profile",
-        startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
-        onClickStartIconToolbar = popup
-    ) {
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                Spacer_32dp()
 
-            Spacer_32dp()
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (imageBitmap == null) {
-                    CircleImage(state.image, modifier = Modifier.size(120.dp))
-                } else {
-                    CircleImage(imageBitmap, modifier = Modifier.size(120.dp))
-                }
-                Spacer_8dp()
-                DefaultButton(text = "Select") {
-                    events(EditProfileEvent.OnUpdateImageOptionDialog(UIComponentState.Show))
-                }
-            }
-
-            Spacer_32dp()
-
-            TextField(
-                value = state.name,
-                onValueChange = {
-                    if (it.length < 32) {
-                        events(EditProfileEvent.OnUpdateName(it))
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (imageBitmap == null) {
+                        CircleImage(state.image, modifier = Modifier.size(120.dp))
+                    } else {
+                        CircleImage(imageBitmap, modifier = Modifier.size(120.dp))
                     }
-                },
-                label = {
-                    Text("Name")
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = DefaultTextFieldTheme(),
-                shape = MaterialTheme.shapes.small,
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                    keyboardType = KeyboardType.Text,
-                ),
-            )
-
-            Spacer_16dp()
-            TextField(
-                value = state.age,
-                onValueChange = {
-                    if (it.length < 3) {
-                        events(EditProfileEvent.OnUpdateAge(it))
+                    Spacer_8dp()
+                    DefaultButton(text = "Select") {
+                        events(EditProfileEvent.OnUpdateImageOptionDialog(UIComponentState.Show))
                     }
-                },
-                label = {
-                    Text("Age")
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = DefaultTextFieldTheme(),
-                shape = MaterialTheme.shapes.small,
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                    keyboardType = KeyboardType.Number,
-                ),
-            )
+                }
 
-            Spacer_16dp()
+                Spacer_32dp()
 
-            TextField(
-                value = state.email,
-                onValueChange = {},
-                enabled = false,
-                modifier = Modifier.fillMaxWidth(),
-                colors = DefaultTextFieldTheme(),
-                shape = MaterialTheme.shapes.small,
-                label = {
-                    Text("Email")
-                },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                    keyboardType = KeyboardType.Text,
-                ),
-            )
+                TextField(
+                    value = state.name,
+                    onValueChange = {
+                        if (it.length < 32) {
+                            events(EditProfileEvent.OnUpdateName(it))
+                        }
+                    },
+                    label = {
+                        Text("Name")
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = DefaultTextFieldTheme(),
+                    shape = MaterialTheme.shapes.small,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Text,
+                    ),
+                )
 
-            Spacer_32dp()
+                Spacer_16dp()
+                TextField(
+                    value = state.age,
+                    onValueChange = {
+                        if (it.length < 3) {
+                            events(EditProfileEvent.OnUpdateAge(it))
+                        }
+                    },
+                    label = {
+                        Text("Age")
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = DefaultTextFieldTheme(),
+                    shape = MaterialTheme.shapes.small,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Number,
+                    ),
+                )
 
-            DefaultButton(
-                modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
-                progressBarState = state.progressBarState,
-                text = "Submit"
-            ) {
-                events(EditProfileEvent.UpdateProfile(imageBitmap))
+                Spacer_16dp()
+
+                TextField(
+                    value = state.email,
+                    onValueChange = {},
+                    enabled = false,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = DefaultTextFieldTheme(),
+                    shape = MaterialTheme.shapes.small,
+                    label = {
+                        Text("Email")
+                    },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Text,
+                    ),
+                )
+
+                Spacer_32dp()
+
+                DefaultButton(
+                    modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
+                    progressBarState = state.progressBarState,
+                    text = "Submit"
+                ) {
+                    events(EditProfileEvent.UpdateProfile(imageBitmap))
+                }
+
             }
-
         }
     }
 }

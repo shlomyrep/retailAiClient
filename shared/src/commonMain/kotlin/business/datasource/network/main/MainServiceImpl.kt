@@ -14,12 +14,11 @@ import business.datasource.network.main.responses.CommentRequestDTO
 import business.datasource.network.main.responses.HeldInventoryBatchDTO
 import business.datasource.network.main.responses.HomeDTO
 import business.datasource.network.main.responses.OrderDTO
-import business.datasource.network.main.responses.ProductDTO
+import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
-import business.domain.main.Product
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.FormPart
@@ -276,7 +275,7 @@ class MainServiceImpl(
 
     override suspend fun basketAdd(
         token: String,
-        id: Product,
+        id: ProductSelectable,
         count: Int
     ): MainGenericResponse<JRNothing?> {
         return httpClient.post {
@@ -319,7 +318,7 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun product(token: String, id: String): MainGenericResponse<ProductDTO> {
+    override suspend fun product(token: String, id: String): MainGenericResponse<ProductSelectable> {
         return httpClient.get {
             url {
                 headers {
