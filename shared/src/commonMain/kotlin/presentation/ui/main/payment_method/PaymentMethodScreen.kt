@@ -12,14 +12,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -47,126 +49,129 @@ fun PaymentMethodScreen(
     events: (PaymentMethodEvent) -> Unit,
     popup: () -> Unit
 ) {
-    DefaultScreenUI(
-        queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(PaymentMethodEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(PaymentMethodEvent.OnRetryNetwork) },
-        titleToolbar = "Payment Method",
-        startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
-        onClickStartIconToolbar = popup
-    ) {
-        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        DefaultScreenUI(
+            queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(PaymentMethodEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(PaymentMethodEvent.OnRetryNetwork) },
+            titleToolbar = "Payment Method",
+            startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
+            onClickStartIconToolbar = popup
+        ) {
+            Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
 
 
-            Spacer_32dp()
+                Spacer_32dp()
 
-            Text("Cash", style = MaterialTheme.typography.titleMedium)
-            Spacer_8dp()
-            ChipsCardBox(
-                text = "Cash",
-                image = Res.drawable.cash,
-                isSelected = state.selectedPaymentMethod == 0,
-                onSelectExecute = { events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(0)) })
-
-
-
-            Spacer_16dp()
-
-            Text("Wallet", style = MaterialTheme.typography.titleMedium)
-            Spacer_8dp()
-            ChipsCardBox(
-                text = "Wallet",
-                image = Res.drawable.wallet,
-                isSelected = state.selectedPaymentMethod == 1,
-                onSelectExecute = { events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(1)) })
+                Text("Cash", style = MaterialTheme.typography.titleMedium)
+                Spacer_8dp()
+                ChipsCardBox(
+                    text = "Cash",
+                    image = Res.drawable.cash,
+                    isSelected = state.selectedPaymentMethod == 0,
+                    onSelectExecute = { events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(0)) })
 
 
 
-            Spacer_16dp()
+                Spacer_16dp()
 
-            Text("More Payment Options", style = MaterialTheme.typography.titleMedium)
-            Spacer_8dp()
+                Text("Wallet", style = MaterialTheme.typography.titleMedium)
+                Spacer_8dp()
+                ChipsCardBox(
+                    text = "Wallet",
+                    image = Res.drawable.wallet,
+                    isSelected = state.selectedPaymentMethod == 1,
+                    onSelectExecute = { events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(1)) })
 
 
-            Card(
-                modifier = Modifier,
-                border = BorderStroke(1.dp, BorderColor),
-                shape = MaterialTheme.shapes.small
-            ) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        modifier = Modifier.padding(12.dp).fillMaxWidth().noRippleClickable {
-                            events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(2))
-                        },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+
+                Spacer_16dp()
+
+                Text("More Payment Options", style = MaterialTheme.typography.titleMedium)
+                Spacer_8dp()
+
+
+                Card(
+                    modifier = Modifier,
+                    border = BorderStroke(1.dp, BorderColor),
+                    shape = MaterialTheme.shapes.small
+                ) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
                         Row(
+                            modifier = Modifier.padding(12.dp).fillMaxWidth().noRippleClickable {
+                                events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(2))
+                            },
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Image(
-                                painter = painterResource(Res.drawable.paypal),
-                                null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text("Paypal", style = MaterialTheme.typography.bodyLarge)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(Res.drawable.paypal),
+                                    null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text("Paypal", style = MaterialTheme.typography.bodyLarge)
+                            }
+
+                            Switch(checked = state.selectedPaymentMethod == 2, onCheckedChange = {
+                                events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(2))
+                            })
+
                         }
-
-                        Switch(checked = state.selectedPaymentMethod == 2, onCheckedChange = {
-                            events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(2))
-                        })
-
-                    }
-                    HorizontalDivider(color = BorderColor)
-                    Row(
-                        modifier = Modifier.padding(12.dp).fillMaxWidth().noRippleClickable {
-                            events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(3))
-                        },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                        HorizontalDivider(color = BorderColor)
                         Row(
+                            modifier = Modifier.padding(12.dp).fillMaxWidth().noRippleClickable {
+                                events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(3))
+                            },
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Image(
-                                painter = painterResource(Res.drawable.apple), null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text("Apple Pay", style = MaterialTheme.typography.bodyLarge)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(Res.drawable.apple), null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text("Apple Pay", style = MaterialTheme.typography.bodyLarge)
+                            }
+
+                            Switch(checked = state.selectedPaymentMethod == 3, onCheckedChange = {
+                                events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(3))
+                            })
+
                         }
-
-                        Switch(checked = state.selectedPaymentMethod == 3, onCheckedChange = {
-                            events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(3))
-                        })
-
-                    }
-                    HorizontalDivider(color = BorderColor)
-                    Row(
-                        modifier = Modifier.padding(12.dp).fillMaxWidth().noRippleClickable {
-                            events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(4))
-                        },
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                        HorizontalDivider(color = BorderColor)
                         Row(
+                            modifier = Modifier.padding(12.dp).fillMaxWidth().noRippleClickable {
+                                events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(4))
+                            },
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Image(
-                                painter = painterResource(Res.drawable.google), null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text("Google Pay", style = MaterialTheme.typography.bodyLarge)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(Res.drawable.google), null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Text("Google Pay", style = MaterialTheme.typography.bodyLarge)
+                            }
+
+                            Switch(checked = state.selectedPaymentMethod == 4, onCheckedChange = {
+                                events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(4))
+                            })
+
                         }
-
-                        Switch(checked = state.selectedPaymentMethod == 4, onCheckedChange = {
-                            events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(4))
-                        })
-
                     }
                 }
             }

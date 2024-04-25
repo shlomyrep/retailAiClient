@@ -18,11 +18,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.domain.main.Coupons
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -43,33 +46,35 @@ import shoping_by_kmp.shared.generated.resources.offer
 fun MyCouponsScreen(state: MyCouponsState, events: (MyCouponsEvent) -> Unit, popup: () -> Unit) {
     val clipboardManager: ClipboardManager = LocalClipboardManager.current
 
-    DefaultScreenUI(
-        queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(MyCouponsEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(MyCouponsEvent.OnRetryNetwork) },
-        titleToolbar = "My Coupons",
-        startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
-        onClickStartIconToolbar = popup
-    ) {
-        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        DefaultScreenUI(
+            queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(MyCouponsEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(MyCouponsEvent.OnRetryNetwork) },
+            titleToolbar = "My Coupons",
+            startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
+            onClickStartIconToolbar = popup
+        ) {
+            Column(modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
 
-            Spacer_32dp()
+                Spacer_32dp()
 
-            Text("Best offer for you", style = MaterialTheme.typography.titleLarge)
-            Spacer_8dp()
+                Text("Best offer for you", style = MaterialTheme.typography.titleLarge)
+                Spacer_8dp()
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                items(state.couponsList) {
-                    Coupon(it) {
-                        clipboardManager.setText(AnnotatedString(it.code))
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    items(state.couponsList) {
+                        Coupon(it) {
+                            clipboardManager.setText(AnnotatedString(it.code))
+                        }
                     }
                 }
-            }
 
+            }
         }
     }
 }

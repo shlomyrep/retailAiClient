@@ -19,9 +19,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.domain.main.Notification
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -42,34 +45,35 @@ fun NotificationsScreen(
     events: (NotificationsEvent) -> Unit,
     popup: () -> Unit
 ) {
-
-    DefaultScreenUI(
-        queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(NotificationsEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(NotificationsEvent.OnRetryNetwork) },
-        titleToolbar = "notifications",
-        startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
-        onClickStartIconToolbar = popup
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-
-
-            Text(
-                "Mark all as read",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(16.dp),
-            )
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        DefaultScreenUI(
+            queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(NotificationsEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(NotificationsEvent.OnRetryNetwork) },
+            titleToolbar = "notifications",
+            startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
+            onClickStartIconToolbar = popup
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
 
 
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(state.notifications) {
-                    NotificationBox(notification = it)
+                Text(
+                    "Mark all as read",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(16.dp),
+                )
+
+
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(state.notifications) {
+                        NotificationBox(notification = it)
+                    }
                 }
-            }
 
+            }
         }
     }
 }

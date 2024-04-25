@@ -17,10 +17,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.domain.main.Category
 import coil3.compose.rememberAsyncImagePainter
@@ -37,31 +40,32 @@ fun CategoriesScreen(
     popup: () -> Unit,
     navigateToSearch: (String) -> Unit,
 ) {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        DefaultScreenUI(
+            queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(CategoriesEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(CategoriesEvent.OnRetryNetwork) },
+            titleToolbar = "Categories",
+            startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
+            onClickStartIconToolbar = popup
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
 
-    DefaultScreenUI(
-        queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(CategoriesEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(CategoriesEvent.OnRetryNetwork)},
-        titleToolbar = "Categories",
-        startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
-        onClickStartIconToolbar = popup
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
 
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)
-            ) {
-                items(state.categories, key = { it.id }) {
-                    CategoryBox(it, modifier = Modifier.weight(1f)) {
-                        navigateToSearch(it.id)
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)
+                ) {
+                    items(state.categories, key = { it.id }) {
+                        CategoryBox(it, modifier = Modifier.weight(1f)) {
+                            navigateToSearch(it.id)
+                        }
                     }
                 }
-            }
 
+            }
         }
     }
 }

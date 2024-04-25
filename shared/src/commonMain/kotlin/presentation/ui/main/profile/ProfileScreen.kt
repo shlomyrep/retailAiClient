@@ -14,8 +14,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -30,7 +33,7 @@ import presentation.component.noRippleClickable
 import presentation.ui.main.profile.view_model.ProfileEvent
 import presentation.ui.main.profile.view_model.ProfileState
 import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.arrow_right
+import shoping_by_kmp.shared.generated.resources.arrow_left
 import shoping_by_kmp.shared.generated.resources.coupon
 import shoping_by_kmp.shared.generated.resources.location2
 import shoping_by_kmp.shared.generated.resources.order
@@ -53,61 +56,63 @@ fun ProfileScreen(
     navigateToSettings: () -> Unit,
 ) {
 
-    DefaultScreenUI(
-        queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(ProfileEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(ProfileEvent.OnRetryNetwork) }
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        DefaultScreenUI(
+            queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(ProfileEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(ProfileEvent.OnRetryNetwork) }
         ) {
+            Column(
+                modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-            Spacer_16dp()
+                Spacer_16dp()
 
-            Text("Profile", style = MaterialTheme.typography.titleLarge)
+                Text("Profile", style = MaterialTheme.typography.titleLarge)
 
-            Spacer_16dp()
+                Spacer_16dp()
 
-            CircleImage(
-                image = state.profile.profileUrl,
-                modifier = Modifier.size(120.dp)
-            )
+                CircleImage(
+                    image = state.profile.profileUrl,
+                    modifier = Modifier.size(120.dp)
+                )
 
-            Spacer_16dp()
+                Spacer_16dp()
 
-            Text(state.profile.name, style = MaterialTheme.typography.headlineMedium)
+                Text(state.profile.name, style = MaterialTheme.typography.headlineMedium)
 
-            Spacer_32dp()
+                Spacer_32dp()
 
-            Column(modifier = Modifier.fillMaxWidth()) {
-                ProfileItemBox(title = "Edit profile", image = Res.drawable.profile2) {
-                    navigateToEditProfile()
-                }
-                ProfileItemBox(
-                    title = "Manage Address",
-                    image = Res.drawable.location2
-                ) { navigateToAddress() }
-                ProfileItemBox(title = "Payment Methods", image = Res.drawable.payment) {
-                    navigateToPaymentMethod()
-                }
-                ProfileItemBox(title = "My Orders", image = Res.drawable.order) {
-                    navigateToMyOrders()
-                }
-                ProfileItemBox(title = "My Coupons", image = Res.drawable.coupon) {
-                    navigateToMyCoupons()
-                }
-                /*ProfileItemBox(title = "My Wallet", image = "wallet.xml") {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    ProfileItemBox(title = "Edit profile", image = Res.drawable.profile2) {
+                        navigateToEditProfile()
+                    }
+                    ProfileItemBox(
+                        title = "Manage Address",
+                        image = Res.drawable.location2
+                    ) { navigateToAddress() }
+                    ProfileItemBox(title = "Payment Methods", image = Res.drawable.payment) {
+                        navigateToPaymentMethod()
+                    }
+                    ProfileItemBox(title = "My Orders", image = Res.drawable.order) {
+                        navigateToMyOrders()
+                    }
+                    ProfileItemBox(title = "My Coupons", image = Res.drawable.coupon) {
+                        navigateToMyCoupons()
+                    }
+                    /*ProfileItemBox(title = "My Wallet", image = "wallet.xml") {
                     navigateToMyWallet()
                 }*/
-                ProfileItemBox(title = "Settings", image = Res.drawable.setting2) {
-                    navigateToSettings()
+                    ProfileItemBox(title = "Settings", image = Res.drawable.setting2) {
+                        navigateToSettings()
+                    }
+                    ProfileItemBox(title = "Help Center", image = Res.drawable.warning, isLastItem = true) {}
                 }
-                ProfileItemBox(title = "Help Center", image = Res.drawable.warning, isLastItem = true) {}
-            }
 
+            }
         }
     }
 }
@@ -143,7 +148,7 @@ private fun ProfileItemBox(
             }
 
             Icon(
-                painterResource(Res.drawable.arrow_right),
+                painterResource(Res.drawable.arrow_left),
                 null,
                 tint = MaterialTheme.colorScheme.primary.copy(alpha = .7f),
                 modifier = Modifier.size(30.dp)

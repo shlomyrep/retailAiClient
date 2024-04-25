@@ -11,8 +11,11 @@ import androidx.compose.material.icons.filled.AddComment
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import business.core.UIComponentState
 import presentation.component.AddCommentDialog
 import presentation.component.DefaultScreenUI
@@ -33,37 +36,38 @@ fun CommentScreen(state: CommentState, events: (CommentEvent) -> Unit, popup: ()
                 events(CommentEvent.AddComment(rate = rate, comment = comment))
             })
     }
-
-    DefaultScreenUI(queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(CommentEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(CommentEvent.OnRetryNetwork) },
-        titleToolbar = "Comments",
-        startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
-        onClickStartIconToolbar = popup,
-        endIconToolbar = Icons.Filled.AddComment,
-        onClickEndIconToolbar = { events(CommentEvent.OnUpdateAddCommentDialogState(UIComponentState.Show)) }) {
-        Column(modifier = Modifier.fillMaxSize()) {
-
-
-            if (state.comments.isEmpty()) {
-                Text(
-                    "No Comments!",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = BorderColor,
-                    modifier = Modifier.fillMaxSize(),
-                    textAlign = TextAlign.Center
-                )
-            }
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        DefaultScreenUI(queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(CommentEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(CommentEvent.OnRetryNetwork) },
+            titleToolbar = "Comments",
+            startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
+            onClickStartIconToolbar = popup,
+            endIconToolbar = Icons.Filled.AddComment,
+            onClickEndIconToolbar = { events(CommentEvent.OnUpdateAddCommentDialogState(UIComponentState.Show)) }) {
+            Column(modifier = Modifier.fillMaxSize()) {
 
 
-            LazyColumn {
-                items(state.comments, key = { it.id }) {
-                    CommentBox(comment = it, modifier = Modifier.fillMaxWidth())
+                if (state.comments.isEmpty()) {
+                    Text(
+                        "No Comments!",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = BorderColor,
+                        modifier = Modifier.fillMaxSize(),
+                        textAlign = TextAlign.Center
+                    )
                 }
-            }
 
+
+                LazyColumn {
+                    items(state.comments, key = { it.id }) {
+                        CommentBox(comment = it, modifier = Modifier.fillMaxWidth())
+                    }
+                }
+
+            }
         }
     }
 }
