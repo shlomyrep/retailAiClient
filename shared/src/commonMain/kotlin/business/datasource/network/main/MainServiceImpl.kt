@@ -332,7 +332,7 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun productBySku(token: String,sku: String, id: String): MainGenericResponse<ProductSelectable> {
+    override suspend fun productBySku(token: String, sku: String, id: String): MainGenericResponse<ProductSelectable> {
         return httpClient.get {
             url {
                 headers {
@@ -348,13 +348,13 @@ class MainServiceImpl(
 
     override suspend fun productInventory(token: String, supplierId: String, sku: String): HeldInventoryBatchDTO {
         return httpClient.get {
+            headers {
+                append(HttpHeaders.Authorization, token)
+            }
             url {
                 takeFrom(BASE_URL + MainService.PRODUCT_INVENTORY) // Assuming PRODUCT_INVENTORY is the endpoint
                 parameters.append("supplierId", supplierId)
                 parameters.append("sku", sku)
-                headers {
-                    append(HttpHeaders.Authorization, token)
-                }
             }
             contentType(ContentType.Application.Json)
         }.body()
