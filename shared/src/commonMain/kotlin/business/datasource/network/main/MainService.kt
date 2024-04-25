@@ -8,12 +8,11 @@ import business.datasource.network.main.responses.CommentDTO
 import business.datasource.network.main.responses.HeldInventoryBatchDTO
 import business.datasource.network.main.responses.HomeDTO
 import business.datasource.network.main.responses.OrderDTO
-import business.datasource.network.main.responses.ProductDTO
+import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
-import business.domain.main.Product
 
 interface MainService {
     companion object {
@@ -91,10 +90,10 @@ interface MainService {
     ): MainGenericResponse<Boolean>
 
     suspend fun basket(token: String): MainGenericResponse<List<BasketDTO>>
-    suspend fun basketAdd(token: String, id: Product, count: Int): MainGenericResponse<JRNothing?>
+    suspend fun basketAdd(token: String, id: ProductSelectable, count: Int): MainGenericResponse<JRNothing?>
     suspend fun basketDelete(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun home(token: String): MainGenericResponse<HomeDTO>
-    suspend fun product(token: String, id: String): MainGenericResponse<ProductDTO>
+    suspend fun product(token: String, id: String): MainGenericResponse<ProductSelectable>
     suspend fun productInventory(token: String, supplierId :String,sku: String): HeldInventoryBatchDTO
     suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun wishlist(

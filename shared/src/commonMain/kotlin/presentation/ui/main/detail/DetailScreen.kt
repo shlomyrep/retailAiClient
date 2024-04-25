@@ -61,11 +61,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import business.datasource.network.main.responses.ColorSelectable
+import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.BatchItem
 import business.domain.main.Comment
-import business.domain.main.Product
 import kotlinx.coroutines.delay
 import presentation.component.CircleButton
 import presentation.component.CircleImage
@@ -255,7 +255,7 @@ fun DetailScreen(
 
                         Spacer_8dp()
 
-                        if (state.product.comments.isEmpty()) {
+                        if (state.product.comments?.isEmpty() == true) {
                             Text(
                                 "No Comments!",
                                 style = MaterialTheme.typography.titleLarge,
@@ -268,9 +268,9 @@ fun DetailScreen(
                             modifier = Modifier.fillMaxWidth(),
                             contentPadding = PaddingValues(horizontal = 24.dp)
                         ) {
-                            items(state.product.comments, key = { it.createAt }) {
-                                CommentBox(comment = it)
-                            }
+//                            items(state.product.comments, key = { it.createAt }) {
+//                                CommentBox(comment = it)
+//                            }
                         }
 
                         Spacer_16dp()
@@ -365,7 +365,7 @@ fun ColorBox(colorHex: String?) {
 }
 
 @Composable
-fun BuyButtonBox(product: Product, onClick: () -> Unit) {
+fun BuyButtonBox(product: ProductSelectable, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(8.dp),

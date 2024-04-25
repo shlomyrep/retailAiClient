@@ -4,11 +4,11 @@ import business.core.NetworkState
 import business.core.ProgressBarState
 import business.core.Queue
 import business.core.UIComponent
+import business.datasource.network.main.responses.ProductSelectable
 import business.domain.main.HeldInventoryBatch
-import business.domain.main.Product
 
 data class DetailState(
-    val product: Product = Product(),
+    val product: ProductSelectable = ProductSelectable(),
     val selectedImage: String = "",
     val sizeSelectable: String = "",
     val colorSelectable: String = "",

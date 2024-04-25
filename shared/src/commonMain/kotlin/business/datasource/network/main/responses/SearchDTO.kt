@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SearchDTO(
-    @SerialName("products") val products: List<ProductDTO>?,
+    @SerialName("products") val products: List<ProductSelectable>?,
 )
 
 fun SearchDTO.toSearch() = Search(

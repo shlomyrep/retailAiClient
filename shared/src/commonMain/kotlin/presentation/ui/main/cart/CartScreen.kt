@@ -44,11 +44,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import business.datasource.network.main.responses.ColorSelectable
-import business.datasource.network.main.responses.ProductDTO
+import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.Basket
-import kotlinx.serialization.Contextual
 import presentation.component.DEFAULT__BUTTON_SIZE
 import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
@@ -297,7 +296,7 @@ fun constructSelections(selections: List<Selection>): String {
     val selectionDescriptions = selections.mapNotNull { selection ->
         when (val selected = selection.selector?.selected) {
             is ColorSelectable -> selected.name
-            is ProductDTO -> selected.name
+            is ProductSelectable -> selected.name
             is SizeSelectable -> if (selected.size == "0") "" else selected.size
             else -> null
         }

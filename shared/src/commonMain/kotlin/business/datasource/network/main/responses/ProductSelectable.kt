@@ -11,12 +11,12 @@ const val TYPE_PRODUCT = "product"
 
 
 @Serializable
-data class ProductDTO(
-    @SerialName("description") val description: String? = "",
+data class ProductSelectable(
+    @SerialName("description") val description: String = "",
     @SerialName("_id") override val _id: String = "",
-    val id: String? = _id,
+    val id: String = _id,
     @SerialName("image") val image: String? = "",
-    @SerialName("isLike") val isLike: Boolean? = false,
+    @SerialName("isLike") val isLike: Boolean = false,
     @SerialName("name") val name: String = "",
     @SerialName("likes") val likes: Int? = 0,
     @SerialName("price") val price: Int? = 0,
@@ -27,10 +27,10 @@ data class ProductDTO(
     @SerialName("rate") val rate: Double? = 0.0,
     @SerialName("title") val title: String = "",
     @SerialName("sku") var sku: String = "",
-    @SerialName("category") val category: CategoryDTO? = null,
+    @SerialName("category") val category: CategoryDTO = CategoryDTO("", "'", "", null),
     @SerialName("comments") val comments: List<CommentDTO>? = listOf(),
-    @SerialName("gallery") val gallery: List<String>? = listOf(),
-    @SerialName("supplier") val supplier: SupplierDto? = null,
+    @SerialName("gallery") val gallery: List<String> = listOf(),
+    @SerialName("supplier") val supplier: SupplierDto = SupplierDto(),
     @SerialName("isActive") val isActive: Boolean = true,
     @SerialName("long_description") val longDescription: String = "",
     @SerialName("short_description") val shortDescription: String = "",
@@ -47,19 +47,49 @@ data class ProductDTO(
     companion object {
         const val type = "product"
     }
-}
-@Serializable
 
+    fun getCalculatedSku(): String {
+        return when (this.priceType) {
+            PriceType.SINGLE_PRICE.toString() -> {
+                this.sku
+            }
+
+            PriceType.SIZES_PRICE.toString() -> {
+                (this.selections.firstOrNull { it.selector?.selectionType == SizeSelectable.type }?.selector?.selected as SizeSelectable).sku
+            }
+
+            PriceType.COLOR_PRICE.toString(),
+            PriceType.COLOR_SIZES_PRICE.toString() -> {
+                // Logic for selecting both color and size
+                val colorSelection =
+                    this.selections.firstOrNull { it.selector?.selectionType == ColorSelectable.type }
+
+                val sizeSelection =
+                    this.selections.firstOrNull { it.selector?.selectionType == SizeSelectable.type }
+
+                val idSelectedColor = colorSelection?.selector?.selected?._id
+                (sizeSelection?.selector?.selected as SizeSelectable).colors[idSelectedColor]?.sku
+                    ?: ""
+            }
+
+            else -> ""
+        }
+    }
+}
+
+
+@Serializable
 data class FilterTags(
     val values: List<String>,
     val type: String?
 )
-@Serializable
 
+@Serializable
 data class Image(
-    val url: String,
+    val url: String = "",
     val is_sketch: Boolean = false
 )
+
 @Serializable
 data class Selection(
     val selector: Selector?,
@@ -172,7 +202,17 @@ enum class PriceType {
     @SerialName("color_price")
     COLOR_PRICE;
 
+    override fun toString(): String {
+        return when (this) {
+            SINGLE_PRICE -> "Single Price"
+            SIZES_PRICE -> "Sizes Price"
+            COLOR_SIZES_PRICE -> "Color and Sizes Price"
+            COLOR_PRICE -> "Color Price"
+        }
+    }
+
     companion object {
+
         fun fromString(value: String): PriceType {
             return when (value.lowercase()) {
                 "single_price" -> SINGLE_PRICE
@@ -185,7 +225,7 @@ enum class PriceType {
     }
 }
 
-fun ProductDTO.toProduct() = Product(
+fun ProductSelectable.toProduct() = Product(
     description = description ?: "",
     id = id ?: "0",
     sku = sku ?: "",
@@ -204,9 +244,9 @@ fun ProductDTO.toProduct() = Product(
 )
 
 fun getCustomizationSteps(
-    product: ProductDTO,
+    product: ProductSelectable,
     selections: MutableList<Selection> = mutableListOf(),
-    originalProduct: ProductDTO
+    originalProduct: ProductSelectable
 ): MutableList<Selection> {
     product.selections?.map { s ->
         var shouldAdd = true
@@ -254,9 +294,9 @@ fun getCustomizationSteps(
         if (shouldAdd) {
             selections.add(s)
         }
-        if (s.selector?.selectionType == ProductDTO.type && (s.selector.selected as ProductDTO).isActive) {
+        if (s.selector?.selectionType == ProductSelectable.type && (s.selector.selected as ProductSelectable).isActive) {
             getCustomizationSteps(
-                s.selector.selected as ProductDTO, selections, originalProduct
+                s.selector.selected as ProductSelectable, selections, originalProduct
             )
         }
     }

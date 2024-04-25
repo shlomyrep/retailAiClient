@@ -7,10 +7,9 @@ import business.core.DataState
 import business.core.NetworkState
 import business.core.ProgressBarState
 import business.datasource.network.main.MainService
+import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.toHeldInventoryBatch
-import business.datasource.network.main.responses.toProduct
 import business.domain.main.HeldInventoryBatch
-import business.domain.main.Product
 import business.util.createException
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
@@ -22,7 +21,7 @@ class ProductInteractor(
 ) {
 
 
-    fun execute(id: String): Flow<DataState<Product>> = flow {
+    fun execute(id: String): Flow<DataState<ProductSelectable>> = flow {
 
         try {
             emit(DataState.Loading(progressBarState = ProgressBarState.LoadingWithLogo))
@@ -33,7 +32,7 @@ class ProductInteractor(
                     apiResponse.alert?.createException()
                 )
             }
-            val result = apiResponse.result?.toProduct()
+            val result = apiResponse.result
             emit(DataState.NetworkStatus(NetworkState.Good))
             emit(DataState.Data(result))
         } catch (e: Exception) {

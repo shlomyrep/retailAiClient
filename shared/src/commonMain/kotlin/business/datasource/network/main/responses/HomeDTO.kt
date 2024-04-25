@@ -13,8 +13,8 @@ data class HomeDTO(
     @SerialName("banners") val banners: List<BannerDTO>?,
     @SerialName("categories") val categories: List<CategoryDTO>?,
     @SerialName("flash_sale") val flashSale: FlashSaleDTO?,
-    @SerialName("most_sale") val mostSale: List<ProductDTO>?,
-    @SerialName("newest_product") val newestProduct: List<ProductDTO>?
+    @SerialName("most_sale") val mostSale: List<ProductSelectable>?,
+    @SerialName("newest_product") val newestProduct: List<ProductSelectable>?
 )
 
 fun HomeDTO.toHome() = Home(
