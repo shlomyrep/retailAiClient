@@ -12,32 +12,54 @@ const val TYPE_PRODUCT = "product"
 
 @Serializable
 data class ProductDTO(
-    @SerialName("description") val description: String?,
-    @SerialName("_id") override val _id: String?,
+    @SerialName("description") val description: String? = "",
+    @SerialName("_id") override val _id: String = "",
     val id: String? = _id,
-    @SerialName("image") val image: String?,
-    @SerialName("isLike") val isLike: Boolean?,
+    @SerialName("image") val image: String? = "",
+    @SerialName("isLike") val isLike: Boolean? = false,
     @SerialName("name") val name: String = "",
-    @SerialName("likes") val likes: Int?,
-    @SerialName("price") val price: Int?,
+    @SerialName("likes") val likes: Int? = 0,
+    @SerialName("price") val price: Int? = 0,
     @SerialName("base_price") override val basePrice: Double = 0.0,
     @SerialName("upgrade_price") override val upgradePrice: Double = 0.0,
     @SerialName("price_type") val priceType: String = "",
     @SerialName("selections") val selections: List<@Contextual Selection> = mutableListOf(),
-    @SerialName("rate") val rate: Double?,
+    @SerialName("rate") val rate: Double? = 0.0,
     @SerialName("title") val title: String = "",
     @SerialName("sku") var sku: String = "",
-    @SerialName("category") val category: CategoryDTO?,
-    @SerialName("comments") val comments: List<CommentDTO>?,
-    @SerialName("gallery") val gallery: List<String>?,
-    @SerialName("supplier") val supplier: SupplierDto?,
+    @SerialName("category") val category: CategoryDTO? = null,
+    @SerialName("comments") val comments: List<CommentDTO>? = listOf(),
+    @SerialName("gallery") val gallery: List<String>? = listOf(),
+    @SerialName("supplier") val supplier: SupplierDto? = null,
+    @SerialName("isActive") val isActive: Boolean = true,
+    @SerialName("long_description") val longDescription: String = "",
+    @SerialName("short_description") val shortDescription: String = "",
+    @SerialName("inherits_size") val inheritsSize: Boolean = true,
+    @SerialName("is_size_customizable") val isSizeCustomizable: Boolean = true,
+    @SerialName("price_include_sub_products") var priceIncludeSubProducts: Boolean = true,
+    @SerialName("images") var images: List<Image> = mutableListOf(),
+    @SerialName("uuid") var uuid: String = "",
+    @SerialName("filter") var filter: Map<String, FilterTags> = mutableMapOf(),
+    @SerialName("tags") val tags: List<String> = mutableListOf(),
+    @SerialName("final_sale") var finalSale: Int = FinalSale.ZERO.ordinal,
+    @SerialName("pdf_url") val pdfUrl: String = ""
 ) : Selectable {
     companion object {
-        val type = "product"
-
+        const val type = "product"
     }
 }
+@Serializable
 
+data class FilterTags(
+    val values: List<String>,
+    val type: String?
+)
+@Serializable
+
+data class Image(
+    val url: String,
+    val is_sketch: Boolean = false
+)
 @Serializable
 data class Selection(
     val selector: Selector?,
@@ -181,3 +203,62 @@ fun ProductDTO.toProduct() = Product(
     supplier = supplier?.toSupplier() ?: Supplier(),
 )
 
+fun getCustomizationSteps(
+    product: ProductDTO,
+    selections: MutableList<Selection> = mutableListOf(),
+    originalProduct: ProductDTO
+): MutableList<Selection> {
+    product.selections?.map { s ->
+        var shouldAdd = true
+        val originalProductSize =
+            originalProduct.selections.firstOrNull { it.selector?.selectionType == SizeSelectable.type }
+        if (product.inheritsSize && s.selector?.selectionType == SizeSelectable.type) {
+            // place the right selection in case of inheritance
+            originalProductSize?.let {
+                it.selector?.selected?.let { sl ->
+                    if (!(s.selector.selected as SizeSelectable).modified) {
+                        if (s.selectionList?.contains(sl) == true) {
+                            s.selector.selected = sl
+                        }
+                    }
+                }
+            }
+            if (!product.isSizeCustomizable) {
+                shouldAdd = false
+            }
+        }
+
+        // This section makes sure that whenever someone changes the main product size if there are child selections that are affected and not valid we return to default selection
+        if (product.inheritsSize && !product.isSizeCustomizable) {
+            product.selections.firstOrNull { it.selector?.selectionType == SizeSelectable.type }
+                ?.let {
+                    val sizeStrings =
+                        it.selectionList?.map { selectable -> (selectable as SizeSelectable).size }
+                    sizeStrings?.let { list ->
+                        originalProductSize?.let { originalSizeSelection ->
+                            if (!list.contains((originalSizeSelection.selector?.selected as SizeSelectable).size)) {
+                                //disabled
+                                selections.firstOrNull { sl -> sl.selector?.selected == product }
+                                    ?.let { unValidSelection ->
+                                        unValidSelection.selector?.default?.let { defSelection ->
+                                            unValidSelection.selector.selected = defSelection
+                                        }
+                                    }
+                                // Should we toast here ?
+                            }
+                        }
+                    }
+                }
+        }
+
+        if (shouldAdd) {
+            selections.add(s)
+        }
+        if (s.selector?.selectionType == ProductDTO.type && (s.selector.selected as ProductDTO).isActive) {
+            getCustomizationSteps(
+                s.selector.selected as ProductDTO, selections, originalProduct
+            )
+        }
+    }
+    return selections
+}
