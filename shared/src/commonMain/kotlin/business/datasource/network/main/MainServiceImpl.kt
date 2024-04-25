@@ -333,6 +333,20 @@ class MainServiceImpl(
         }.body()
     }
 
+    override suspend fun productBySku(token: String,sku: String, id: String): MainGenericResponse<ProductDTO> {
+        return httpClient.get {
+            url {
+                headers {
+                    append(HttpHeaders.Authorization, token)
+                }
+                takeFrom(BASE_URL)
+                encodedPath += MainService.PRODUCT
+                encodedPath += "/$sku/$id"
+            }
+            contentType(ContentType.Application.Json)
+        }.body()
+    }
+
     override suspend fun productInventory(token: String, supplierId: String, sku: String): HeldInventoryBatchDTO {
         return httpClient.get {
             url {

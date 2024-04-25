@@ -62,4 +62,26 @@ class ProductInteractor(
             emit(DataState.Loading(progressBarState = ProgressBarState.Idle))
         }
     }
+
+//    fun getProductBySku( id: String): Flow<DataState<Product>> = flow {
+//        try {
+//            emit(DataState.Loading(progressBarState = ProgressBarState.LoadingWithLogo))
+//            val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
+//            val sku = appDataStoreManager.readValue(DataStoreKeys.SCANNED_BARCODE) ?: ""
+//            val apiResponse = service.productBySku(token = token, sku = sku, id = id)
+////            if (apiResponse.status == false || apiResponse.result == null) {
+////
+////            }
+//            val result = apiResponse.result?.toProduct()
+//            emit(DataState.NetworkStatus(NetworkState.Good))
+//            emit(DataState.Data(result))
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//            emit(DataState.NetworkStatus(NetworkState.Failed))
+//            emit(handleUseCaseException(e))
+//
+//        } finally {
+//            emit(DataState.Loading(progressBarState = ProgressBarState.Idle))
+//        }
+//    }
 }

@@ -95,6 +95,7 @@ interface MainService {
     suspend fun basketDelete(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun home(token: String): MainGenericResponse<HomeDTO>
     suspend fun product(token: String, id: String): MainGenericResponse<ProductDTO>
+    suspend fun productBySku(token: String,sku:String, id: String): MainGenericResponse<ProductDTO>
     suspend fun productInventory(token: String, supplierId :String,sku: String): HeldInventoryBatchDTO
     suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun wishlist(
