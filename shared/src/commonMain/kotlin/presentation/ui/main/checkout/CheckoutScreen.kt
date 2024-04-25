@@ -21,9 +21,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.core.UIComponentState
 import business.domain.main.Address
@@ -67,61 +70,62 @@ fun CheckoutScreen(
         SelectShippingDialog(state = state, events = events)
     }
 
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        DefaultScreenUI(
+            queue = state.errorQueue,
+            onRemoveHeadFromQueue = { events(CheckoutEvent.OnRemoveHeadFromQueue) },
+            progressBarState = state.progressBarState,
+            networkState = state.networkState,
+            onTryAgain = { events(CheckoutEvent.OnRetryNetwork) },
+            titleToolbar = "Checkout",
+            startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
+            onClickStartIconToolbar = popup
+        ) {
 
-    DefaultScreenUI(
-        queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(CheckoutEvent.OnRemoveHeadFromQueue) },
-        progressBarState = state.progressBarState,
-        networkState = state.networkState,
-        onTryAgain = { events(CheckoutEvent.OnRetryNetwork) },
-        titleToolbar = "Checkout",
-        startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
-        onClickStartIconToolbar = popup
-    ) {
-
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.fillMaxSize().padding(16.dp).align(Alignment.TopCenter)) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(modifier = Modifier.fillMaxSize().padding(16.dp).align(Alignment.TopCenter)) {
 
 
-                Spacer_32dp()
+                    Spacer_32dp()
 
-                Text("Shipping Address", style = MaterialTheme.typography.titleLarge)
-                Spacer_12dp()
-                ShippingBox(
-                    title = "Home",
-                    image = Res.drawable.location2, detail = state.selectedAddress.getShippingAddress()
-                ) {
-                    navigateToAddress()
+                    Text("Shipping Address", style = MaterialTheme.typography.titleLarge)
+                    Spacer_12dp()
+                    ShippingBox(
+                        title = "Home",
+                        image = Res.drawable.location2, detail = state.selectedAddress.getShippingAddress()
+                    ) {
+                        navigateToAddress()
+                    }
+
+                    Spacer_16dp()
+                    HorizontalDivider(color = BorderColor)
+                    Spacer_16dp()
+
+                    Text("Choose Shipping Type", style = MaterialTheme.typography.titleLarge)
+                    Spacer_12dp()
+                    ShippingBox(
+                        title = state.selectedShipping.title,
+                        image = Res.drawable.shipping,
+                        detail = state.selectedShipping.getEstimatedDay(),
+                    ) {
+                        events(CheckoutEvent.OnUpdateSelectShippingDialogState(UIComponentState.Show))
+                    }
+
+
                 }
 
-                Spacer_16dp()
-                HorizontalDivider(color = BorderColor)
-                Spacer_16dp()
-
-                Text("Choose Shipping Type", style = MaterialTheme.typography.titleLarge)
-                Spacer_12dp()
-                ShippingBox(
-                    title = state.selectedShipping.title,
-                    image = Res.drawable.shipping,
-                    detail = state.selectedShipping.getEstimatedDay(),
-                ) {
-                    events(CheckoutEvent.OnUpdateSelectShippingDialogState(UIComponentState.Show))
+                Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
+                    CheckoutButtonBox(
+                        "$ ${state.totalCost}",
+                        "$ ${state.selectedShipping.price}",
+                        selectedAddress = state.selectedAddress,
+                    ) {
+                        events(CheckoutEvent.BuyProduct)
+                    }
                 }
-
-
             }
 
-            Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
-                CheckoutButtonBox(
-                    "$ ${state.totalCost}",
-                    "$ ${state.selectedShipping.price}",
-                    selectedAddress = state.selectedAddress,
-                ) {
-                    events(CheckoutEvent.BuyProduct)
-                }
-            }
         }
-
     }
 }
 
