@@ -57,7 +57,7 @@ fun FilterDialog(
             Spacer_16dp()
 
             Text(
-                "Filter",
+                "פילטר",
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge
@@ -125,7 +125,7 @@ fun FilterDialog(
                     events(SearchEvent.Search())
                 }
                 Spacer_16dp()
-                DefaultButton(modifier = Modifier.weight(1f), text = "Filter") {
+                DefaultButton(modifier = Modifier.weight(1f), text = "פילטר") {
                     events(SearchEvent.OnUpdateSelectedCategory(selectedCategories))
                     events(SearchEvent.OnUpdatePriceRange(selectedRange))
                     events(SearchEvent.OnUpdateFilterDialogState(UIComponentState.Hide))

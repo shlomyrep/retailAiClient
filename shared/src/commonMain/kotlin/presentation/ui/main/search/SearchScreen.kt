@@ -119,7 +119,7 @@ fun SearchScreen(
                                 null,
                                 modifier = Modifier.size(24.dp)
                             )
-                            Text("Sort")
+                            Text("מיון")
                         }
                     }
                     TextButton(onClick = {
@@ -139,7 +139,7 @@ fun SearchScreen(
                                 null,
                                 modifier = Modifier.size(24.dp)
                             )
-                            Text("Filter")
+                            Text("פילטר")
                         }
                     }
                 }
@@ -249,7 +249,7 @@ private fun SearchBox(
             )
             TextField(
                 placeholder = {
-                    Text("Search...")
+                    Text("חפש...")
                 },
                 value = value,
                 onValueChange = onValueChange,

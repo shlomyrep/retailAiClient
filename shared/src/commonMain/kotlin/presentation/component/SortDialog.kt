@@ -49,7 +49,7 @@ fun SortDialog(
 
 
             Text(
-                "Sort",
+                "מיון",
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge
