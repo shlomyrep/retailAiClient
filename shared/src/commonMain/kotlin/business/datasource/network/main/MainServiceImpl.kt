@@ -332,7 +332,7 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun productBySku(token: String,sku: String, id: String): MainGenericResponse<ProductDTO> {
+    override suspend fun productBySku(token: String,sku: String, id: String): MainGenericResponse<ProductSelectable> {
         return httpClient.get {
             url {
                 headers {
