@@ -29,6 +29,8 @@ class DetailViewModel(
 
     val state: MutableState<DetailState> = mutableStateOf(DetailState())
     val inventoryStatusText = mutableStateOf("מעדכן מלאי")
+    val heldInventoryText = mutableStateOf("")
+
     val inventoryStatusColor = mutableStateOf(Color.Black)
     val inventoryClickable = mutableStateOf(false)
     val inventoryUnderLine = mutableStateOf(false)
@@ -65,7 +67,7 @@ class DetailViewModel(
             }
 
             is DetailEvent.SelectColor -> {
-                selectColor(event.colorSelectableId,event.product)
+                selectColor(event.colorSelectableId, event.product)
             }
 
             is DetailEvent.GetProduct -> {
@@ -94,14 +96,14 @@ class DetailViewModel(
         }
     }
 
-    private fun selectSize(sizeSelectable: String, product:ProductSelectable) {
+    private fun selectSize(sizeSelectable: String, product: ProductSelectable) {
         state.value = sizeSelectable?.let { state.value.copy(sizeSelectable = it) }!!
-        getProductInventory(product.supplier.supplierId?:"",product.getCalculatedSku())
+        getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
     }
 
-    private fun selectColor(colorSelectable: String,product:ProductSelectable) {
+    private fun selectColor(colorSelectable: String, product: ProductSelectable) {
         state.value = colorSelectable?.let { state.value.copy(colorSelectable = it) }!!
-        getProductInventory(product.supplier.supplierId?:"",product.getCalculatedSku())
+        getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
     }
 
 
@@ -172,12 +174,12 @@ class DetailViewModel(
                 }
 
                 is DataState.Data -> {
-                    dataState.data?.let {
-                        state.value = state.value.copy(product = it)
+                    dataState.data?.let { product ->
+                        state.value = state.value.copy(product = product)
                         state.value =
-                            state.value.copy(selectedImage = it.gallery.firstOrNull() ?: "")
+                            state.value.copy(selectedImage = product.gallery.firstOrNull() ?: "")
 
-                        it.supplier.supplierId?.let { it1 -> getProductInventory(it1, it.sku) }
+                        product.supplier.supplierId?.let { supplierId -> getProductInventory(supplierId, product.sku) }
 //                        getProductInventory("6358ea2f19992d304ce3821a", "117011212")
                     }
                 }
@@ -192,6 +194,9 @@ class DetailViewModel(
 
     private fun getProductInventory(supplierId: String, sku: String) {
         isLoading.value = true
+        inventoryStatusColor.value = Color.Black
+        inventoryClickable.value = false
+        inventoryUnderLine.value = false
         inventoryStatusText.value = "מעדכן מלאי"
         productInteractor.getProductInventory(supplierId = supplierId, sku = sku).onEach { dataState ->
             when (dataState) {
@@ -207,6 +212,14 @@ class DetailViewModel(
                     dataState.data?.let { batchItems ->
                         handleInventoryResponse(batchItems.batchesList)
                         state.value = state.value.copy(productInventoryBatch = batchItems)
+
+                    }
+                    heldInventoryText.value = when (dataState.data?.heldInventory) {
+                        0 -> "מוחזק מלאי: לא"
+                        1 -> "מוחזק מלאי: כן"
+                        else -> {
+                            "מוחזק מלאי: לא"
+                        }
                     }
                 }
 

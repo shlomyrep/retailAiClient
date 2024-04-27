@@ -1,5 +1,6 @@
 package presentation.ui.main.detail
 
+import ExpandingText
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -33,7 +34,6 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -59,6 +59,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import business.datasource.network.main.responses.ColorSelectable
 import business.datasource.network.main.responses.ProductSelectable
@@ -72,14 +73,12 @@ import presentation.component.CircleImage
 import presentation.component.DEFAULT__BUTTON_SIZE
 import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
-import presentation.component.ExpandingText
 import presentation.component.Spacer_16dp
 import presentation.component.Spacer_32dp
 import presentation.component.Spacer_4dp
 import presentation.component.Spacer_8dp
 import presentation.component.noRippleClickable
 import presentation.component.rememberCustomImagePainter
-import presentation.theme.BackgroundContent
 import presentation.theme.BorderColor
 import presentation.theme.orange_400
 import presentation.ui.main.detail.view_model.DetailEvent
@@ -209,73 +208,22 @@ fun DetailScreen(
                         Spacer_16dp()
 
                         Text(
-                            "Product Details",
+                            "פרטי מוצר",
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                             style = MaterialTheme.typography.titleLarge
                         )
 
                         Spacer_8dp()
 
+                        val productDescription = getProductDescription(state.product, viewModel.heldInventoryText.value)
                         ExpandingText(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                            text = state.product.description,
-                            style = MaterialTheme.typography.bodySmall,
+                            text = productDescription,
+                            style = MaterialTheme.typography.bodySmall.copy(fontSize = 16.sp)
+
                         ) {}
 
-
-                        Spacer_16dp()
-
-                        HorizontalDivider(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                            thickness = 1.dp,
-                            color = BackgroundContent
-                        )
-
-                        Spacer_16dp()
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Read some comments",
-                                style = MaterialTheme.typography.titleLarge,
-                            )
-                            Text(
-                                text = "More",
-                                modifier = Modifier
-                                    .clickable {
-                                        navigateToMoreComment(state.product.id)
-                                    },
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-
-                        }
-
-                        Spacer_8dp()
-
-                        if (state.product.comments?.isEmpty() == true) {
-                            Text(
-                                "No Comments!",
-                                style = MaterialTheme.typography.titleLarge,
-                                color = BorderColor,
-                                modifier = Modifier.padding(horizontal = 32.dp)
-                            )
-                        }
-
-                        LazyRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentPadding = PaddingValues(horizontal = 24.dp)
-                        ) {
-//                            items(state.product.comments, key = { it.createAt }) {
-//                                CommentBox(comment = it)
-//                            }
-                        }
-
-                        Spacer_16dp()
-
+                        Spacer_32dp()
                     }
                 }
                 Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
@@ -718,6 +666,49 @@ fun BatchListDialog(batches: List<BatchItem>, onDismiss: () -> Unit) {
         }
     }
 }
+
+@Composable
+fun getProductDescription(product: ProductSelectable, heldInventory: String): String {
+    // Start with an empty description
+    val descriptionBuilder = StringBuilder()
+
+    // Add supplier information if available
+    if (product.supplier.companyName?.isNotEmpty() == true) {
+        descriptionBuilder.append("ספק: ${product.supplier.companyName}\n")
+    }
+    descriptionBuilder.append("$heldInventory\n")
+
+    product.selections.forEach { selection ->
+        when (val selected = selection.selector?.selected) {
+            is ColorSelectable -> {
+                selected.name?.let {
+                    if (it.isNotEmpty()) {
+                        descriptionBuilder.append("גוון: $it\n")
+                    }
+                }
+            }
+
+            is ProductSelectable -> {
+                if (selected.name.isNotEmpty()) {
+                    val selectionDesc = selection.selector.selectionDesc ?: ""
+                    descriptionBuilder.append("$selectionDesc: ${selected.name}\n")
+                }
+            }
+
+            is SizeSelectable -> {
+                selected.size?.let {
+                    if (it.isNotEmpty() && it != "0") {
+                        descriptionBuilder.append("${selection.selector.selectionDesc}: $it ס״מ \n")
+                    }
+                }
+            }
+
+            null -> {}
+        }
+    }
+    return descriptionBuilder.toString().trim()
+}
+
 
 
 
