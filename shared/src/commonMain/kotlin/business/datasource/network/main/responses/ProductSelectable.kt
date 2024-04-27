@@ -204,10 +204,10 @@ enum class PriceType {
 
     override fun toString(): String {
         return when (this) {
-            SINGLE_PRICE -> "Single Price"
-            SIZES_PRICE -> "Sizes Price"
-            COLOR_SIZES_PRICE -> "Color and Sizes Price"
-            COLOR_PRICE -> "Color Price"
+            SINGLE_PRICE -> "single_price"
+            SIZES_PRICE -> "sizes_price"
+            COLOR_SIZES_PRICE -> "color_sizes_price"
+            COLOR_PRICE -> "color_price"
         }
     }
 
