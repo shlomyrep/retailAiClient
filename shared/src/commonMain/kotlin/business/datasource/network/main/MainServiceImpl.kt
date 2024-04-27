@@ -332,15 +332,15 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun productBySku(token: String, sku: String, id: String): MainGenericResponse<ProductSelectable> {
+    override suspend fun productBySku(token: String, sku: String): MainGenericResponse<ProductSelectable> {
         return httpClient.get {
             url {
                 headers {
                     append(HttpHeaders.Authorization, token)
                 }
                 takeFrom(BASE_URL)
-                encodedPath += MainService.PRODUCT
-                encodedPath += "/$sku/$id"
+                encodedPath += MainService.PRODUCT_SKU
+                encodedPath += "/$sku"
             }
             contentType(ContentType.Application.Json)
         }.body()

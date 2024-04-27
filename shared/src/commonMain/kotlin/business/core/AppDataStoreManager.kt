@@ -23,7 +23,7 @@ class AppDataStoreManager(val context: Context) : AppDataStore {
         return context.getData(key)
     }
 
-    override fun openActivity(barcodeScannerListener: ScannerResultListener) {
-        context.openNativeScreen()
+    override fun openActivity(onScanResult: (String) -> Unit) {
+        context.openNativeScreen(onScanResult)
     }
 }

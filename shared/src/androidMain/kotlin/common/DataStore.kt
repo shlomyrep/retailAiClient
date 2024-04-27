@@ -17,10 +17,8 @@ actual suspend fun Context.getData(key: String): String? {
     return dataStore.data.first()[stringPreferencesKey(key)] ?: ""
 }
 
-actual fun Context.openNativeScreen() {
-    ScannerOpenerBridge.handleScanResult = { result ->
-        Toast.makeText(this, "Android scanned successfully --> $result", Toast.LENGTH_LONG).show()
-    }
+actual fun Context.openNativeScreen(onScanResult: (String) -> Unit) {
+    ScannerOpenerBridge.handleScanResult = onScanResult
 
     val intent = Intent(this, ScannerActivity::class.java)
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

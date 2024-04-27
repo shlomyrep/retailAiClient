@@ -8,6 +8,7 @@ import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
+import business.interactors.main.BarcodeInteractor
 import business.interactors.main.HomeInteractor
 import business.interactors.main.LikeInteractor
 import common.ScannerResultListener
@@ -21,10 +22,10 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class HomeViewModel(
     private val homeInteractor: HomeInteractor,
+    private val barcodeInteractor: BarcodeInteractor,
     private val likeInteractor: LikeInteractor,
     private val appDataStoreManager: AppDataStore,
 ) : ViewModel() {
-
 
 
     val state: MutableState<HomeState> = mutableStateOf(HomeState())
@@ -170,6 +171,7 @@ class HomeViewModel(
                 is DataState.NetworkStatus -> {
                     onTriggerEvent(HomeEvent.OnUpdateNetworkState(dataState.networkState))
                 }
+
                 is DataState.Response -> {
                     onTriggerEvent(HomeEvent.Error(dataState.uiComponent))
                 }
@@ -226,11 +228,31 @@ class HomeViewModel(
     }
 
     fun openBarcodeScanner() {
-        appDataStoreManager.openActivity(object : ScannerResultListener {
-            override fun onResult(result: String) {
-                println("${CUSTOM_TAG}: HomeViewModel: onResult: $result")
-            }
-        })
+        appDataStoreManager.openActivity { result ->
+//            println("result: $result")
+            barcodeInteractor.execute(result).onEach { dataState ->
+                when (dataState) {
+                    is DataState.NetworkStatus -> {
+                        onTriggerEvent(HomeEvent.OnUpdateNetworkState(dataState.networkState))
+                    }
+
+                    is DataState.Response -> {
+                        onTriggerEvent(HomeEvent.Error(dataState.uiComponent))
+                    }
+
+                    is DataState.Data -> {
+                        dataState.data?.let {
+                            println("dataState.data: $it")
+                        }
+                    }
+
+                    is DataState.Loading -> {
+                        state.value =
+                            state.value.copy(progressBarState = dataState.progressBarState)
+                    }
+                }
+            }.launchIn(viewModelScope)
+        }
     }
 
 }

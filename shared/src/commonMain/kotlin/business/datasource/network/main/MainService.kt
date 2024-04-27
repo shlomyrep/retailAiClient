@@ -25,6 +25,7 @@ interface MainService {
         const val HOME = "home"
         const val ORDERS = "orders"
         const val PRODUCT = "search/product"
+        const val PRODUCT_SKU = "search/sku"
         const val LIKE = "like"
         const val PROFILE = "user/profile"
         const val COMMENT = "comment"
@@ -93,7 +94,7 @@ interface MainService {
     suspend fun basketAdd(token: String, id: ProductSelectable, count: Int): MainGenericResponse<JRNothing?>
     suspend fun basketDelete(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun home(token: String): MainGenericResponse<HomeDTO>
-    suspend fun productBySku(token: String,sku:String, id: String): MainGenericResponse<ProductSelectable>
+    suspend fun productBySku(token: String,sku:String): MainGenericResponse<ProductSelectable>
     suspend fun product(token: String, id: String): MainGenericResponse<ProductSelectable>
 
     suspend fun productInventory(token: String, supplierId :String,sku: String): HeldInventoryBatchDTO

@@ -14,5 +14,5 @@ interface AppDataStore {
         key: String,
     ): String?
 
-    fun openActivity(barcodeScannerListener: ScannerResultListener)
+    fun openActivity(onScanResult: (String) -> Unit)
 }

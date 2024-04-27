@@ -11,6 +11,7 @@ import business.datasource.network.splash.SplashServiceImpl
 import business.interactors.main.AddAddressInteractor
 import business.interactors.main.AddBasketInteractor
 import business.interactors.main.AddCommentInteractor
+import business.interactors.main.BarcodeInteractor
 import business.interactors.main.BasketListInteractor
 import business.interactors.main.BuyProductInteractor
 import business.interactors.main.DeleteBasketInteractor
@@ -64,7 +65,7 @@ fun appModule(context: Context) = module {
     single<AppDataStore> { AppDataStoreManager(context) }
     factory { SharedViewModel(get()) }
     factory { LoginViewModel(get(), get(), get()) }
-    factory { HomeViewModel(get(), get(), get()) }
+    factory { HomeViewModel(get(), get(), get(),get()) }
     factory { AddressViewModel(get(), get()) }
     factory { CategoriesViewModel(get()) }
     factory { ProfileViewModel(get()) }
@@ -102,5 +103,6 @@ fun appModule(context: Context) = module {
     single { RegisterInteractor(get(), get()) }
     single { CheckTokenInteractor(get()) }
     single { HomeInteractor(get(), get()) }
+    single { BarcodeInteractor(get(), get()) }
     single { ProductInteractor(get(), get()) }
 }
