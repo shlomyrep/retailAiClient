@@ -215,10 +215,10 @@ class DetailViewModel(
 
                     }
                     heldInventoryText.value = when (dataState.data?.heldInventory) {
-                        0 -> "מוחזק מלאי: לא"
-                        1 -> "מוחזק מלאי: כן"
+                        0 -> "לא"
+                        1 -> "כן"
                         else -> {
-                            "מוחזק מלאי: לא"
+                            "לא"
                         }
                     }
                 }
@@ -308,6 +308,4 @@ class DetailViewModel(
             roundedNumber.toString()
         }
     }
-
-
 }

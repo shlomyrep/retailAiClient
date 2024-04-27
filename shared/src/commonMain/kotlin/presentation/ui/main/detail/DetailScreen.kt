@@ -53,6 +53,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -668,47 +669,58 @@ fun BatchListDialog(batches: List<BatchItem>, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun getProductDescription(product: ProductSelectable, heldInventory: String): String {
-    // Start with an empty description
-    val descriptionBuilder = StringBuilder()
-
-    // Add supplier information if available
-    if (product.supplier.companyName?.isNotEmpty() == true) {
-        descriptionBuilder.append("ספק: ${product.supplier.companyName}\n")
-    }
-    descriptionBuilder.append("$heldInventory\n")
-
-    product.selections.forEach { selection ->
-        when (val selected = selection.selector?.selected) {
-            is ColorSelectable -> {
-                selected.name?.let {
-                    if (it.isNotEmpty()) {
-                        descriptionBuilder.append("גוון: $it\n")
+fun getProductDescription(product: ProductSelectable, heldInventory: String): AnnotatedString {
+    return buildAnnotatedString {
+        // Add supplier information if available
+        if (product.supplier.companyName?.isNotEmpty() == true) {
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append("ספק: ")
+            }
+            append("${product.supplier.companyName}\n")
+        }
+        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+            append("מוחזק מלאי: ")
+        }
+        append("$heldInventory\n")
+        product.selections.forEach { selection ->
+            when (val selected = selection.selector?.selected) {
+                is ColorSelectable -> {
+                    selected.name?.let {
+                        if (it.isNotEmpty()) {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("גוון: ")
+                            }
+                            append("$it\n")
+                        }
                     }
                 }
-            }
 
-            is ProductSelectable -> {
-                if (selected.name.isNotEmpty()) {
-                    val selectionDesc = selection.selector.selectionDesc ?: ""
-                    descriptionBuilder.append("$selectionDesc: ${selected.name}\n")
-                }
-            }
-
-            is SizeSelectable -> {
-                selected.size?.let {
-                    if (it.isNotEmpty() && it != "0") {
-                        descriptionBuilder.append("${selection.selector.selectionDesc}: $it ס״מ \n")
+                is ProductSelectable -> {
+                    if (selected.name.isNotEmpty()) {
+                        val selectionDesc = selection.selector.selectionDesc ?: ""
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append("$selectionDesc: ")
+                        }
+                        append("${selected.name}\n")
                     }
                 }
-            }
 
-            null -> {}
+                is SizeSelectable -> {
+                    selected.size?.let {
+                        if (it.isNotEmpty() && it != "0") {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("${selection.selector.selectionDesc}: ")
+                            }
+                            append("$it ס״מ\n")
+                        }
+                    }
+                }
+
+                null -> {}
+            }
         }
     }
-    return descriptionBuilder.toString().trim()
 }
-
 
 
 
