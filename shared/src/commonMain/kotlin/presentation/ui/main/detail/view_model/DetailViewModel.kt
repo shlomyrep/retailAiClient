@@ -10,7 +10,10 @@ import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
+import business.datasource.network.main.responses.ColorSelectable
+import business.datasource.network.main.responses.PriceType
 import business.datasource.network.main.responses.ProductSelectable
+import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.BatchItem
 import business.interactors.main.AddBasketInteractor
 import business.interactors.main.LikeInteractor
@@ -308,4 +311,56 @@ class DetailViewModel(
             roundedNumber.toString()
         }
     }
+
+    private fun getPrice(product: ProductSelectable, useUpgradePrice: Boolean = false): Int {
+        return when (product.priceType) {
+            PriceType.SINGLE_PRICE.toString() -> {
+                if (useUpgradePrice) product.upgradePrice?.toInt() ?: 0
+                else product.basePrice?.toInt() ?: 0
+            }
+
+            PriceType.SIZES_PRICE.toString() -> {
+                product.selections.firstOrNull { it.selector?.selectionType == SizeSelectable.type }
+                    ?.selector?.selected?.let { selected ->
+                        if (useUpgradePrice) selected.upgradePrice?.toInt() ?: 0
+                        else selected.basePrice?.toInt() ?: 0
+                    } ?: 0
+            }
+
+            PriceType.COLOR_SIZES_PRICE.toString(), PriceType.COLOR_PRICE.toString() -> {
+                val selectedColor = product.selections
+                    .firstOrNull { it.selector?.selectionType == ColorSelectable.type }
+                    ?.selector?.selected
+
+                product.selections.firstOrNull { it.selector?.selectionType == SizeSelectable.type }
+                    ?.selector?.selected?.let { selected ->
+                        val colorsMap = (selected as? SizeSelectable)?.colors
+                        colorsMap?.let {
+                            if (selectedColor != null) {
+                                if (useUpgradePrice) colorsMap[selectedColor._id]?.upgradePrice?.toInt() ?: 0
+                                else colorsMap[selectedColor._id]?.basePrice?.toInt() ?: 0
+                            } else 0
+                        }
+                    } ?: 0
+            }
+
+            else -> 0
+        }
+    }
+
+    fun getProductPrice(product: ProductSelectable): String {
+        var price = getPrice(product)
+        product.selections.filter { it.selector?.selectionType == ProductSelectable.type }.forEach { selection ->
+            val subProduct = selection.selector?.selected as? ProductSelectable
+            subProduct?.let {
+                price += getPrice(it, product.priceIncludeSubProducts)
+            }
+        }
+        if (product.supplier.shouldAddVatToPrice == true) {
+            price = (price * 1.17).toInt()  // Apply VAT
+        }
+        val vatText = if (product.supplier.shouldAddVatToPrice == true) "כולל מע\"מ" else "לא כולל מע\"מ"
+        return "$price ₪ $vatText"
+    }
 }
+

@@ -193,15 +193,26 @@ fun DetailScreen(
                         }
 
                         Spacer_16dp()
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                        ) {
+                            Text(
+                                text = state.product.title,
+                                style = MaterialTheme.typography.headlineLarge,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
 
-
-                        Text(
-                            state.product.title,
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                            style = MaterialTheme.typography.headlineLarge,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                            Text(
+                                text = viewModel.getProductPrice(state.product),
+                                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 14.sp),  // Set font size to 14sp
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.align(Alignment.End)  // Align price to the end of the column
+                            )
+                        }
 
                         // a grid that shows the size selection if exists
                         Selections(state.product, events)
