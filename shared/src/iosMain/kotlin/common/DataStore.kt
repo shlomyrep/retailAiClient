@@ -14,10 +14,11 @@ actual suspend fun Context.putData(key: String, `object`: String) {
 actual suspend inline fun Context.getData(key: String): String? {
     return NSUserDefaults.standardUserDefaults().stringForKey(key)
 }
-//fun Context.openNativeScreen(onScanResult: (String) -> Unit) {
 
 
 actual fun Context.openNativeScreen(onScanResult: (String) -> Unit) {
     ScannerOpenerBridge.openScannerScreenFunc?.invoke()
     ScannerOpenerBridge.handleScanResult = onScanResult
+    NSLog("TAMIR  תמיר IOS --> Scan result יש לנו תשובה חזרה: $onScanResult")
+
 }
