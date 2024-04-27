@@ -202,16 +202,20 @@ import Foundation
 
 
     @objc func barcodeButtonTapped(_ sender: UIButton) {
-        guard let barcode = sender.title(for: .normal) else { return }
+        guard let title = sender.title(for: .normal),
+              let prefixRange = title.range(of: "פתח מוצר ") else { return }
+        
+        let barcode = String(title[prefixRange.upperBound...]) // This ensures you get only the barcode
         handleSelectedBarcode(barcode)
     }
-    
+
     private func handleSelectedBarcode(_ barcode: String) {
         print("Barcode Selected: \(barcode)")
         didFindCode?(barcode)
-        ScannerOpenerBridge.shared.handleScanResult?(barcode)
+        NSLog("TAMIR --> handleSelectedBarcode --> Scanned Code: \(barcode)")
         closeViewController()
     }
+
 
     
     private func closeViewController() {

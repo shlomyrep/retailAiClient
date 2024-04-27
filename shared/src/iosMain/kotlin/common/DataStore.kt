@@ -19,6 +19,6 @@ actual suspend inline fun Context.getData(key: String): String? {
 actual fun Context.openNativeScreen(onScanResult: (String) -> Unit) {
     ScannerOpenerBridge.openScannerScreenFunc?.invoke()
     ScannerOpenerBridge.handleScanResult = onScanResult
-    NSLog("TAMIR  תמיר IOS --> Scan result יש לנו תשובה חזרה: $onScanResult")
+    NSLog("TAMIR IOS --> Scan result back in common: $onScanResult")
 
 }
