@@ -61,11 +61,11 @@ class DetailViewModel(
             }
 
             is DetailEvent.SelectSize -> {
-                selectSize(event.sizeSelectableId)
+                selectSize(event.sizeSelectableId, event.product)
             }
 
             is DetailEvent.SelectColor -> {
-                selectColor(event.colorSelectableId)
+                selectColor(event.colorSelectableId,event.product)
             }
 
             is DetailEvent.GetProduct -> {
@@ -94,12 +94,14 @@ class DetailViewModel(
         }
     }
 
-    private fun selectSize(sizeSelectable: String) {
+    private fun selectSize(sizeSelectable: String, product:ProductSelectable) {
         state.value = sizeSelectable?.let { state.value.copy(sizeSelectable = it) }!!
+        getProductInventory(product.supplier.supplierId?:"",product.getCalculatedSku())
     }
 
-    private fun selectColor(colorSelectable: String) {
+    private fun selectColor(colorSelectable: String,product:ProductSelectable) {
         state.value = colorSelectable?.let { state.value.copy(colorSelectable = it) }!!
+        getProductInventory(product.supplier.supplierId?:"",product.getCalculatedSku())
     }
 
 
@@ -194,7 +196,7 @@ class DetailViewModel(
         productInteractor.getProductInventory(supplierId = supplierId, sku = sku).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {
-                    onTriggerEvent(DetailEvent.OnUpdateNetworkState(dataState.networkState))
+//                    onTriggerEvent(DetailEvent.OnUpdateNetworkState(dataState.networkState))
                 }
 
                 is DataState.Response -> {
@@ -209,7 +211,7 @@ class DetailViewModel(
                 }
 
                 is DataState.Loading -> {
-                    state.value = state.value.copy(progressBarState = dataState.progressBarState)
+//                    state.value = state.value.copy(progressBarState = dataState.progressBarState)
                 }
             }
         }.launchIn(viewModelScope)

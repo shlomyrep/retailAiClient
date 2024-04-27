@@ -34,7 +34,7 @@ sealed class DetailEvent {
         val networkState: NetworkState
     ) : DetailEvent()
 
-    data class SelectSize(val sizeSelectableId: String) : DetailEvent()
-    data class SelectColor(val colorSelectableId: String) : DetailEvent()
+    data class SelectSize(val sizeSelectableId: String, val product: ProductSelectable) : DetailEvent()
+    data class SelectColor(val colorSelectableId: String,val product: ProductSelectable) : DetailEvent()
 
 }

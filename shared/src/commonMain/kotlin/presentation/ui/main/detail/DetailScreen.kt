@@ -48,7 +48,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
@@ -205,7 +204,7 @@ fun DetailScreen(
                         )
 
                         // a grid that shows the size selection if exists
-                        Selections(state.product.selections, events)
+                        Selections(state.product, events)
 
                         Spacer_16dp()
 
@@ -292,7 +291,7 @@ fun DetailScreen(
 }
 
 @Composable
-fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit) {
+fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: ProductSelectable) {
     if (selection.selector?.selected is ColorSelectable) {
         Spacer_8dp()
         Row(
@@ -307,7 +306,7 @@ fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit) {
                         .clickable {
                             color._id?.let { it1 ->
                                 selection.selector.selected = color
-                                events(DetailEvent.SelectColor(it1))
+                                events(DetailEvent.SelectColor(it1, product))
                             }
                         }
                         .padding(8.dp)
@@ -518,16 +517,16 @@ fun CommentBox(comment: Comment, modifier: Modifier = Modifier.width(300.dp)) {
 }
 
 @Composable
-fun Selections(selections: List<Selection>, events: (DetailEvent) -> Unit) {
-    selections.forEach {
-        SizeGrid(it, events)
-        ColorGrid(it, events)
+fun Selections(product: ProductSelectable, events: (DetailEvent) -> Unit) {
+    product.selections.forEach {
+        SizeGrid(it, events, product)
+        ColorGrid(it, events, product)
         ProductGrid(it, events)
     }
 }
 
 @Composable
-fun SizeGrid(selection: Selection, events: (DetailEvent) -> Unit) {
+fun SizeGrid(selection: Selection, events: (DetailEvent) -> Unit, product: ProductSelectable) {
 
 
     if (selection.selector?.selected is SizeSelectable) {
@@ -551,7 +550,7 @@ fun SizeGrid(selection: Selection, events: (DetailEvent) -> Unit) {
                                         size._id?.let { it1 ->
                                             selection.selector.selected = size
                                             // Trigger your event here
-                                            events(DetailEvent.SelectSize(it1))
+                                            events(DetailEvent.SelectSize(it1, product))
                                         }
                                     }
                                     .border(
