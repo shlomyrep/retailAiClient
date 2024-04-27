@@ -108,17 +108,17 @@ class ScannerActivity : AppCompatActivity() {
             val barcodeScanner = BarcodeScanning.getClient()
             val textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
+            textRecognizer.process(image)
+                .addOnSuccessListener { texts ->
+                    if (texts.textBlocks.isNotEmpty()) {
+                        handleTextRecognitionResult(texts)
+                    }
+                }
+
             barcodeScanner.process(image)
                 .addOnSuccessListener { barcodes ->
                     if (barcodes.isNotEmpty()) {
                         createBarcodeButtons(barcodes)
-                    } else {
-                        textRecognizer.process(image)
-                            .addOnSuccessListener { texts ->
-                                if (texts.textBlocks.isNotEmpty()) {
-                                    handleTextRecognitionResult(texts)
-                                }
-                            }
                     }
                 }
                 .addOnFailureListener {
