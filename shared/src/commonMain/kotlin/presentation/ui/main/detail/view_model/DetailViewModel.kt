@@ -264,10 +264,10 @@ class DetailViewModel(
                 val quantity = batchItemList[0].quantity
                 val freeQuantity = batchItemList[0].freeQuantity
 
-                val roundedOnHand = if (quantity % 1.0 == 0.0) quantity.toInt() else quantity
-                val roundedFreeQty = if (freeQuantity % 1.0 == 0.0) freeQuantity.toInt() else freeQuantity
+                val formattedQuantity = formatToOneDecimalPlace(quantity)
+                val formattedFreeQuantity = formatToOneDecimalPlace(freeQuantity)
 
-                inventoryStatusText.value = " מלאי : $roundedOnHand, זמין : $roundedFreeQty"
+                inventoryStatusText.value = "מלאי: $formattedQuantity, זמין: $formattedFreeQuantity"
                 inventoryStatusColor.value = Color.Black
                 inventoryClickable.value = false
                 inventoryUnderLine.value = false
@@ -282,4 +282,19 @@ class DetailViewModel(
         }
         isLoading.value = false
     }
+
+    private fun formatToOneDecimalPlace(number: Double): String {
+        // Check if the number has a decimal part
+        return if (number % 1 == 0.0) {
+            // If no decimal part, convert directly to Int and then to String
+            number.toInt().toString()
+        } else {
+            // If there is a decimal part, round to one decimal place manually
+            val roundedNumber = kotlin.math.round(number * 10) / 10
+            // Convert to String, this will have one digit after the decimal point due to the rounding above
+            roundedNumber.toString()
+        }
+    }
+
+
 }
