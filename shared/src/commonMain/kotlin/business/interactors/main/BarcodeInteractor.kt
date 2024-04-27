@@ -29,9 +29,8 @@ class BarcodeInteractor(
 //                    apiResponse.alert?.createException()
 //                )
             }
-//            val result = apiResponse.result?.toHome()
             emit(DataState.NetworkStatus(NetworkState.Good))
-//            emit(DataState.Data(result))
+            emit(DataState.Data(apiResponse.result))
 
         } catch (e: Exception) {
             e.printStackTrace()

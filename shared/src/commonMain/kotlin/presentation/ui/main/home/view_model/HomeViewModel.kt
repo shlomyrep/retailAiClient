@@ -226,32 +226,29 @@ class HomeViewModel(
         state.value = state.value.copy(networkState = networkState)
     }
 
-    fun openBarcodeScanner() {
+    fun openBarcodeScanner(navigateToDetail: (String) -> Unit) {
         appDataStoreManager.openActivity { result ->
-
             barcodeInteractor.execute(result).onEach { dataState ->
                 when (dataState) {
                     is DataState.NetworkStatus -> {
                         onTriggerEvent(HomeEvent.OnUpdateNetworkState(dataState.networkState))
                     }
-
                     is DataState.Response -> {
                         onTriggerEvent(HomeEvent.Error(dataState.uiComponent))
                     }
-
                     is DataState.Data -> {
                         dataState.data?.let {
                             println("dataState.data: $it")
+                            navigateToDetail(it.id)
                         }
                     }
-
                     is DataState.Loading -> {
-                        state.value =
-                            state.value.copy(progressBarState = dataState.progressBarState)
+                        state.value = state.value.copy(progressBarState = dataState.progressBarState)
                     }
                 }
             }.launchIn(viewModelScope)
         }
     }
+
 
 }
