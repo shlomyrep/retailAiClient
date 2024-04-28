@@ -52,7 +52,7 @@ class DetailViewModel(
         productDescription = getProductDescription(product, heldInventory)
     }
     init {
-        updateProductDescription(state.value.product, "Current Held Inventory")
+        updateProductDescription(state.value.product, heldInventoryText.value)
     }
 
 

@@ -61,7 +61,7 @@ class CategoriesViewModel(
 
                 is DataState.Data -> {
                     dataState.data?.let {
-                        state.value = state.value.copy(categories = it.categories)
+                        state.value = state.value.copy(categories = it.categories.sortedBy{ it.name })
                     }
                 }
 

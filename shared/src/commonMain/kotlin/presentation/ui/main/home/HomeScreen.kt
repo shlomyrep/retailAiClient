@@ -273,7 +273,7 @@ fun HomeScreen(
                         modifier = Modifier.fillMaxWidth(),
                         contentPadding = PaddingValues(8.dp)
                     ) {
-                        items(state.home.categories, key = { it.id }) {
+                        items(state.home.categories.sortedBy { it.name }, key = { it.id }) {
                             CategoryBox(category = it) {
                                 navigateToSearch(it.id, null)
                             }
@@ -470,31 +470,21 @@ private fun CategoryBox(category: Category, onCategoryClick: () -> Unit) {
             }
         ) {
             Box(
-                modifier = Modifier.background(
-                    MaterialTheme.colorScheme.primary.copy(.2f),
-                    CircleShape
-                ).size(60.dp)
-                    .padding(12.dp)
+                modifier = Modifier.size(75.dp).padding(2.dp).clip(RoundedCornerShape(12.dp))
             ) {
-
                 AsyncImage(
                     category.icon, null,
-                    modifier = Modifier.fillMaxSize().size(55.dp),
+                    modifier = Modifier.fillMaxSize().size(65.dp),
                     contentScale = ContentScale.Crop
                 )
-                /*  Image(
-                      painter = rememberAsyncImagePainter(category.icon),
-                      null,
-                      modifier = Modifier.fillMaxSize().size(55.dp),
-                      contentScale = ContentScale.Crop
-                  )*/
             }
             Spacer_8dp()
             Text(
                 category.name,
                 style = MaterialTheme.typography.labelMedium,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                color = Color.Black
             )
         }
     }

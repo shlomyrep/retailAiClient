@@ -750,10 +750,6 @@ fun BatchListDialog(batches: List<BatchItem>, onDismiss: () -> Unit) {
     }
 }
 
-
-
-
-
 fun getProductDescription(product: ProductSelectable, heldInventory: String): AnnotatedString {
     return buildAnnotatedString {
         // Add supplier information if available
