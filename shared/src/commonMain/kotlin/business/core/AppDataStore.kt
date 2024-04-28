@@ -1,7 +1,5 @@
 package business.core
 
-import common.ScannerResultListener
-
 
 interface AppDataStore {
 
@@ -15,4 +13,5 @@ interface AppDataStore {
     ): String?
 
     fun openActivity(onScanResult: (String) -> Unit)
+    fun openPdfUrl(url:String)
 }

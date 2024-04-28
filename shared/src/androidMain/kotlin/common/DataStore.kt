@@ -1,6 +1,9 @@
 package common
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -29,4 +32,19 @@ actual fun Context.openNativeScreen(onScanResult: (String) -> Unit) {
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     startActivity(intent)
 }
+
+actual fun Context.pdfOpener(url: String) {
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(Uri.parse(url), "application/pdf")
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+    try {
+        this.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(this, "No application found to open PDF.", Toast.LENGTH_SHORT).show()
+    }
+}
+
+
+
 

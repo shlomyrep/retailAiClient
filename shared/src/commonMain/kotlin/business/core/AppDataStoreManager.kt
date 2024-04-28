@@ -1,9 +1,9 @@
 package business.core
 
 import common.Context
-import common.ScannerResultListener
 import common.getData
 import common.openNativeScreen
+import common.pdfOpener
 import common.putData
 
 const val APP_DATASTORE = "com.razzaghi.shoppingbykmp"
@@ -26,4 +26,9 @@ class AppDataStoreManager(val context: Context) : AppDataStore {
     override fun openActivity(onScanResult: (String) -> Unit) {
         context.openNativeScreen(onScanResult)
     }
+
+    override fun openPdfUrl(url: String) {
+        context.pdfOpener(url)
+    }
+
 }

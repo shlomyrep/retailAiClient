@@ -65,7 +65,7 @@ fun appModule(context: Context) = module {
     single<AppDataStore> { AppDataStoreManager(context) }
     factory { SharedViewModel(get()) }
     factory { LoginViewModel(get(), get(), get()) }
-    factory { HomeViewModel(get(), get(), get(),get()) }
+    factory { HomeViewModel(get(), get(), get(), get()) }
     factory { AddressViewModel(get(), get()) }
     factory { CategoriesViewModel(get()) }
     factory { ProfileViewModel(get()) }
@@ -78,7 +78,7 @@ fun appModule(context: Context) = module {
     factory { CheckoutViewModel(get(), get(), get()) }
     factory { WishlistViewModel(get(), get()) }
     factory { CartViewModel(get(), get(), get()) }
-    factory { DetailViewModel(get(), get(), get()) }
+    factory { DetailViewModel(get(), get(), get(), get()) }
     factory { SearchViewModel(get(), get()) }
     single { WishListInteractor(get(), get()) }
     single { BasketListInteractor(get(), get()) }

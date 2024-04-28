@@ -20,5 +20,8 @@ actual fun Context.openNativeScreen(onScanResult: (String) -> Unit) {
     ScannerOpenerBridge.openScannerScreenFunc?.invoke()
     ScannerOpenerBridge.handleScanResult = onScanResult
     NSLog("TAMIR IOS --> Scan result back in common: $onScanResult")
+}
 
+actual fun Context.pdfOpener(url: String) {
+    PdfOpenerBridge.openPdfFunc?.invoke(url)
 }

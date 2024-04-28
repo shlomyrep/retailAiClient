@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import business.constants.CUSTOM_TAG
+import business.core.AppDataStore
 import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
@@ -27,6 +28,7 @@ class DetailViewModel(
     private val productInteractor: ProductInteractor,
     private val addBasketInteractor: AddBasketInteractor,
     private val likeInteractor: LikeInteractor,
+    private val appDataStoreManager: AppDataStore
 ) : ViewModel() {
 
 
@@ -361,6 +363,10 @@ class DetailViewModel(
         }
         val vatText = if (product.supplier.shouldAddVatToPrice == true) "כולל מע\"מ" else "לא כולל מע\"מ"
         return "$price ₪ $vatText"
+    }
+
+    fun openPdf(url: String) {
+        appDataStoreManager.openPdfUrl(url)
     }
 }
 

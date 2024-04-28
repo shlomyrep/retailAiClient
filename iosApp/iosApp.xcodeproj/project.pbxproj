@@ -12,6 +12,7 @@
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		360AF96F2BC13BB300AD0C18 /* ScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 360AF96D2BC12C4300AD0C18 /* ScannerViewController.swift */; };
 		360AF97A2BC5912E00AD0C18 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 360AF9792BC5912E00AD0C18 /* Alamofire.framework */; };
+		36678C2F2BDE24BF009CBE40 /* PDFManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36678C2E2BDE24BF009CBE40 /* PDFManager.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 		B5A7480EA59E4A05EF3B8B23 /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C1920547F7B5CFA3501061 /* Pods_iosApp.framework */; };
 /* End PBXBuildFile section */
@@ -35,6 +36,7 @@
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		360AF96D2BC12C4300AD0C18 /* ScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerViewController.swift; sourceTree = "<group>"; };
 		360AF9792BC5912E00AD0C18 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		36678C2E2BDE24BF009CBE40 /* PDFManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFManager.swift; sourceTree = "<group>"; };
 		417236B4D15A2F5D60319287 /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.debug.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
+				36678C2E2BDE24BF009CBE40 /* PDFManager.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -247,6 +250,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				36678C2F2BDE24BF009CBE40 /* PDFManager.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				360AF96F2BC13BB300AD0C18 /* ScannerViewController.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,

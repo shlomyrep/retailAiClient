@@ -212,7 +212,7 @@ fun DetailScreen(
 
                         setDiffLevelText(state.product)
 
-                        setProductPageText(state.product)
+                        setProductPageText(state.product, viewModel)
 
                         // a grid that shows the size selection if exists
                         Selections(state.product, events)
@@ -298,21 +298,23 @@ fun setDiffLevelText(product: ProductSelectable) {
         }
     }
 }
+
+
 @Composable
-fun setProductPageText(product: ProductSelectable) {
+fun setProductPageText(product: ProductSelectable, viewModel: DetailViewModel) {
     if (product.pdfUrl.isNotEmpty())
-    Text(
-        text = buildAnnotatedString {
-            withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
-                append("לחץ לפתיחת דף מוצר")
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clickable {  },
-        style = MaterialTheme.typography.titleLarge
-    )
+        Text(
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
+                    append("לחץ לפתיחת דף מוצר")
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .clickable { viewModel.openPdf(product.pdfUrl) },
+            style = MaterialTheme.typography.titleLarge
+        )
 }
 
 @Composable

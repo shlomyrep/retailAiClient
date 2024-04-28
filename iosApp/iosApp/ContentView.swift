@@ -14,14 +14,12 @@ struct ContentView: View {
     var body: some View {
         ComposeView()
             .onAppear {
-                // Assign the Swift function to the Kotlin object's property.
                 ScannerOpenerBridge.shared.openScannerScreenFunc = openScannerScreenFromSwift
-                
+                PdfOpenerBridge.shared.openPdfFunc = openPdfFromSwift as ((String) -> Void)
             }
             .ignoresSafeArea(.all, edges: .bottom) // Compose has own keyboard handler
     }
 }
-
 
 func openScannerScreenFromSwift() {
     DispatchQueue.main.async {
@@ -38,5 +36,26 @@ func openScannerScreenFromSwift() {
              }
         
         rootViewController?.present(scannerViewController, animated: true)
+    }
+}
+
+
+func openPdfFromSwift(url: String) {
+    PDFManager.shared.openPdf(url: url)
+}
+
+extension ComposeView {
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    class Coordinator: NSObject, UIDocumentInteractionControllerDelegate {
+        var parent: ComposeView
+        init(_ parent: ComposeView) {
+            self.parent = parent
+        }
+
+        func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
+            return UIApplication.shared.windows.first { $0.isKeyWindow }?.rootViewController ?? UIViewController()
+        }
     }
 }
