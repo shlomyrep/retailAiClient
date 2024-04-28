@@ -69,6 +69,8 @@ import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.BatchItem
 import business.domain.main.Comment
 import kotlinx.coroutines.delay
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 import presentation.component.CircleButton
 import presentation.component.CircleImage
 import presentation.component.DEFAULT__BUTTON_SIZE
@@ -86,6 +88,9 @@ import presentation.ui.main.detail.view_model.DetailEvent
 import presentation.ui.main.detail.view_model.DetailState
 import presentation.ui.main.detail.view_model.DetailViewModel
 import presentation.util.convertDate
+import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.v3
+import shoping_by_kmp.shared.generated.resources.v4
 
 
 @Composable
@@ -160,39 +165,12 @@ fun DetailScreen(
 
                     }
 
-                    Spacer_32dp()
+                    Spacer_8dp()
 
                     Column(modifier = Modifier.padding(vertical = 16.dp)) {
                         val batches = viewModel.state.value.productInventoryBatch.batchesList
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                state.product.category.name,
-                                style = MaterialTheme.typography.titleMedium
-                            )
 
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
-                                InventoryStatusText(
-                                    viewModel = viewModel,
-                                    onDialogRequest = viewModel::show
-                                )
-                                if (showDialog) {
-                                    BatchListDialog(
-                                        batches = state.productInventoryBatch.batchesList,
-                                        onDismiss = viewModel::dismiss
-                                    )
-                                }
-                            }
-
-                        }
-
-                        Spacer_16dp()
+                        Spacer_8dp()
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -200,19 +178,41 @@ fun DetailScreen(
                         ) {
                             Text(
                                 text = state.product.title,
-                                style = MaterialTheme.typography.headlineLarge,
+                                style = MaterialTheme.typography.headlineMedium,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
+                        }
+                        Spacer_8dp()
 
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            InventoryStatusText(
+                                viewModel = viewModel,
+                                onDialogRequest = viewModel::show
+                            )
+                            if (showDialog) {
+                                BatchListDialog(
+                                    batches = state.productInventoryBatch.batchesList,
+                                    onDismiss = viewModel::dismiss
+                                )
+                            }
                             Text(
                                 text = viewModel.getProductPrice(state.product),
-                                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 14.sp),  // Set font size to 14sp
+                                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 14.sp),
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.align(Alignment.End)  // Align price to the end of the column
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
+
+                        Spacer_8dp()
+
+                        setDiffLevelText(state.product)
+
+                        setProductPageText(state.product)
 
                         // a grid that shows the size selection if exists
                         Selections(state.product, events)
@@ -248,6 +248,71 @@ fun DetailScreen(
             }
         }
     }
+}
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+fun setDiffLevelText(product: ProductSelectable) {
+    val containsV3 = product.name.contains("v3", ignoreCase = true)
+    val containsV4 = product.name.contains("v4", ignoreCase = true)
+
+    var showDialog by remember { mutableStateOf(false) }
+    val imageResId = if (containsV4) Res.drawable.v4 else Res.drawable.v3
+
+    if (containsV3 || containsV4) {
+        Text(
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
+                    append("לחץ לפתיחת רמת שונות")
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .clickable { showDialog = true },
+            style = MaterialTheme.typography.titleLarge
+        )
+    }
+
+    if (showDialog) {
+        Dialog(onDismissRequest = { showDialog = false }) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(onClick = { showDialog = false }),
+                contentAlignment = Alignment.Center // This will center the contents of the Box
+            ) {
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth(1f)
+                        .fillMaxHeight(0.35f),
+                ) {
+                    Image(
+                        painter = painterResource(imageResId),
+                        contentDescription = "Diff Level Image",
+                        modifier = Modifier.fillMaxSize() // Make the Image fill the Card
+                    )
+                }
+            }
+        }
+    }
+}
+@Composable
+fun setProductPageText(product: ProductSelectable) {
+    if (product.pdfUrl.isNotEmpty())
+    Text(
+        text = buildAnnotatedString {
+            withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
+                append("לחץ לפתיחת דף מוצר")
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clickable {  },
+        style = MaterialTheme.typography.titleLarge
+    )
 }
 
 @Composable
