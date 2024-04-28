@@ -161,15 +161,12 @@ fun DetailScreen(
                                 }
                             }
                         }
-
-
                     }
 
                     Spacer_8dp()
 
                     Column(modifier = Modifier.padding(vertical = 16.dp)) {
                         val batches = viewModel.state.value.productInventoryBatch.batchesList
-
                         Spacer_8dp()
                         Column(
                             modifier = Modifier
@@ -178,7 +175,7 @@ fun DetailScreen(
                         ) {
                             Text(
                                 text = state.product.title,
-                                style = MaterialTheme.typography.headlineMedium,
+                                style = MaterialTheme.typography.headlineMedium.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold),
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -186,8 +183,10 @@ fun DetailScreen(
                         Spacer_8dp()
 
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.Top, // Changed to top alignment
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             InventoryStatusText(
@@ -207,6 +206,7 @@ fun DetailScreen(
                                 overflow = TextOverflow.Ellipsis
                             )
                         }
+
 
                         Spacer_8dp()
 
@@ -266,6 +266,7 @@ fun setDiffLevelText(product: ProductSelectable) {
                     append("לחץ לפתיחת רמת שונות")
                 }
             },
+            color = Color(0xFF89CFF0),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
@@ -309,6 +310,7 @@ fun setProductPageText(product: ProductSelectable, viewModel: DetailViewModel) {
                     append("לחץ לפתיחת דף מוצר")
                 }
             },
+            color = Color(0xFF89CFF0),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
@@ -480,7 +482,7 @@ fun BuyButtonBox(product: ProductSelectable, onClick: () -> Unit) {
 
             DefaultButton(
                 modifier = Modifier.fillMaxWidth(.7f).height(DEFAULT__BUTTON_SIZE),
-                text = "Add to Cart"
+                text = "הוסף להזמנה"
             ) {
                 onClick()
             }
@@ -656,7 +658,7 @@ fun InventoryStatusText(viewModel: DetailViewModel, onDialogRequest: () -> Unit)
         style = MaterialTheme.typography.titleMedium.copy(color = inventoryColor),
         modifier = Modifier
             .clickable(enabled = isClickable, onClick = onDialogRequest)
-            .padding(16.dp)
+            .padding(8.dp)
     )
 }
 
