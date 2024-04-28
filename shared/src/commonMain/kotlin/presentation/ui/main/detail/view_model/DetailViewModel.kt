@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import business.constants.CUSTOM_TAG
 import business.core.AppDataStore
 import business.core.DataState
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
+import presentation.ui.main.detail.getProductDescription
 
 class DetailViewModel(
     private val productInteractor: ProductInteractor,
@@ -41,6 +43,17 @@ class DetailViewModel(
     val inventoryUnderLine = mutableStateOf(false)
     var showDialog by mutableStateOf(false)
     val isLoading = mutableStateOf(false)
+
+    var productDescription by mutableStateOf<AnnotatedString?>(null)
+        private set
+
+    // Function to update product description, correctly using non-@Composable function
+    private fun updateProductDescription(product: ProductSelectable, heldInventory: String) {
+        productDescription = getProductDescription(product, heldInventory)
+    }
+    init {
+        updateProductDescription(state.value.product, "Current Held Inventory")
+    }
 
 
     fun show() {
@@ -98,17 +111,27 @@ class DetailViewModel(
             is DetailEvent.OnUpdateNetworkState -> {
                 onUpdateNetworkState(event.networkState)
             }
+
+            is DetailEvent.SelectProduct -> {
+                selectProduct(event.productSelectableId, event.product)
+            }
         }
     }
 
     private fun selectSize(sizeSelectable: String, product: ProductSelectable) {
         state.value = sizeSelectable?.let { state.value.copy(sizeSelectable = it) }!!
         getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
+
     }
 
     private fun selectColor(colorSelectable: String, product: ProductSelectable) {
         state.value = colorSelectable?.let { state.value.copy(colorSelectable = it) }!!
         getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
+    }
+
+    private fun selectProduct(productSelectable: String, product: ProductSelectable) {
+        state.value = productSelectable?.let { state.value.copy(colorSelectable = it) }!!
+//        getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
     }
 
 
@@ -217,7 +240,6 @@ class DetailViewModel(
                     dataState.data?.let { batchItems ->
                         handleInventoryResponse(batchItems.batchesList)
                         state.value = state.value.copy(productInventoryBatch = batchItems)
-
                     }
                     heldInventoryText.value = when (dataState.data?.heldInventory) {
                         0 -> "לא"
@@ -226,6 +248,7 @@ class DetailViewModel(
                             "לא"
                         }
                     }
+                    updateProductDescription(state.value.product,heldInventoryText.value)
                 }
 
                 is DataState.Loading -> {

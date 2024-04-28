@@ -23,18 +23,19 @@ sealed class DetailEvent {
         val sku: String
     ) : DetailEvent()
 
-   data object OnRemoveHeadFromQueue : DetailEvent()
+    data object OnRemoveHeadFromQueue : DetailEvent()
 
     data class Error(
         val uiComponent: UIComponent
     ) : DetailEvent()
 
-   data object OnRetryNetwork : DetailEvent()
+    data object OnRetryNetwork : DetailEvent()
     data class OnUpdateNetworkState(
         val networkState: NetworkState
     ) : DetailEvent()
 
     data class SelectSize(val sizeSelectableId: String, val product: ProductSelectable) : DetailEvent()
-    data class SelectColor(val colorSelectableId: String,val product: ProductSelectable) : DetailEvent()
+    data class SelectColor(val colorSelectableId: String, val product: ProductSelectable) : DetailEvent()
+    class SelectProduct(val productSelectableId: String, val product: ProductSelectable) : DetailEvent()
 
 }

@@ -227,6 +227,7 @@ fun DetailScreen(
 
                         Spacer_8dp()
 
+
                         val productDescription = getProductDescription(state.product, viewModel.heldInventoryText.value)
                         ExpandingText(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -392,7 +393,8 @@ fun ProductCard(product: ProductSelectable, selection: Selection, events: (Detai
             .clickable {
                 product._id?.let { productId ->
                     selection.selector?.selected = product
-//                    events(DetailEvent.SelectProduct(productId))
+                    events(DetailEvent.SelectProduct(productId, product))
+//                  ############ update proProductDescription  (getProductDescription(state.product, viewModel.heldInventoryText.value)  )########################
                 }
             }
     ) {
@@ -748,7 +750,10 @@ fun BatchListDialog(batches: List<BatchItem>, onDismiss: () -> Unit) {
     }
 }
 
-@Composable
+
+
+
+
 fun getProductDescription(product: ProductSelectable, heldInventory: String): AnnotatedString {
     return buildAnnotatedString {
         // Add supplier information if available
