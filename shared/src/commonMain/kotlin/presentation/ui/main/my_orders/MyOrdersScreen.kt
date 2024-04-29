@@ -63,6 +63,7 @@ import presentation.ui.main.my_orders.view_model.MyOrdersState
 import presentation.util.convertDate
 import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.arrow_down
+import shoping_by_kmp.shared.generated.resources.default_image_loader
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -234,7 +235,9 @@ private fun OrderBox(order: Order) {
                         it.image,
                         null,
                         modifier = Modifier.size(55.dp).padding(horizontal = 4.dp),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+                        error = painterResource(Res.drawable.default_image_loader),
+                        placeholder = painterResource(Res.drawable.default_image_loader)
                     )
                 }
             }

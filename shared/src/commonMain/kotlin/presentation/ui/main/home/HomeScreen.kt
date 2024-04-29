@@ -73,6 +73,7 @@ import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.barcode_scanner
 import shoping_by_kmp.shared.generated.resources.bell
 import shoping_by_kmp.shared.generated.resources.category
+import shoping_by_kmp.shared.generated.resources.default_image_loader
 import shoping_by_kmp.shared.generated.resources.flash_sale
 import shoping_by_kmp.shared.generated.resources.location
 import shoping_by_kmp.shared.generated.resources.most_sale
@@ -459,6 +460,7 @@ fun TimerBox(state: HomeState) {
 
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun CategoryBox(category: Category, onCategoryClick: () -> Unit) {
     Box(modifier = Modifier.padding(horizontal = 8.dp)) {
@@ -475,7 +477,9 @@ private fun CategoryBox(category: Category, onCategoryClick: () -> Unit) {
                 AsyncImage(
                     category.icon, null,
                     modifier = Modifier.fillMaxSize().size(65.dp),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    error = painterResource(Res.drawable.default_image_loader),
+                    placeholder = painterResource(Res.drawable.default_image_loader)
                 )
             }
             Spacer_8dp()

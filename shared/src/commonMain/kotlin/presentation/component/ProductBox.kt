@@ -29,10 +29,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import business.domain.main.Product
 import coil3.compose.AsyncImage
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 import presentation.theme.BackgroundContent
 import presentation.theme.orange_400
+import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.default_image_loader
 
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun ProductBox(
     modifier: Modifier = Modifier.width(180.dp),
@@ -51,6 +56,8 @@ fun ProductBox(
                     null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
+                    error = painterResource(Res.drawable.default_image_loader),
+                    placeholder = painterResource(Res.drawable.default_image_loader)
                 )
                 Box(
                     modifier = Modifier.padding(8.dp)
