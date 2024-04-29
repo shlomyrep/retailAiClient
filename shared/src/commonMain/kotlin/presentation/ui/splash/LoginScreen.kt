@@ -1,7 +1,7 @@
 package presentation.ui.splash
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,9 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -28,16 +27,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import presentation.component.DEFAULT__BUTTON_SIZE_EXTRA
 import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
 import presentation.component.PasswordTextField
-import presentation.component.SimpleImageButton
 import presentation.component.Spacer_16dp
 import presentation.component.Spacer_32dp
 import presentation.component.Spacer_4dp
@@ -46,19 +44,12 @@ import presentation.theme.DefaultTextFieldTheme
 import presentation.ui.splash.view_model.LoginEvent
 import presentation.ui.splash.view_model.LoginState
 import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.apple
-import shoping_by_kmp.shared.generated.resources.dont_have_an_account
 import shoping_by_kmp.shared.generated.resources.email
 import shoping_by_kmp.shared.generated.resources.enter_valid_email
 import shoping_by_kmp.shared.generated.resources.enter_valid_password
-import shoping_by_kmp.shared.generated.resources.facebook
-import shoping_by_kmp.shared.generated.resources.forget_password
-import shoping_by_kmp.shared.generated.resources.google
-import shoping_by_kmp.shared.generated.resources.or_sign_in_with
 import shoping_by_kmp.shared.generated.resources.password
+import shoping_by_kmp.shared.generated.resources.retail_ai_logo
 import shoping_by_kmp.shared.generated.resources.sign_in
-import shoping_by_kmp.shared.generated.resources.sign_up
-import shoping_by_kmp.shared.generated.resources.welcome_title
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -89,12 +80,21 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(stringResource(Res.string.sign_in), style = MaterialTheme.typography.displaySmall)
-                Spacer_16dp()
-                Text(
-                    stringResource(Res.string.welcome_title),
-                    style = MaterialTheme.typography.labelMedium
+                Image(
+                    painter = painterResource(Res.drawable.retail_ai_logo), // Make sure you have this drawable in your resources.
+                    contentDescription = "Retail AI Logo",
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .size(width = 350.dp, height = 200.dp)
                 )
+//                Text(stringResource(Res.string.app_name),
+//                    color = ProgressBarColor,
+//                    style = MaterialTheme.typography.displaySmall)
+                Spacer_16dp()
+//                Text(
+//                    stringResource(Res.string.welcome_title),
+//                    style = MaterialTheme.typography.labelMedium
+//                )
                 Spacer_32dp()
 
                 Column(
@@ -157,12 +157,12 @@ fun LoginScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Text(
-                        stringResource(Res.string.forget_password),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        textDecoration = TextDecoration.Underline
-                    )
+//                    Text(
+//                        stringResource(Res.string.forget_password),
+//                        style = MaterialTheme.typography.labelMedium,
+//                        color = MaterialTheme.colorScheme.primary,
+//                        textDecoration = TextDecoration.Underline
+//                    )
                 }
 
                 Spacer_32dp()
@@ -183,54 +183,53 @@ fun LoginScreen(
                     Spacer(Modifier.height(32.dp))
                 }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        HorizontalDivider(modifier = Modifier.width(75.dp))
-                        Text(text = stringResource(Res.string.or_sign_in_with))
-                        HorizontalDivider(modifier = Modifier.width(75.dp))
-                    }
-                    Spacer_32dp()
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        SimpleImageButton(Res.drawable.facebook)
-                        SimpleImageButton(Res.drawable.apple)
-                        SimpleImageButton(Res.drawable.google)
-                    }
-
-                }
-
-                Spacer_32dp()
-
-
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = stringResource(Res.string.dont_have_an_account),
-                    )
-                    Spacer_4dp()
-                    Text(
-                        modifier = Modifier.clickable {
-                            navigateToRegister()
-                        },
-                        text = stringResource(Res.string.sign_up),
-                        color = MaterialTheme.colorScheme.primary,
-                        textDecoration = TextDecoration.Underline
-                    )
-                }
-
+//                Column(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                ) {
+//
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth(),
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.SpaceBetween
+//                    ) {
+//                        HorizontalDivider(modifier = Modifier.width(75.dp))
+//                        Text(text = stringResource(Res.string.or_sign_in_with))
+//                        HorizontalDivider(modifier = Modifier.width(75.dp))
+//                    }
+//                    Spacer_32dp()
+//
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.SpaceEvenly
+//                    ) {
+//                        SimpleImageButton(Res.drawable.facebook)
+//                        SimpleImageButton(Res.drawable.apple)
+//                        SimpleImageButton(Res.drawable.google)
+//                    }
+//
+//                }
+//
+//                Spacer_32dp()
+//
+//
+//
+//                Row(verticalAlignment = Alignment.CenterVertically) {
+//                    Text(
+//                        text = stringResource(Res.string.dont_have_an_account),
+//                    )
+//                    Spacer_4dp()
+//                    Text(
+//                        modifier = Modifier.clickable {
+//                            navigateToRegister()
+//                        },
+//                        text = stringResource(Res.string.sign_up),
+//                        color = MaterialTheme.colorScheme.primary,
+//                        textDecoration = TextDecoration.Underline
+//                    )
+//                }
             }
         }
     }

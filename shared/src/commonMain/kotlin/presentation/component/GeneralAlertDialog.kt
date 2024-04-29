@@ -13,8 +13,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,54 +32,55 @@ fun GeneralAlertDialog(
     onDismissRequest: () -> Unit,
 ) {
 
-    BasicAlertDialog(
-        onDismissRequest = onDismissRequest,
-        modifier = Modifier
-            .fillMaxWidth().background(MaterialTheme.colorScheme.background)
-    ) {
-
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp).verticalScroll(rememberScrollState()),
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        BasicAlertDialog(
+            onDismissRequest = onDismissRequest,
+            modifier = Modifier
+                .fillMaxWidth().background(MaterialTheme.colorScheme.background)
         ) {
 
-            Text(
-                title,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(16.dp).verticalScroll(rememberScrollState()),
+            ) {
 
-            Spacer_8dp()
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
 
-            Text(
-                message,
-                style = MaterialTheme.typography.bodyLarge,
-            )
-
-
-            Spacer_32dp()
-
-            Row(modifier = Modifier.fillMaxWidth()) {
-
-                DefaultButton(
-                    modifier = Modifier.weight(1f).height(DEFAULT__BUTTON_SIZE),
-                    text = positiveButtonText
-                ) {
-                    onPositiveClick()
-                    onDismissRequest()
-                }
                 Spacer_8dp()
-                DefaultButton(
-                    modifier = Modifier.weight(1f).height(DEFAULT__BUTTON_SIZE),
-                    text = negativeButtonText
-                ) {
-                    onNegativeClick()
-                    onDismissRequest()
+
+                Text(
+                    message,
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+
+
+                Spacer_32dp()
+
+                Row(modifier = Modifier.fillMaxWidth()) {
+
+                    DefaultButton(
+                        modifier = Modifier.weight(1f).height(DEFAULT__BUTTON_SIZE),
+                        text = positiveButtonText
+                    ) {
+                        onPositiveClick()
+                        onDismissRequest()
+                    }
+                    Spacer_8dp()
+                    DefaultButton(
+                        modifier = Modifier.weight(1f).height(DEFAULT__BUTTON_SIZE),
+                        text = negativeButtonText
+                    ) {
+                        onNegativeClick()
+                        onDismissRequest()
+                    }
                 }
+
             }
 
         }
-
     }
-
 }

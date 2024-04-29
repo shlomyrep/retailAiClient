@@ -24,11 +24,19 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import presentation.theme.BorderColor
 import presentation.theme.DefaultTextFieldTheme
+import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.address
+import shoping_by_kmp.shared.generated.resources.city
+import shoping_by_kmp.shared.generated.resources.country
+import shoping_by_kmp.shared.generated.resources.submit
+import shoping_by_kmp.shared.generated.resources.zip_code
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
 fun AddAddressDialog(
     onDismissRequest: () -> Unit,
@@ -64,7 +72,7 @@ fun AddAddressDialog(
             Spacer_32dp()
 
             Text(
-                "Country:",
+                stringResource(Res.string.country) + ":",
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleMedium
             )
@@ -85,28 +93,7 @@ fun AddAddressDialog(
             )
             Spacer_8dp()
             Text(
-                "State:",
-                modifier = Modifier.fillMaxWidth(),
-                style = MaterialTheme.typography.titleMedium
-            )
-
-
-            TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, BorderColor, MaterialTheme.shapes.small),
-                value = state, onValueChange = { state = it },
-                colors = DefaultTextFieldTheme(),
-                shape = MaterialTheme.shapes.small,
-                singleLine = false,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next,
-                    keyboardType = KeyboardType.Text,
-                ),
-            )
-            Spacer_8dp()
-            Text(
-                "City:",
+                stringResource(Res.string.city) + ":",
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleMedium
             )
@@ -127,7 +114,7 @@ fun AddAddressDialog(
             )
             Spacer_8dp()
             Text(
-                "Address:",
+                stringResource(Res.string.address) + ":",
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleMedium
             )
@@ -148,7 +135,7 @@ fun AddAddressDialog(
             )
             Spacer_8dp()
             Text(
-                "Zip Code:",
+                stringResource(Res.string.zip_code) + ":",
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleMedium
             )
@@ -175,7 +162,7 @@ fun AddAddressDialog(
 
             DefaultButton(
                 modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
-                text = "Submit"
+                text = stringResource(Res.string.submit)
             ) {
                 onExecute(address, country, city, state, zipCode)
                 onDismissRequest()

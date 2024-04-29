@@ -19,7 +19,6 @@ sealed class MainNavigation (
     val selectedIcon: DrawableResource,
     val unSelectedIcon: DrawableResource,
 ) {
-
    data object Home : MainNavigation(
         route = "Home", title = "Home",
         selectedIcon = Res.drawable.home,

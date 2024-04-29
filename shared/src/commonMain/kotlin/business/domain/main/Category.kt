@@ -10,6 +10,6 @@ data class Category(
 val category_all = Category(
     icon = "",
     id = "-1",
-    name = "All",
+    name = "הכל",
     parent = 0,
 )

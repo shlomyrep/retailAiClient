@@ -17,14 +17,20 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import business.core.UIComponentState
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import presentation.component.AddCommentDialog
 import presentation.component.DefaultScreenUI
 import presentation.theme.BorderColor
 import presentation.ui.main.comment.view_model.CommentEvent
 import presentation.ui.main.comment.view_model.CommentState
 import presentation.ui.main.detail.CommentBox
+import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.comments
+import shoping_by_kmp.shared.generated.resources.no_comments
 
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun CommentScreen(state: CommentState, events: (CommentEvent) -> Unit, popup: () -> Unit) {
 
@@ -42,7 +48,7 @@ fun CommentScreen(state: CommentState, events: (CommentEvent) -> Unit, popup: ()
             progressBarState = state.progressBarState,
             networkState = state.networkState,
             onTryAgain = { events(CommentEvent.OnRetryNetwork) },
-            titleToolbar = "Comments",
+            titleToolbar = stringResource(Res.string.comments),
             startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
             onClickStartIconToolbar = popup,
             endIconToolbar = Icons.Filled.AddComment,
@@ -52,7 +58,7 @@ fun CommentScreen(state: CommentState, events: (CommentEvent) -> Unit, popup: ()
 
                 if (state.comments.isEmpty()) {
                     Text(
-                        "No Comments!",
+                        stringResource(Res.string.no_comments),
                         style = MaterialTheme.typography.titleLarge,
                         color = BorderColor,
                         modifier = Modifier.fillMaxSize(),

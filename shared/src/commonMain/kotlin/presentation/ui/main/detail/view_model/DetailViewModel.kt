@@ -1,5 +1,6 @@
 package presentation.ui.main.detail.view_model
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,7 +27,12 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import presentation.ui.main.detail.getProductDescription
+import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.vat_included
+import shoping_by_kmp.shared.generated.resources.vat_not_included
 
 class DetailViewModel(
     private val productInteractor: ProductInteractor,
@@ -34,7 +40,6 @@ class DetailViewModel(
     private val likeInteractor: LikeInteractor,
     private val appDataStoreManager: AppDataStore
 ) : ViewModel() {
-
 
     val state: MutableState<DetailState> = mutableStateOf(DetailState())
     val inventoryStatusText = mutableStateOf("מעדכן מלאי")
@@ -183,20 +188,20 @@ class DetailViewModel(
 
     private fun addBasket(id: ProductSelectable) {
         addBasketInteractor.execute(id = id, 1).onEach { dataState ->
-                when (dataState) {
-                    is DataState.NetworkStatus -> {}
-                    is DataState.Response -> {
-                        onTriggerEvent(DetailEvent.Error(dataState.uiComponent))
-                    }
-
-                    is DataState.Data -> {}
-
-                    is DataState.Loading -> {
-                        state.value =
-                            state.value.copy(progressBarState = dataState.progressBarState)
-                    }
+            when (dataState) {
+                is DataState.NetworkStatus -> {}
+                is DataState.Response -> {
+                    onTriggerEvent(DetailEvent.Error(dataState.uiComponent))
                 }
-            }.launchIn(viewModelScope)
+
+                is DataState.Data -> {}
+
+                is DataState.Loading -> {
+                    state.value =
+                        state.value.copy(progressBarState = dataState.progressBarState)
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun updateLike() {
@@ -413,6 +418,8 @@ class DetailViewModel(
         }
     }
 
+    @Composable
+    @OptIn(ExperimentalResourceApi::class)
     fun getProductPrice(product: ProductSelectable): String {
         var price = getPrice(product)
         product.selections.filter { it.selector?.selectionType == ProductSelectable.type }.forEach { selection ->
@@ -424,10 +431,10 @@ class DetailViewModel(
         if (product.supplier.shouldAddVatToPrice == true) {
             price = (price * 1.17).toInt()  // Apply VAT
         }
-        val vatText = if (product.supplier.shouldAddVatToPrice == true) "כולל מע\"מ" else "לא כולל מע\"מ"
+        val vatText =
+            if (product.supplier.shouldAddVatToPrice == true) stringResource(Res.string.vat_included) else stringResource(Res.string.vat_not_included)
         return "$price ₪ $vatText"
     }
-
     fun openPdf(url: String) {
         appDataStoreManager.openPdfUrl(url)
     }

@@ -21,10 +21,10 @@ fun String.convertDate() :String{
         // Format the time difference in "X days ago" format
 
         return when (val daysAgo = duration.inWholeDays.toInt()) {
-            0 -> "Today"
-            1 -> "Yesterday"
-            in 2..Int.MAX_VALUE -> "$daysAgo days ago"
-            else -> "In the future"
+            0 -> "היום"
+            1 -> "אתמול"
+            in 2..Int.MAX_VALUE -> " לפני $daysAgo ימים "
+            else -> "בעתיד"
         }
     } catch (e: Exception) {
         e.printStackTrace()

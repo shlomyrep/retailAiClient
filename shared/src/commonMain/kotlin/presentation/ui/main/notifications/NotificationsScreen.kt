@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import business.domain.main.Notification
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import presentation.component.DefaultScreenUI
 import presentation.component.Spacer_8dp
 import presentation.theme.BorderColor
@@ -37,8 +38,11 @@ import presentation.ui.main.notifications.view_model.NotificationsEvent
 import presentation.ui.main.notifications.view_model.NotificationsState
 import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.bell
+import shoping_by_kmp.shared.generated.resources.mark_all_as_read
+import shoping_by_kmp.shared.generated.resources.notifications
 
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun NotificationsScreen(
     state: NotificationsState,
@@ -52,7 +56,7 @@ fun NotificationsScreen(
             progressBarState = state.progressBarState,
             networkState = state.networkState,
             onTryAgain = { events(NotificationsEvent.OnRetryNetwork) },
-            titleToolbar = "notifications",
+            titleToolbar = stringResource(Res.string.notifications),
             startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
             onClickStartIconToolbar = popup
         ) {
@@ -60,7 +64,7 @@ fun NotificationsScreen(
 
 
                 Text(
-                    "Mark all as read",
+                    stringResource(Res.string.mark_all_as_read),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(16.dp),

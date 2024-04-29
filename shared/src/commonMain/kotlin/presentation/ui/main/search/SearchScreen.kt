@@ -43,6 +43,7 @@ import business.core.UIComponentState
 import business.domain.main.Product
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import presentation.component.CircleButton
 import presentation.component.DefaultScreenUI
 import presentation.component.FilterDialog
@@ -249,7 +250,9 @@ private fun SearchBox(
             )
             TextField(
                 placeholder = {
-                    Text("חפש...")
+                    Text(
+                        stringResource(Res.string.search)
+                    )
                 },
                 value = value,
                 onValueChange = onValueChange,

@@ -51,6 +51,8 @@ import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.Basket
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import presentation.component.DEFAULT__BUTTON_SIZE
 import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
@@ -61,8 +63,14 @@ import presentation.component.rememberCustomImagePainter
 import presentation.theme.BorderColor
 import presentation.ui.main.cart.view_model.CartEvent
 import presentation.ui.main.cart.view_model.CartState
+import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.basket_is_empty
+import shoping_by_kmp.shared.generated.resources.delete
+import shoping_by_kmp.shared.generated.resources.proceed_to_checkout
+import shoping_by_kmp.shared.generated.resources.total_cost
 
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun CartScreen(
     state: CartState,
@@ -114,7 +122,7 @@ fun CartScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            "Basket is empty!",
+                            text = stringResource(Res.string.basket_is_empty),
                             style = MaterialTheme.typography.labelLarge,
                             color = BorderColor,
                         )
@@ -127,6 +135,7 @@ fun CartScreen(
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun ProceedButtonBox(totalCost: String, onClick: () -> Unit) {
 
@@ -146,7 +155,7 @@ fun ProceedButtonBox(totalCost: String, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Total Cost", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(Res.string.total_cost), style = MaterialTheme.typography.titleMedium)
                 Text(totalCost, style = MaterialTheme.typography.titleLarge)
             }
 
@@ -154,7 +163,7 @@ fun ProceedButtonBox(totalCost: String, onClick: () -> Unit) {
 
             DefaultButton(
                 modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
-                text = "Proceed to Checkout"
+                text = stringResource(Res.string.proceed_to_checkout)
             ) {
                 onClick()
             }
@@ -311,28 +320,28 @@ fun constructSelections(selections: List<Selection>): String {
 }
 
 
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    fun DismissBackground(dismissState: SwipeToDismissBoxState) {
-        val color = MaterialTheme.colorScheme.primary.copy(alpha = .2f)
-        val direction = dismissState.dismissDirection
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
+@Composable
+fun DismissBackground(dismissState: SwipeToDismissBoxState) {
+    val color = MaterialTheme.colorScheme.primary.copy(alpha = .2f)
+    val direction = dismissState.dismissDirection
 
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color)
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
-        ) {
-            if (direction == SwipeToDismissBoxValue.EndToStart) Icon(
-                Icons.Default.Delete,
-                tint = MaterialTheme.colorScheme.primary,
-                contentDescription = "delete"
-            )
-            Spacer(modifier = Modifier)
-        }
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End
+    ) {
+        if (direction == SwipeToDismissBoxValue.EndToStart) Icon(
+            Icons.Default.Delete,
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = stringResource(Res.string.delete)
+        )
+        Spacer(modifier = Modifier)
     }
+}
 
 
 

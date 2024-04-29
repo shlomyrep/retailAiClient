@@ -54,6 +54,7 @@ import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import presentation.component.DefaultScreenUI
 import presentation.component.Spacer_8dp
 import presentation.component.noRippleClickable
@@ -62,11 +63,18 @@ import presentation.ui.main.my_orders.view_model.MyOrdersEvent
 import presentation.ui.main.my_orders.view_model.MyOrdersState
 import presentation.util.convertDate
 import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.address
+import shoping_by_kmp.shared.generated.resources.amount
 import shoping_by_kmp.shared.generated.resources.arrow_down
 import shoping_by_kmp.shared.generated.resources.default_image_loader
+import shoping_by_kmp.shared.generated.resources.delivery_cost
+import shoping_by_kmp.shared.generated.resources.delivery_type
+import shoping_by_kmp.shared.generated.resources.no_orders
+import shoping_by_kmp.shared.generated.resources.orders
+import shoping_by_kmp.shared.generated.resources.promo_code
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalResourceApi::class)
 @Composable
 fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup: () -> Unit) {
 
@@ -75,9 +83,9 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
     val tabList by remember {
         mutableStateOf(
             listOf(
-                "Active",
-                "Success",
-                "Failed",
+                "פעיל",
+                "הושלם",
+                "בוטל",
             )
         )
     }
@@ -91,7 +99,7 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
             progressBarState = state.progressBarState,
             networkState = state.networkState,
             onTryAgain = { events(MyOrdersEvent.OnRetryNetwork) },
-            titleToolbar = "My Orders",
+            titleToolbar = stringResource(Res.string.orders),
             startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
             onClickStartIconToolbar = popup
         ) {
@@ -166,11 +174,12 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun MyOrdersList(list: List<Order>) {
     if (list.isEmpty()) {
         Text(
-            "Nothing yet!",
+            stringResource(Res.string.no_orders),
             style = MaterialTheme.typography.titleLarge,
             color = BorderColor,
             modifier = Modifier.fillMaxSize().padding(top = 64.dp),
@@ -221,7 +230,7 @@ private fun OrderBox(order: Order) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Promo Code", style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(Res.string.promo_code), style = MaterialTheme.typography.bodyLarge)
                 Text(order.code, style = MaterialTheme.typography.bodyMedium)
             }
             Spacer_8dp()
@@ -252,7 +261,7 @@ private fun OrderBox(order: Order) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Amount", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(Res.string.amount), style = MaterialTheme.typography.bodyLarge)
                             Text(order.getAmount(), style = MaterialTheme.typography.bodyMedium)
                         }
                         Spacer_8dp()
@@ -262,7 +271,7 @@ private fun OrderBox(order: Order) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Delivery Cost", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(Res.string.delivery_cost), style = MaterialTheme.typography.bodyLarge)
                             Text(
                                 order.shippingType.getPrice(),
                                 style = MaterialTheme.typography.bodyMedium
@@ -275,7 +284,7 @@ private fun OrderBox(order: Order) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Delivery Type", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(Res.string.delivery_type), style = MaterialTheme.typography.bodyLarge)
                             Text(
                                 order.shippingType.title,
                                 style = MaterialTheme.typography.bodyMedium
@@ -289,7 +298,7 @@ private fun OrderBox(order: Order) {
                             horizontalAlignment = Alignment.Start,
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Text("Address", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(Res.string.address), style = MaterialTheme.typography.bodyLarge)
                             Text(
                                 order.address.getShippingAddress(),
                                 style = MaterialTheme.typography.bodyMedium

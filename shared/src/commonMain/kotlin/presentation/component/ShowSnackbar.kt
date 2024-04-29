@@ -8,8 +8,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
+import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.ok
 
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun ShowSnackbar(
     modifier: Modifier,
@@ -28,7 +33,7 @@ fun ShowSnackbar(
                     // Dismiss the Snackbar
                     onDismiss()
                 }) {
-                    Text(text = "OK")
+                    Text(text = stringResource(Res.string.ok))
                 }
             }
         ) {

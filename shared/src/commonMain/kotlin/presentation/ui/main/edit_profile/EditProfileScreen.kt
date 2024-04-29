@@ -37,6 +37,8 @@ import common.rememberGalleryManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import presentation.component.CircleImage
 import presentation.component.DEFAULT__BUTTON_SIZE
 import presentation.component.DefaultButton
@@ -49,8 +51,20 @@ import presentation.component.Spacer_8dp
 import presentation.theme.DefaultTextFieldTheme
 import presentation.ui.main.edit_profile.view_model.EditProfileEvent
 import presentation.ui.main.edit_profile.view_model.EditProfileState
+import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.age
+import shoping_by_kmp.shared.generated.resources.camera_permission_message
+import shoping_by_kmp.shared.generated.resources.cancel
+import shoping_by_kmp.shared.generated.resources.edit_profile
+import shoping_by_kmp.shared.generated.resources.email
+import shoping_by_kmp.shared.generated.resources.name
+import shoping_by_kmp.shared.generated.resources.permission_required_dialog_title
+import shoping_by_kmp.shared.generated.resources.select
+import shoping_by_kmp.shared.generated.resources.settings
+import shoping_by_kmp.shared.generated.resources.submit
 
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun EditProfileScreen(
     state: EditProfileState,
@@ -132,10 +146,10 @@ fun EditProfileScreen(
         launchSetting = false
     }
     if (state.permissionDialog == UIComponentState.Show) {
-        GeneralAlertDialog(title = "Permission Required",
-            message = "To set your profile picture, please grant this permission. You can manage permissions in your device settings.",
-            positiveButtonText = "Settings",
-            negativeButtonText = "Cancel",
+        GeneralAlertDialog(title = stringResource(Res.string.permission_required_dialog_title),
+            message = stringResource(Res.string.camera_permission_message),
+            positiveButtonText = stringResource(Res.string.settings),
+            negativeButtonText = stringResource(Res.string.cancel),
             onDismissRequest = {
                 events(EditProfileEvent.OnUpdatePermissionDialog(UIComponentState.Hide))
             },
@@ -156,7 +170,7 @@ fun EditProfileScreen(
             progressBarState = state.progressBarState,
             networkState = state.networkState,
             onTryAgain = { events(EditProfileEvent.OnRetryNetwork) },
-            titleToolbar = "Edit Profile",
+            titleToolbar = stringResource(Res.string.edit_profile),
             startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
             onClickStartIconToolbar = popup
         ) {
@@ -174,7 +188,7 @@ fun EditProfileScreen(
                         CircleImage(imageBitmap, modifier = Modifier.size(120.dp))
                     }
                     Spacer_8dp()
-                    DefaultButton(text = "Select") {
+                    DefaultButton(text = stringResource(Res.string.select)) {
                         events(EditProfileEvent.OnUpdateImageOptionDialog(UIComponentState.Show))
                     }
                 }
@@ -189,7 +203,7 @@ fun EditProfileScreen(
                         }
                     },
                     label = {
-                        Text("Name")
+                        Text(stringResource(Res.string.name))
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = DefaultTextFieldTheme(),
@@ -210,7 +224,7 @@ fun EditProfileScreen(
                         }
                     },
                     label = {
-                        Text("Age")
+                        Text(stringResource(Res.string.age))
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = DefaultTextFieldTheme(),
@@ -232,7 +246,7 @@ fun EditProfileScreen(
                     colors = DefaultTextFieldTheme(),
                     shape = MaterialTheme.shapes.small,
                     label = {
-                        Text("Email")
+                        Text(stringResource(Res.string.email))
                     },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
@@ -246,7 +260,7 @@ fun EditProfileScreen(
                 DefaultButton(
                     modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
                     progressBarState = state.progressBarState,
-                    text = "Submit"
+                    text = stringResource(Res.string.submit)
                 ) {
                     events(EditProfileEvent.UpdateProfile(imageBitmap))
                 }

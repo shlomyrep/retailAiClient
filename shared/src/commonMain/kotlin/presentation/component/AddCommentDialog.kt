@@ -26,11 +26,18 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import presentation.theme.BorderColor
 import presentation.theme.DefaultTextFieldTheme
+import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.add
+import shoping_by_kmp.shared.generated.resources.comment
+import shoping_by_kmp.shared.generated.resources.rate
+import shoping_by_kmp.shared.generated.resources.submit
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
 fun AddCommentDialog(onDismissRequest: () -> Unit, onExecute: (Double, String) -> Unit) {
 
@@ -51,7 +58,8 @@ fun AddCommentDialog(onDismissRequest: () -> Unit, onExecute: (Double, String) -
             Spacer_16dp()
 
             Text(
-                "Add",
+
+                stringResource(Res.string.add) + ":",
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge
@@ -60,7 +68,7 @@ fun AddCommentDialog(onDismissRequest: () -> Unit, onExecute: (Double, String) -
             Spacer_32dp()
 
             Text(
-                "Rate:",
+                stringResource(Res.string.rate) + ":",
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleMedium
             )
@@ -91,7 +99,7 @@ fun AddCommentDialog(onDismissRequest: () -> Unit, onExecute: (Double, String) -
 
 
             Text(
-                "Comment:",
+                stringResource(Res.string.comment) + ":",
                 modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.titleMedium
             )
@@ -114,7 +122,7 @@ fun AddCommentDialog(onDismissRequest: () -> Unit, onExecute: (Double, String) -
 
             Spacer_32dp()
 
-            DefaultButton(modifier = Modifier.fillMaxWidth(), text = "Submit") {
+            DefaultButton(modifier = Modifier.fillMaxWidth(), text = stringResource(Res.string.submit)) {
                 onExecute(rate, comment)
                 onDismissRequest()
             }

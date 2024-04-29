@@ -13,9 +13,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
+import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.camera
+import shoping_by_kmp.shared.generated.resources.gallery
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
 fun ImageOptionDialog(
     onDismissRequest: () -> Unit,
@@ -35,7 +40,7 @@ fun ImageOptionDialog(
 
             DefaultButton(
                 modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
-                text = "Gallery"
+                text = stringResource(Res.string.gallery),
             ) {
                 onGalleryRequest()
                 onDismissRequest()
@@ -45,7 +50,7 @@ fun ImageOptionDialog(
 
             DefaultButton(
                 modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
-                text = "Camera"
+                text = stringResource(Res.string.camera),
             ) {
                 onCameraRequest()
                 onDismissRequest()
@@ -54,6 +59,4 @@ fun ImageOptionDialog(
         }
 
     }
-
-
 }

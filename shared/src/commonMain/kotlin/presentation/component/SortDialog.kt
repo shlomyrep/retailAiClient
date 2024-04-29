@@ -11,10 +11,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.constants.Sort.HIGHER_PRICE
 import business.constants.Sort.LOWEST_PRICE
@@ -22,10 +25,19 @@ import business.constants.Sort.MOST_SALE
 import business.constants.Sort.NEWEST
 import business.constants.Sort.OLDEST
 import business.core.UIComponentState
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import presentation.ui.main.search.view_model.SearchEvent
 import presentation.ui.main.search.view_model.SearchState
+import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.highest_price
+import shoping_by_kmp.shared.generated.resources.lowest_price
+import shoping_by_kmp.shared.generated.resources.most_sale
+import shoping_by_kmp.shared.generated.resources.newest
+import shoping_by_kmp.shared.generated.resources.oldest
+import shoping_by_kmp.shared.generated.resources.sort
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
 fun SortDialog(
     state: SearchState,
@@ -34,72 +46,69 @@ fun SortDialog(
 
     val selectedSort = mutableStateOf(state.selectedSort)
 
-
-    BasicAlertDialog(
-        onDismissRequest = {
-            events(SearchEvent.OnUpdateSortDialogState(UIComponentState.Hide))
-        },
-        modifier = Modifier
-            .fillMaxWidth(0.9f).background(MaterialTheme.colorScheme.background)
-    ) {
-
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+        BasicAlertDialog(
+            onDismissRequest = {
+                events(SearchEvent.OnUpdateSortDialogState(UIComponentState.Hide))
+            },
+            modifier = Modifier
+                .fillMaxWidth(0.9f).background(MaterialTheme.colorScheme.background)
         ) {
 
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+            ) {
 
-            Text(
-                "מיון",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge
-            )
 
-            Spacer_16dp()
+                Text(
+                    stringResource(Res.string.sort),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleLarge
+                )
 
-            Row(modifier = Modifier.fillMaxWidth().noRippleClickable {
-                events(SearchEvent.OnUpdateSelectedSort(NEWEST))
-                events(SearchEvent.OnUpdateSortDialogState(UIComponentState.Hide))
-            }, verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = selectedSort.value == NEWEST, onCheckedChange = {})
-                Text("Newest", style = MaterialTheme.typography.labelLarge)
+                Spacer_16dp()
+
+                Row(modifier = Modifier.fillMaxWidth().noRippleClickable {
+                    events(SearchEvent.OnUpdateSelectedSort(NEWEST))
+                    events(SearchEvent.OnUpdateSortDialogState(UIComponentState.Hide))
+                }, verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = selectedSort.value == NEWEST, onCheckedChange = {})
+                    Text(stringResource(Res.string.newest), style = MaterialTheme.typography.labelLarge)
+                }
+
+                Row(modifier = Modifier.fillMaxWidth().noRippleClickable {
+                    events(SearchEvent.OnUpdateSelectedSort(OLDEST))
+                    events(SearchEvent.OnUpdateSortDialogState(UIComponentState.Hide))
+                }, verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = selectedSort.value == OLDEST, onCheckedChange = {})
+                    Text(stringResource(Res.string.oldest), style = MaterialTheme.typography.labelLarge)
+                }
+
+                Row(modifier = Modifier.fillMaxWidth().noRippleClickable {
+                    events(SearchEvent.OnUpdateSelectedSort(HIGHER_PRICE))
+                    events(SearchEvent.OnUpdateSortDialogState(UIComponentState.Hide))
+                }, verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = selectedSort.value == HIGHER_PRICE, onCheckedChange = {})
+                    Text(stringResource(Res.string.highest_price), style = MaterialTheme.typography.labelLarge)
+                }
+
+                Row(modifier = Modifier.fillMaxWidth().noRippleClickable {
+                    events(SearchEvent.OnUpdateSelectedSort(LOWEST_PRICE))
+                    events(SearchEvent.OnUpdateSortDialogState(UIComponentState.Hide))
+                }, verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = selectedSort.value == LOWEST_PRICE, onCheckedChange = {})
+                    Text(stringResource(Res.string.lowest_price), style = MaterialTheme.typography.labelLarge)
+                }
+
+                Row(modifier = Modifier.fillMaxWidth().noRippleClickable {
+                    events(SearchEvent.OnUpdateSelectedSort(MOST_SALE))
+                    events(SearchEvent.OnUpdateSortDialogState(UIComponentState.Hide))
+                }, verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = selectedSort.value == MOST_SALE, onCheckedChange = {})
+                    Text(stringResource(Res.string.most_sale), style = MaterialTheme.typography.labelLarge)
+                }
             }
-
-            Row(modifier = Modifier.fillMaxWidth().noRippleClickable {
-                events(SearchEvent.OnUpdateSelectedSort(OLDEST))
-                events(SearchEvent.OnUpdateSortDialogState(UIComponentState.Hide))
-            }, verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = selectedSort.value == OLDEST, onCheckedChange = {})
-                Text("Oldest", style = MaterialTheme.typography.labelLarge)
-            }
-
-            Row(modifier = Modifier.fillMaxWidth().noRippleClickable {
-                events(SearchEvent.OnUpdateSelectedSort(HIGHER_PRICE))
-                events(SearchEvent.OnUpdateSortDialogState(UIComponentState.Hide))
-            }, verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = selectedSort.value == HIGHER_PRICE, onCheckedChange = {})
-                Text("Highest Price", style = MaterialTheme.typography.labelLarge)
-            }
-
-            Row(modifier = Modifier.fillMaxWidth().noRippleClickable {
-                events(SearchEvent.OnUpdateSelectedSort(LOWEST_PRICE))
-                events(SearchEvent.OnUpdateSortDialogState(UIComponentState.Hide))
-            }, verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = selectedSort.value == LOWEST_PRICE, onCheckedChange = {})
-                Text("Lowest Price", style = MaterialTheme.typography.labelLarge)
-            }
-
-            Row(modifier = Modifier.fillMaxWidth().noRippleClickable {
-                events(SearchEvent.OnUpdateSelectedSort(MOST_SALE))
-                events(SearchEvent.OnUpdateSortDialogState(UIComponentState.Hide))
-            }, verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = selectedSort.value == MOST_SALE, onCheckedChange = {})
-                Text("Most Sale", style = MaterialTheme.typography.labelLarge)
-            }
-
-
         }
-
     }
-
 }

@@ -22,13 +22,18 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.constants.PAGINATION_PAGE_SIZE
 import business.core.ProgressBarState
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import presentation.component.CategoryChipsBox
 import presentation.component.DefaultScreenUI
 import presentation.component.ProductBox
 import presentation.theme.BorderColor
 import presentation.ui.main.wishlist.view_model.WishlistEvent
 import presentation.ui.main.wishlist.view_model.WishlistState
+import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.wishlist_is_empty
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun WishlistScreen(
     state: WishlistState,
@@ -64,7 +69,7 @@ fun WishlistScreen(
                 if (state.wishlist.products.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            "Wishlist is empty!",
+                            stringResource(Res.string.wishlist_is_empty),
                             style = MaterialTheme.typography.labelLarge,
                             color = BorderColor,
                         )

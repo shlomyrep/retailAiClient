@@ -27,15 +27,17 @@ import business.core.UIComponentState
 import business.domain.main.ShippingType
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import presentation.theme.BorderColor
 import presentation.ui.main.checkout.view_model.CheckoutEvent
 import presentation.ui.main.checkout.view_model.CheckoutState
 import presentation.ui.main.checkout.view_model.shippingType_global
 import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.choose_shipping
 import shoping_by_kmp.shared.generated.resources.shipping
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
 fun SelectShippingDialog(state: CheckoutState, events: (CheckoutEvent) -> Unit) {
 
@@ -56,7 +58,7 @@ fun SelectShippingDialog(state: CheckoutState, events: (CheckoutEvent) -> Unit) 
             Spacer_16dp()
 
             Text(
-                "Choose Shipping",
+                stringResource(Res.string.choose_shipping),
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge

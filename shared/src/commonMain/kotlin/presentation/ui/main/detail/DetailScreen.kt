@@ -85,6 +85,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import presentation.component.CircleButton
 import presentation.component.CircleImage
 import presentation.component.DEFAULT__BUTTON_SIZE
@@ -108,10 +109,24 @@ import presentation.ui.main.detail.view_model.DetailState
 import presentation.ui.main.detail.view_model.DetailViewModel
 import presentation.util.convertDate
 import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.add_to_cart
+import shoping_by_kmp.shared.generated.resources.available
+import shoping_by_kmp.shared.generated.resources.batch
+import shoping_by_kmp.shared.generated.resources.camera_permission_message
+import shoping_by_kmp.shared.generated.resources.cancel
+import shoping_by_kmp.shared.generated.resources.inventory
+import shoping_by_kmp.shared.generated.resources.open_product_page
+import shoping_by_kmp.shared.generated.resources.permission_required_dialog_title
+import shoping_by_kmp.shared.generated.resources.product_details
+import shoping_by_kmp.shared.generated.resources.product_diff_level
+import shoping_by_kmp.shared.generated.resources.settings
+import shoping_by_kmp.shared.generated.resources.sku
+import shoping_by_kmp.shared.generated.resources.update_inventory
 import shoping_by_kmp.shared.generated.resources.v3
 import shoping_by_kmp.shared.generated.resources.v4
 
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun DetailScreen(
     popup: () -> Unit,
@@ -195,10 +210,10 @@ fun DetailScreen(
         launchSetting = false
     }
     if (state.permissionDialog == UIComponentState.Show) {
-        GeneralAlertDialog(title = "Permission Required",
-            message = "To set your profile picture, please grant this permission. You can manage permissions in your device settings.",
-            positiveButtonText = "Settings",
-            negativeButtonText = "Cancel",
+        GeneralAlertDialog(title = stringResource(Res.string.permission_required_dialog_title),
+            message = stringResource(Res.string.camera_permission_message),
+            positiveButtonText = stringResource(Res.string.settings),
+            negativeButtonText = stringResource(Res.string.cancel),
             onDismissRequest = {
                 events(DetailEvent.OnUpdatePermissionDialog(UIComponentState.Hide))
             },
@@ -335,7 +350,7 @@ fun DetailScreen(
                         Spacer_16dp()
 
                         Text(
-                            "פרטי מוצר",
+                            stringResource(Res.string.product_details),
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                             style = MaterialTheme.typography.titleLarge
                         )
@@ -379,7 +394,7 @@ fun setDiffLevelText(product: ProductSelectable) {
         Text(
             text = buildAnnotatedString {
                 withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
-                    append("לחץ לפתיחת רמת שונות")
+                    append(stringResource(Res.string.product_diff_level))
                 }
             },
             color = Color(0xFF89CFF0),
@@ -397,7 +412,7 @@ fun setDiffLevelText(product: ProductSelectable) {
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable(onClick = { showDialog = false }),
-                contentAlignment = Alignment.Center // This will center the contents of the Box
+                contentAlignment = Alignment.Center
             ) {
                 Card(
                     shape = RoundedCornerShape(12.dp),
@@ -408,7 +423,7 @@ fun setDiffLevelText(product: ProductSelectable) {
                     Image(
                         painter = painterResource(imageResId),
                         contentDescription = "Diff Level Image",
-                        modifier = Modifier.fillMaxSize() // Make the Image fill the Card
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }
@@ -416,13 +431,14 @@ fun setDiffLevelText(product: ProductSelectable) {
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun setProductPageText(product: ProductSelectable, viewModel: DetailViewModel) {
     if (product.pdfUrl.isNotEmpty())
         Text(
             text = buildAnnotatedString {
                 withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline)) {
-                    append("לחץ לפתיחת דף מוצר")
+                    append(stringResource(Res.string.open_product_page))
                 }
             },
             color = Color(0xFF89CFF0),
@@ -437,7 +453,7 @@ fun setProductPageText(product: ProductSelectable, viewModel: DetailViewModel) {
 @Composable
 fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: ProductSelectable) {
     if (selection.selector?.selected is ColorSelectable) {
-        selection.selector?.selectionDesc?.let {
+        selection.selector.selectionDesc?.let {
             Text(
                 text = it,
                 style = MaterialTheme.typography.bodyLarge,
@@ -604,6 +620,7 @@ fun ColorBox(colorHex: String?) {
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun BuyButtonBox(product: ProductSelectable, onClick: () -> Unit) {
     Card(
@@ -624,13 +641,13 @@ fun BuyButtonBox(product: ProductSelectable, onClick: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text("sku", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(Res.string.sku), style = MaterialTheme.typography.titleMedium)
                 Text(product.getCalculatedSku(), style = MaterialTheme.typography.titleLarge)
             }
 
             DefaultButton(
                 modifier = Modifier.fillMaxWidth(.7f).height(DEFAULT__BUTTON_SIZE),
-                text = "הוסף להזמנה"
+                text = stringResource(Res.string.add_to_cart)
             ) {
                 onClick()
             }
@@ -776,6 +793,7 @@ fun ImageSliderBox(it: String, onClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun InventoryStatusText(viewModel: DetailViewModel, onDialogRequest: () -> Unit) {
     val inventoryStatus = viewModel.inventoryStatusText.value
@@ -799,7 +817,7 @@ fun InventoryStatusText(viewModel: DetailViewModel, onDialogRequest: () -> Unit)
         dots = "    "
     }
 
-    val displayText = if (isLoading) " מעדכן מלאי $dots " else inventoryStatus
+    val displayText = if (isLoading) stringResource(Res.string.update_inventory) + " $dots " else inventoryStatus
 
     val text = if (isUnderline) {
         buildAnnotatedString {
@@ -820,6 +838,7 @@ fun InventoryStatusText(viewModel: DetailViewModel, onDialogRequest: () -> Unit)
     )
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun BatchListHeader() {
     Row(
@@ -830,19 +849,19 @@ fun BatchListHeader() {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "אצווה",
+            text = stringResource(Res.string.batch),
             color = Color.White,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
         Text(
-            text = "מלאי",
+            text = stringResource(Res.string.inventory),
             color = Color.White,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
         Text(
-            text = "זמין",
+            text = stringResource(Res.string.available),
             color = Color.White,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center

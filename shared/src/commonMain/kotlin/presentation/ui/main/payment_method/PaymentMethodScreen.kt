@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import presentation.component.DefaultScreenUI
 import presentation.component.Spacer_16dp
 import presentation.component.Spacer_32dp
@@ -38,6 +39,8 @@ import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.apple
 import shoping_by_kmp.shared.generated.resources.cash
 import shoping_by_kmp.shared.generated.resources.google
+import shoping_by_kmp.shared.generated.resources.more_payment_methods
+import shoping_by_kmp.shared.generated.resources.payment_methods
 import shoping_by_kmp.shared.generated.resources.paypal
 import shoping_by_kmp.shared.generated.resources.wallet
 
@@ -57,7 +60,7 @@ fun PaymentMethodScreen(
             progressBarState = state.progressBarState,
             networkState = state.networkState,
             onTryAgain = { events(PaymentMethodEvent.OnRetryNetwork) },
-            titleToolbar = "Payment Method",
+            titleToolbar = stringResource(Res.string.payment_methods),
             startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
             onClickStartIconToolbar = popup
         ) {
@@ -66,10 +69,10 @@ fun PaymentMethodScreen(
 
                 Spacer_32dp()
 
-                Text("Cash", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(Res.string.cash), style = MaterialTheme.typography.titleMedium)
                 Spacer_8dp()
                 ChipsCardBox(
-                    text = "Cash",
+                    text = stringResource(Res.string.cash),
                     image = Res.drawable.cash,
                     isSelected = state.selectedPaymentMethod == 0,
                     onSelectExecute = { events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(0)) })
@@ -78,10 +81,10 @@ fun PaymentMethodScreen(
 
                 Spacer_16dp()
 
-                Text("Wallet", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(Res.string.wallet), style = MaterialTheme.typography.titleMedium)
                 Spacer_8dp()
                 ChipsCardBox(
-                    text = "Wallet",
+                    text = stringResource(Res.string.wallet),
                     image = Res.drawable.wallet,
                     isSelected = state.selectedPaymentMethod == 1,
                     onSelectExecute = { events(PaymentMethodEvent.OnUpdateSelectedPaymentMethod(1)) })
@@ -90,7 +93,7 @@ fun PaymentMethodScreen(
 
                 Spacer_16dp()
 
-                Text("More Payment Options", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(Res.string.more_payment_methods), style = MaterialTheme.typography.titleMedium)
                 Spacer_8dp()
 
 
