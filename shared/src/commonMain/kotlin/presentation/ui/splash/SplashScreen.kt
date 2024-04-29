@@ -7,14 +7,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import presentation.theme.ProgressBarColor
 import presentation.theme.White
 import presentation.ui.splash.view_model.LoginEvent
 import presentation.ui.splash.view_model.LoginState
@@ -54,5 +57,12 @@ internal fun SplashScreen(
                 .padding(top = 150.dp)
                 .size(width = 350.dp, height = 200.dp)
         )
+        Text(
+            text = "Where Innovation Meets Shopping",
+            color = ProgressBarColor,
+            fontSize = 20.sp,
+            modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+        )
     }
+
 }
