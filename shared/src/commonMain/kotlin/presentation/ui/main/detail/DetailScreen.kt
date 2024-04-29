@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -97,7 +98,10 @@ import presentation.component.Spacer_4dp
 import presentation.component.Spacer_8dp
 import presentation.component.noRippleClickable
 import presentation.component.rememberCustomImagePainter
+import presentation.theme.Black
 import presentation.theme.BorderColor
+import presentation.theme.GrayBgOp
+import presentation.theme.Transparent
 import presentation.theme.orange_400
 import presentation.ui.main.detail.view_model.DetailEvent
 import presentation.ui.main.detail.view_model.DetailState
@@ -412,7 +416,6 @@ fun setDiffLevelText(product: ProductSelectable) {
     }
 }
 
-
 @Composable
 fun setProductPageText(product: ProductSelectable, viewModel: DetailViewModel) {
     if (product.pdfUrl.isNotEmpty())
@@ -434,31 +437,44 @@ fun setProductPageText(product: ProductSelectable, viewModel: DetailViewModel) {
 @Composable
 fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: ProductSelectable) {
     if (selection.selector?.selected is ColorSelectable) {
+        selection.selector?.selectionDesc?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodyLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(bottom = 8.dp, start = 12.dp)
+            )
+        }
         Spacer_8dp()
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             selection.selectionList?.forEach { color ->
-                Box(
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable {
-                            color._id?.let { it1 ->
-                                selection.selector.selected = color
-                                events(DetailEvent.SelectColor(it1, product))
+                item {
+                    Box(
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                color._id?.let { it1 ->
+                                    selection.selector.selected = color
+                                    events(DetailEvent.SelectColor(it1, product))
+                                }
                             }
+                            .padding(5.dp)
+                            .border(
+                                width = 2.dp,
+                                color = if ((selection.selector.selected as ColorSelectable)._id == color._id) Black else GrayBgOp,
+                                shape = MaterialTheme.shapes.small
+                            )
+                    ) {
+                        (color as ColorSelectable).hex?.let {
+                            ColorBox(it)
                         }
-                        .padding(8.dp)
-                        .border(
-                            width = 1.dp,
-                            color = if ((selection.selector.selected as ColorSelectable)._id == color._id) MaterialTheme.colorScheme.primary else BorderColor,
-                            shape = MaterialTheme.shapes.small
-                        )
-                ) {
-                    (color as ColorSelectable).hex?.let {
-                        ColorBox(it)
                     }
                 }
             }
@@ -466,28 +482,40 @@ fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Prod
     }
 }
 
+
 @Composable
 fun ProductGrid(selection: Selection, events: (DetailEvent) -> Unit) {
+    val listState = rememberLazyListState()
+    val selectedProduct = selection.selector?.selected as? ProductSelectable
+    val initialIndex = selection.selectionList?.indexOfFirst { it._id == selectedProduct?._id } ?: 0
+
+    LaunchedEffect(initialIndex) {
+        listState.scrollToItem(initialIndex)
+    }
+
     if (selection.selector?.selected is ProductSelectable) {
-        selection.selector?.selectionDesc?.let {
+        selection.selector.selectionDesc?.let {
             Text(
                 text = it,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp, start = 12.dp)
             )
         }
+
         Spacer(modifier = Modifier.height(8.dp))
+
         LazyRow(
+            state = listState, // Attach the LazyListState
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-
-            items(selection.selectionList ?: listOf()) { selectable ->
+            itemsIndexed(selection.selectionList ?: listOf()) { index, selectable ->
                 val product = selectable as ProductSelectable
+
                 ProductCard(product, selection, events)
             }
         }
@@ -500,27 +528,30 @@ fun ProductCard(product: ProductSelectable, selection: Selection, events: (Detai
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
             .padding(8.dp)
-            .width(150.dp)
+            .width(135.dp)
             .clickable {
                 product._id?.let { productId ->
                     selection.selector?.selected = product
                     events(DetailEvent.SelectProduct(productId, product))
-//                  ############ update proProductDescription  (getProductDescription(state.product, viewModel.heldInventoryText.value)  )########################
                 }
             }
+            .border(
+                width = 2.dp,
+                color = if ((selection.selector?.selected as ProductSelectable)._id == product._id) Black else Transparent,
+                shape = MaterialTheme.shapes.small
+            )
     ) {
         Column(
             modifier = Modifier.padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             // Image handling
             val imageUrl = product.images.firstOrNull()?.url ?: ""
             Image(
                 painter = rememberCustomImagePainter(imageUrl),
                 contentDescription = "Product Image",
                 modifier = Modifier
-                    .height(100.dp)
+                    .height(90.dp)
                     .fillMaxWidth(),
             )
             Text(
@@ -555,17 +586,21 @@ fun String.toColorInt(): Int {
 @Composable
 fun ColorBox(colorHex: String?) {
     colorHex?.let {
-
         val composeColor = Color(it.toColorInt())
 
         if (composeColor != Color.Unspecified) {
             Box(
                 modifier = Modifier
-                    .size(24.dp)
-                    .background(composeColor)
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(composeColor) // Set background color
+                    .border(
+                        width = 1.dp,
+                        color = BorderColor,
+                        shape = RoundedCornerShape(8.dp)
+                    )
             )
         }
-
     }
 }
 
@@ -669,19 +704,26 @@ fun Selections(product: ProductSelectable, events: (DetailEvent) -> Unit) {
 
 @Composable
 fun SizeGrid(selection: Selection, events: (DetailEvent) -> Unit, product: ProductSelectable) {
-
-
     if (selection.selector?.selected is SizeSelectable) {
+        selection.selector.selectionDesc?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(bottom = 8.dp, start = 12.dp),
+            )
+        }
         Spacer_8dp()
         // Calculate the number of rows needed
-        val numRows = (selection.selectionList?.size ?: 0 + 2) / 3
+        val numRows = (selection.selectionList?.size ?: (0 + 2)) / 3
 
         Column(modifier = Modifier.padding(8.dp)) {
             for (row in 0 until numRows) {
                 Row {
                     for (col in 0..2) {
                         val index = row * 3 + col
-                        if (index < selection.selectionList?.size ?: 0) {
+                        if (index < (selection.selectionList?.size ?: 0)) {
                             val size = selection.selectionList?.get(index) as SizeSelectable
                             Box(
                                 modifier = Modifier
@@ -705,7 +747,10 @@ fun SizeGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Produ
                                     text = size.size ?: "",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = if ((selection.selector.selected as SizeSelectable)._id == size._id) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.padding(8.dp)
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    textAlign = TextAlign.Center
                                 )
                             }
                         } else {
@@ -913,6 +958,7 @@ fun getProductDescription(product: ProductSelectable, heldInventory: String): An
         }
     }
 }
+
 @Composable
 fun CameraButton(onClick: () -> Unit) {
     Box(
