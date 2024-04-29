@@ -1,7 +1,9 @@
 package presentation.ui.main.detail.view_model
 
+import androidx.compose.ui.graphics.ImageBitmap
 import business.core.NetworkState
 import business.core.UIComponent
+import business.core.UIComponentState
 import business.datasource.network.main.responses.ProductSelectable
 
 sealed class DetailEvent {
@@ -37,5 +39,9 @@ sealed class DetailEvent {
     data class SelectSize(val sizeSelectableId: String, val product: ProductSelectable) : DetailEvent()
     data class SelectColor(val colorSelectableId: String, val product: ProductSelectable) : DetailEvent()
     class SelectProduct(val productSelectableId: String, val product: ProductSelectable) : DetailEvent()
+
+    data class OnUpdateImageOptionDialog(val value: UIComponentState) : DetailEvent()
+    data class OnUpdatePermissionDialog(val value: UIComponentState) : DetailEvent()
+    data class OnAddImage(val imageBitmap: ImageBitmap?)  : DetailEvent()
 
 }

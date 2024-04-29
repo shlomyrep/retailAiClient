@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.AnnotatedString
 import business.constants.CUSTOM_TAG
 import business.core.AppDataStore
@@ -12,6 +13,7 @@ import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
+import business.core.UIComponentState
 import business.datasource.network.main.responses.ColorSelectable
 import business.datasource.network.main.responses.PriceType
 import business.datasource.network.main.responses.ProductSelectable
@@ -37,20 +39,18 @@ class DetailViewModel(
     val state: MutableState<DetailState> = mutableStateOf(DetailState())
     val inventoryStatusText = mutableStateOf("מעדכן מלאי")
     val heldInventoryText = mutableStateOf("")
-
     val inventoryStatusColor = mutableStateOf(Color.Black)
     val inventoryClickable = mutableStateOf(false)
     val inventoryUnderLine = mutableStateOf(false)
     var showDialog by mutableStateOf(false)
     val isLoading = mutableStateOf(false)
+    private var productDescription by mutableStateOf<AnnotatedString?>(null)
 
-    var productDescription by mutableStateOf<AnnotatedString?>(null)
-        private set
 
-    // Function to update product description, correctly using non-@Composable function
     private fun updateProductDescription(product: ProductSelectable, heldInventory: String) {
         productDescription = getProductDescription(product, heldInventory)
     }
+
     init {
         updateProductDescription(state.value.product, heldInventoryText.value)
     }
@@ -64,10 +64,8 @@ class DetailViewModel(
         showDialog = false
     }
 
-
     fun onTriggerEvent(event: DetailEvent) {
         when (event) {
-
             is DetailEvent.Like -> {
                 likeProduct(id = event.id)
             }
@@ -115,13 +113,36 @@ class DetailViewModel(
             is DetailEvent.SelectProduct -> {
                 selectProduct(event.productSelectableId, event.product)
             }
+
+            is DetailEvent.OnUpdateImageOptionDialog -> {
+                onUpdateImageOptionDialog(event.value)
+            }
+
+            is DetailEvent.OnUpdatePermissionDialog -> {
+                onUpdatePermissionDialog(event.value)
+            }
+
+            is DetailEvent.OnAddImage -> {
+                event.imageBitmap?.let { addImage(it) }
+            }
         }
+    }
+
+    private fun addImage(imageBitmap: ImageBitmap) {
+        uploadImage(imageBitmap, state.value.product.getCalculatedSku())
+    }
+
+    private fun onUpdateImageOptionDialog(value: UIComponentState) {
+        state.value = state.value.copy(imageOptionDialog = value)
+    }
+
+    private fun onUpdatePermissionDialog(value: UIComponentState) {
+        state.value = state.value.copy(permissionDialog = value)
     }
 
     private fun selectSize(sizeSelectable: String, product: ProductSelectable) {
         state.value = sizeSelectable?.let { state.value.copy(sizeSelectable = it) }!!
         getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
-
     }
 
     private fun selectColor(colorSelectable: String, product: ProductSelectable) {
@@ -131,14 +152,11 @@ class DetailViewModel(
 
     private fun selectProduct(productSelectable: String, product: ProductSelectable) {
         state.value = productSelectable?.let { state.value.copy(colorSelectable = it) }!!
-//        getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
     }
-
 
     private fun onUpdateSelectedImage(value: String) {
         state.value = state.value.copy(selectedImage = value)
     }
-
 
     private fun likeProduct(id: String) {
         likeInteractor.execute(id = id)
@@ -163,7 +181,6 @@ class DetailViewModel(
             }.launchIn(viewModelScope)
     }
 
-
     private fun addBasket(id: ProductSelectable) {
         addBasketInteractor.execute(id = id, 1)
             .onEach { dataState ->
@@ -183,12 +200,10 @@ class DetailViewModel(
             }.launchIn(viewModelScope)
     }
 
-
     private fun updateLike() {
         state.value =
             state.value.copy(product = state.value.product.copy(isLike = !state.value.product.isLike))
     }
-
 
     private fun getProduct(id: String) {
         productInteractor.execute(id = id).onEach { dataState ->
@@ -210,6 +225,35 @@ class DetailViewModel(
                         product.supplier.supplierId?.let { supplierId -> getProductInventory(supplierId, product.sku) }
 //                        getProductInventory("6358ea2f19992d304ce3821a", "117011212")
                     }
+                }
+
+                is DataState.Loading -> {
+                    state.value =
+                        state.value.copy(progressBarState = dataState.progressBarState)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun uploadImage(bitmap: ImageBitmap, sku: String) {
+        val tempImagesList = arrayListOf<String>()
+        productInteractor.uploadImage(bitmap = bitmap, sku = sku).onEach { dataState ->
+            when (dataState) {
+                is DataState.NetworkStatus -> {
+                    onTriggerEvent(DetailEvent.OnUpdateNetworkState(dataState.networkState))
+                }
+
+                is DataState.Response -> {
+                    onTriggerEvent(DetailEvent.Error(dataState.uiComponent))
+                }
+
+                is DataState.Data -> {
+                    dataState.data?.let { productImageResult ->
+                        productImageResult.product.images.forEach { image ->
+                            tempImagesList.add(image.url)
+                        }
+                    }
+                    state.value = state.value.copy(galleryImages = tempImagesList)
                 }
 
                 is DataState.Loading -> {
@@ -248,7 +292,7 @@ class DetailViewModel(
                             "לא"
                         }
                     }
-                    updateProductDescription(state.value.product,heldInventoryText.value)
+                    updateProductDescription(state.value.product, heldInventoryText.value)
                 }
 
                 is DataState.Loading -> {
@@ -257,7 +301,6 @@ class DetailViewModel(
             }
         }.launchIn(viewModelScope)
     }
-
 
     private fun appendToMessageQueue(uiComponent: UIComponent) {
         if (uiComponent is UIComponent.None) {
@@ -282,11 +325,9 @@ class DetailViewModel(
         }
     }
 
-
     private fun onRetryNetwork() {
         getProduct(state.value.product.id)
     }
-
 
     private fun onUpdateNetworkState(networkState: NetworkState) {
         state.value = state.value.copy(networkState = networkState)

@@ -1,12 +1,14 @@
 package business.interactors.main
 
 
+import androidx.compose.ui.graphics.ImageBitmap
 import business.constants.DataStoreKeys
 import business.core.AppDataStore
 import business.core.DataState
 import business.core.NetworkState
 import business.core.ProgressBarState
 import business.datasource.network.main.MainService
+import business.datasource.network.main.responses.AddImageResult
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.toHeldInventoryBatch
 import business.domain.main.HeldInventoryBatch
@@ -54,6 +56,23 @@ class ProductInteractor(
             val result = apiResponse?.toHeldInventoryBatch()
             emit(DataState.NetworkStatus(NetworkState.Good))
             emit(DataState.Data(result))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emit(handleUseCaseException(e))
+        } finally {
+            emit(DataState.Loading(progressBarState = ProgressBarState.Idle))
+        }
+    }
+
+    fun uploadImage(bitmap: ImageBitmap, sku: String): Flow<DataState<AddImageResult>> = flow {
+        try {
+            emit(DataState.Loading(progressBarState = ProgressBarState.LoadingWithLogo))
+
+            val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
+
+            val apiResponse = service.uploadImage(token = token, bitmap, sku)
+            emit(DataState.NetworkStatus(NetworkState.Good))
+            emit(DataState.Data(apiResponse))
         } catch (e: Exception) {
             e.printStackTrace()
             emit(handleUseCaseException(e))

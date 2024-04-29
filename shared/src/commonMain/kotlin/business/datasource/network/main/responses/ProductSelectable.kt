@@ -173,6 +173,18 @@ enum class FinalSale(val type: Int) {
         fun fromInt(value: Int) = values().first { it.type == value }
     }
 }
+@Serializable
+data class AddImageResult(
+    @SerialName("product")
+    val product: ProductImageResult,
+    @SerialName("message")
+    val message: String
+)
+@Serializable
+data class ProductImageResult(
+    @SerialName("images")
+    val images: List<Image>
+)
 
 @Serializable
 data class ColorInfo(

@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
@@ -43,11 +44,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
@@ -62,13 +65,23 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import business.core.UIComponentState
 import business.datasource.network.main.responses.ColorSelectable
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.BatchItem
 import business.domain.main.Comment
+import common.PermissionCallback
+import common.PermissionStatus
+import common.PermissionType
+import common.createPermissionsManager
+import common.rememberCameraManager
+import common.rememberGalleryManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import presentation.component.CircleButton
@@ -76,6 +89,8 @@ import presentation.component.CircleImage
 import presentation.component.DEFAULT__BUTTON_SIZE
 import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
+import presentation.component.GeneralAlertDialog
+import presentation.component.ImageOptionDialog
 import presentation.component.Spacer_16dp
 import presentation.component.Spacer_32dp
 import presentation.component.Spacer_4dp
@@ -102,6 +117,94 @@ fun DetailScreen(
     viewModel: DetailViewModel
 ) {
     val showDialog = viewModel.showDialog
+
+    val coroutineScope = rememberCoroutineScope()
+    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
+    var launchCamera by remember { mutableStateOf(value = false) }
+    var launchGallery by remember { mutableStateOf(value = false) }
+    var launchSetting by remember { mutableStateOf(value = false) }
+
+    val permissionsManager = createPermissionsManager(object : PermissionCallback {
+        override fun onPermissionStatus(
+            permissionType: PermissionType,
+            status: PermissionStatus
+        ) {
+            when (status) {
+                PermissionStatus.GRANTED -> {
+                    when (permissionType) {
+                        PermissionType.CAMERA -> launchCamera = true
+                        PermissionType.GALLERY -> launchGallery = true
+                    }
+                }
+
+                else -> {
+                    events(DetailEvent.OnUpdatePermissionDialog(UIComponentState.Show))
+                }
+            }
+        }
+    })
+
+    val cameraManager = rememberCameraManager {
+        coroutineScope.launch {
+            val bitmap = withContext(Dispatchers.Default) {
+                it?.toImageBitmap()
+            }
+            imageBitmap = bitmap
+        }
+    }
+
+    val galleryManager = rememberGalleryManager {
+        coroutineScope.launch {
+            val bitmap = withContext(Dispatchers.Default) {
+                it?.toImageBitmap()
+            }
+            imageBitmap = bitmap
+        }
+    }
+    if (state.imageOptionDialog == UIComponentState.Show) {
+        ImageOptionDialog(onDismissRequest = {
+            events(DetailEvent.OnUpdateImageOptionDialog(UIComponentState.Hide))
+        }, onGalleryRequest = {
+            launchGallery = true
+        }, onCameraRequest = {
+            launchCamera = true
+        })
+    }
+    if (launchGallery) {
+        if (permissionsManager.isPermissionGranted(PermissionType.GALLERY)) {
+            galleryManager.launch()
+        } else {
+            permissionsManager.AskPermission(PermissionType.GALLERY)
+        }
+        launchGallery = false
+    }
+    if (launchCamera) {
+        if (permissionsManager.isPermissionGranted(PermissionType.CAMERA)) {
+            cameraManager.launch()
+        } else {
+            permissionsManager.AskPermission(PermissionType.CAMERA)
+        }
+        launchCamera = false
+    }
+    if (launchSetting) {
+        permissionsManager.LaunchSettings()
+        launchSetting = false
+    }
+    if (state.permissionDialog == UIComponentState.Show) {
+        GeneralAlertDialog(title = "Permission Required",
+            message = "To set your profile picture, please grant this permission. You can manage permissions in your device settings.",
+            positiveButtonText = "Settings",
+            negativeButtonText = "Cancel",
+            onDismissRequest = {
+                events(DetailEvent.OnUpdatePermissionDialog(UIComponentState.Hide))
+            },
+            onPositiveClick = {
+                launchSetting = true
+
+            },
+            onNegativeClick = {
+            })
+    }
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         DefaultScreenUI(
@@ -153,6 +256,14 @@ fun DetailScreen(
                                     modifier = Modifier.wrapContentWidth(),
                                     contentPadding = PaddingValues(8.dp)
                                 ) {
+                                    if (imageBitmap != null) {
+                                        events(DetailEvent.OnAddImage(imageBitmap))
+                                    }
+                                    item {
+                                        CameraButton {
+                                            events(DetailEvent.OnUpdateImageOptionDialog(UIComponentState.Show))
+                                        }
+                                    }
                                     items(state.product.gallery) {
                                         ImageSliderBox(it) {
                                             events(DetailEvent.OnUpdateSelectedImage(it))
@@ -802,6 +913,27 @@ fun getProductDescription(product: ProductSelectable, heldInventory: String): An
         }
     }
 }
+@Composable
+fun CameraButton(onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .size(65.dp)
+            .clip(MaterialTheme.shapes.small)
+            .background(Color.LightGray)
+            .clickable(onClick = onClick)
+            .padding(4.dp),
+        contentAlignment = Alignment.Center,
+
+        ) {
+        Icon(
+            imageVector = Icons.Default.CameraAlt,
+            contentDescription = "Add Image",
+            modifier = Modifier.size(32.dp),
+            tint = Color.White
+        )
+    }
+}
+
 
 
 

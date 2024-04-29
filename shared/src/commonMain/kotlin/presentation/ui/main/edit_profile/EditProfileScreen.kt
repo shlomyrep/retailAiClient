@@ -83,8 +83,6 @@ fun EditProfileScreen(
                 }
             }
         }
-
-
     })
 
     val cameraManager = rememberCameraManager {

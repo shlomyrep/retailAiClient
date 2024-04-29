@@ -1,7 +1,9 @@
 package business.datasource.network.main
 
+import androidx.compose.ui.graphics.ImageBitmap
 import business.datasource.network.common.JRNothing
 import business.datasource.network.common.MainGenericResponse
+import business.datasource.network.main.responses.AddImageResult
 import business.datasource.network.main.responses.AddressDTO
 import business.datasource.network.main.responses.BasketDTO
 import business.datasource.network.main.responses.CommentDTO
@@ -98,6 +100,7 @@ interface MainService {
     suspend fun product(token: String, id: String): MainGenericResponse<ProductSelectable>
 
     suspend fun productInventory(token: String, supplierId :String,sku: String): HeldInventoryBatchDTO
+    suspend fun uploadImage(token: String,bitmap: ImageBitmap, sku: String): AddImageResult
     suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun wishlist(
         token: String,

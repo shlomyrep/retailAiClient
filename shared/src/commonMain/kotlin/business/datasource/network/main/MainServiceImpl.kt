@@ -1,8 +1,10 @@
 package business.datasource.network.main
 
+import androidx.compose.ui.graphics.ImageBitmap
 import business.constants.BASE_URL
 import business.datasource.network.common.JRNothing
 import business.datasource.network.common.MainGenericResponse
+import business.datasource.network.main.responses.AddImageResult
 import business.datasource.network.main.responses.AddressDTO
 import business.datasource.network.main.responses.AddressRequestDTO
 import business.datasource.network.main.responses.BasketAddRequestDTO
@@ -19,6 +21,7 @@ import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
+import common.toBytes
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.FormPart
@@ -29,6 +32,7 @@ import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
@@ -352,13 +356,38 @@ class MainServiceImpl(
                 append(HttpHeaders.Authorization, token)
             }
             url {
-                takeFrom(BASE_URL + MainService.PRODUCT_INVENTORY) // Assuming PRODUCT_INVENTORY is the endpoint
+                takeFrom(BASE_URL + MainService.PRODUCT_INVENTORY)
                 parameters.append("supplierId", supplierId)
                 parameters.append("sku", sku)
             }
             contentType(ContentType.Application.Json)
         }.body()
     }
+
+    @OptIn(InternalAPI::class)
+    override suspend fun uploadImage(token: String, bitmap: ImageBitmap, sku: String): AddImageResult {
+        val imageUrl = "$BASE_URL product/picture"
+        return httpClient.post {
+            url(imageUrl)
+            headers {
+                append(HttpHeaders.Authorization, "Bearer $token")
+            }
+            body = MultiPartFormDataContent(
+                formData {
+                    append("sku", sku)
+                    append(
+                        "picture",
+                        bitmap.toBytes(),
+                        Headers.build {
+                            append(HttpHeaders.ContentDisposition, "form-data; name=\"picture\"; filename=\"image.jpg\"")
+                            append(HttpHeaders.ContentType, "image/jpeg")
+                        }
+                    )
+                }
+            )
+        }.body<AddImageResult>()
+    }
+
 
     override suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?> {
         return httpClient.get {
