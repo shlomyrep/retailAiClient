@@ -46,6 +46,17 @@ class DetailViewModel(
     val inventoryUnderLine = mutableStateOf(false)
     var showDialog by mutableStateOf(false)
     val isLoading = mutableStateOf(false)
+    var formattedQuantity = ""
+    var formattedFreeQuantity = ""
+
+    companion object {
+        const val INVENTORY_UPDATE = "INVENTORY_UPDATE"
+        const val INVENTORY_NOT_AVAILABLE = "INVENTORY_NOT_AVAILABLE"
+        const val SINGLE_INVENTORY_RESULT = "SINGLE_INVENTORY_RESULT"
+        const val YES = "YES"
+        const val NO = "NO"
+        const val INVENTORY_LIST = "INVENTORY_LIST"
+    }
 
     fun show() {
         showDialog = true
@@ -258,7 +269,7 @@ class DetailViewModel(
         inventoryStatusColor.value = Color.Black
         inventoryClickable.value = false
         inventoryUnderLine.value = false
-        inventoryStatusText.value = "מעדכן מלאי"
+        inventoryStatusText.value = INVENTORY_UPDATE
         productInteractor.getProductInventory(supplierId = supplierId, sku = sku).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {
@@ -275,10 +286,10 @@ class DetailViewModel(
                         state.value = state.value.copy(productInventoryBatch = batchItems)
                     }
                     heldInventoryText.value = when (dataState.data?.heldInventory) {
-                        0 -> "לא"
-                        1 -> "כן"
+                        0 -> NO
+                        1 -> YES
                         else -> {
-                            "לא"
+                            NO
                         }
                     }
                 }
@@ -324,7 +335,7 @@ class DetailViewModel(
     private fun handleInventoryResponse(batchItemList: List<BatchItem>?) {
         when {
             batchItemList.isNullOrEmpty() -> {
-                inventoryStatusText.value = "לא קיים מלאי עבור פריט זה"
+                inventoryStatusText.value = INVENTORY_NOT_AVAILABLE
                 inventoryStatusColor.value = Color.Black
                 inventoryClickable.value = false
                 inventoryUnderLine.value = false
@@ -334,17 +345,17 @@ class DetailViewModel(
                 val quantity = batchItemList[0].quantity
                 val freeQuantity = batchItemList[0].freeQuantity
 
-                val formattedQuantity = formatToOneDecimalPlace(quantity)
-                val formattedFreeQuantity = formatToOneDecimalPlace(freeQuantity)
+                formattedQuantity = formatToOneDecimalPlace(quantity)
+                formattedFreeQuantity = formatToOneDecimalPlace(freeQuantity)
 
-                inventoryStatusText.value = "מלאי: $formattedQuantity, זמין: $formattedFreeQuantity"
+                inventoryStatusText.value = SINGLE_INVENTORY_RESULT
                 inventoryStatusColor.value = Color.Black
                 inventoryClickable.value = false
                 inventoryUnderLine.value = false
             }
 
             else -> {
-                inventoryStatusText.value = "רשימת מלאי"
+                inventoryStatusText.value = INVENTORY_LIST
                 inventoryStatusColor.value = Color.Blue
                 inventoryClickable.value = true
                 inventoryUnderLine.value = true
@@ -419,6 +430,7 @@ class DetailViewModel(
             if (product.supplier.shouldAddVatToPrice == true) stringResource(Res.string.vat_included) else stringResource(Res.string.vat_not_included)
         return "$price ₪ $vatText"
     }
+
     fun openPdf(url: String) {
         appDataStoreManager.openPdfUrl(url)
     }

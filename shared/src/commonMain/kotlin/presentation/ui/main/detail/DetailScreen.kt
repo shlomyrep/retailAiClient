@@ -107,6 +107,12 @@ import presentation.theme.orange_400
 import presentation.ui.main.detail.view_model.DetailEvent
 import presentation.ui.main.detail.view_model.DetailState
 import presentation.ui.main.detail.view_model.DetailViewModel
+import presentation.ui.main.detail.view_model.DetailViewModel.Companion.INVENTORY_LIST
+import presentation.ui.main.detail.view_model.DetailViewModel.Companion.INVENTORY_NOT_AVAILABLE
+import presentation.ui.main.detail.view_model.DetailViewModel.Companion.INVENTORY_UPDATE
+import presentation.ui.main.detail.view_model.DetailViewModel.Companion.NO
+import presentation.ui.main.detail.view_model.DetailViewModel.Companion.SINGLE_INVENTORY_RESULT
+import presentation.ui.main.detail.view_model.DetailViewModel.Companion.YES
 import presentation.util.convertDate
 import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.add_to_cart
@@ -118,6 +124,9 @@ import shoping_by_kmp.shared.generated.resources.cm
 import shoping_by_kmp.shared.generated.resources.color
 import shoping_by_kmp.shared.generated.resources.held_inventory
 import shoping_by_kmp.shared.generated.resources.inventory
+import shoping_by_kmp.shared.generated.resources.inventory_list
+import shoping_by_kmp.shared.generated.resources.no
+import shoping_by_kmp.shared.generated.resources.no_inventory_for_this_product
 import shoping_by_kmp.shared.generated.resources.open_product_page
 import shoping_by_kmp.shared.generated.resources.permission_required_dialog_title
 import shoping_by_kmp.shared.generated.resources.product_details
@@ -128,6 +137,7 @@ import shoping_by_kmp.shared.generated.resources.supplier
 import shoping_by_kmp.shared.generated.resources.update_inventory
 import shoping_by_kmp.shared.generated.resources.v3
 import shoping_by_kmp.shared.generated.resources.v4
+import shoping_by_kmp.shared.generated.resources.yes
 
 
 @OptIn(ExperimentalResourceApi::class)
@@ -800,11 +810,33 @@ fun ImageSliderBox(it: String, onClick: () -> Unit) {
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun InventoryStatusText(viewModel: DetailViewModel, onDialogRequest: () -> Unit) {
-    val inventoryStatus = viewModel.inventoryStatusText.value
+    var inventoryStatus = viewModel.inventoryStatusText.value
     val inventoryColor = viewModel.inventoryStatusColor.value
     val isClickable = viewModel.inventoryClickable.value
     val isUnderline = viewModel.inventoryUnderLine.value
     val isLoading = viewModel.isLoading.value
+
+    when (inventoryStatus) {
+        INVENTORY_UPDATE -> {
+            inventoryStatus = stringResource(Res.string.update_inventory)
+        }
+
+        INVENTORY_NOT_AVAILABLE -> {
+            inventoryStatus = stringResource(Res.string.no_inventory_for_this_product)
+        }
+
+        INVENTORY_LIST -> {
+            inventoryStatus = stringResource(Res.string.inventory_list)
+        }
+
+        SINGLE_INVENTORY_RESULT -> {
+
+            viewModel.formattedFreeQuantity
+            inventoryStatus =
+                stringResource(Res.string.inventory) + ":" + viewModel.formattedQuantity + "," + stringResource(Res.string.available) + ":" + viewModel.formattedFreeQuantity
+//            "מלאי: $formattedQuantity, זמין: $formattedFreeQuantity"
+        }
+    }
 
     var dots by remember { mutableStateOf("") }
     LaunchedEffect(isLoading) {
@@ -933,6 +965,21 @@ fun BatchListDialog(batches: List<BatchItem>, onDismiss: () -> Unit) {
 @Composable
 @OptIn(ExperimentalResourceApi::class)
 fun getProductDescription(product: ProductSelectable, heldInventory: String): AnnotatedString {
+
+    val isHeld = when (heldInventory) {
+        NO -> {
+            stringResource(Res.string.no)
+        }
+
+        YES -> {
+            stringResource(Res.string.yes)
+        }
+
+        else -> {
+            stringResource(Res.string.no)
+        }
+    }
+
     return buildAnnotatedString {
         // Add supplier information if available
         if (product.supplier.companyName?.isNotEmpty() == true) {
@@ -944,7 +991,7 @@ fun getProductDescription(product: ProductSelectable, heldInventory: String): An
         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
             append(stringResource(Res.string.held_inventory) + ": ")
         }
-        append("$heldInventory\n")
+        append("$isHeld\n")
         product.selections.forEach { selection ->
             when (val selected = selection.selector?.selected) {
                 is ColorSelectable -> {
