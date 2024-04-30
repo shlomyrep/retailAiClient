@@ -100,7 +100,7 @@ interface MainService {
     suspend fun product(token: String, id: String): MainGenericResponse<ProductSelectable>
 
     suspend fun productInventory(token: String, supplierId :String,sku: String): HeldInventoryBatchDTO
-    suspend fun uploadImage(token: String,bitmap: ImageBitmap, sku: String): AddImageResult
+    suspend fun uploadImage(token: String,bitmap: ImageBitmap, sku: String, productId: String): AddImageResult
     suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun wishlist(
         token: String,

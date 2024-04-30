@@ -64,13 +64,13 @@ class ProductInteractor(
         }
     }
 
-    fun uploadImage(bitmap: ImageBitmap, sku: String): Flow<DataState<AddImageResult>> = flow {
+    fun uploadImage(bitmap: ImageBitmap, sku: String, productId: String): Flow<DataState<AddImageResult>> = flow {
         try {
             emit(DataState.Loading(progressBarState = ProgressBarState.LoadingWithLogo))
 
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
 
-            val apiResponse = service.uploadImage(token = token, bitmap, sku)
+            val apiResponse = service.uploadImage(token = token, bitmap, sku, productId)
             emit(DataState.NetworkStatus(NetworkState.Good))
             emit(DataState.Data(apiResponse))
         } catch (e: Exception) {

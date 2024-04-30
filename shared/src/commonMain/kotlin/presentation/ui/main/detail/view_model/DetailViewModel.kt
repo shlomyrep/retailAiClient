@@ -38,6 +38,7 @@ class DetailViewModel(
     private val likeInteractor: LikeInteractor,
     private val appDataStoreManager: AppDataStore
 ) : ViewModel() {
+
     val state: MutableState<DetailState> = mutableStateOf(DetailState())
     val inventoryStatusText = mutableStateOf("")
     val heldInventoryText = mutableStateOf("")
@@ -131,7 +132,7 @@ class DetailViewModel(
     }
 
     private fun addImage(imageBitmap: ImageBitmap) {
-        uploadImage(imageBitmap, state.value.product.getCalculatedSku())
+        uploadImage(imageBitmap, state.value.product.getCalculatedSku(),state.value.product.id)
     }
 
     private fun onUpdateImageOptionDialog(value: UIComponentState) {
@@ -235,34 +236,31 @@ class DetailViewModel(
         }.launchIn(viewModelScope)
     }
 
-    private fun uploadImage(bitmap: ImageBitmap, sku: String) {
-        val tempImagesList = arrayListOf<String>()
-        productInteractor.uploadImage(bitmap = bitmap, sku = sku).onEach { dataState ->
+    private fun uploadImage(bitmap: ImageBitmap, sku: String, id: String) {
+        productInteractor.uploadImage(bitmap = bitmap, sku = sku, productId = id).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {
                     onTriggerEvent(DetailEvent.OnUpdateNetworkState(dataState.networkState))
                 }
-
                 is DataState.Response -> {
                     onTriggerEvent(DetailEvent.Error(dataState.uiComponent))
                 }
-
                 is DataState.Data -> {
-                    dataState.data?.let { productImageResult ->
-                        productImageResult.product.images.forEach { image ->
-                            tempImagesList.add(image.url)
+                    dataState.data?.let { addImageResult ->
+                        val currentImages = state.value.galleryImages.toMutableList()
+                        addImageResult.product.images.forEach { image ->
+                            currentImages.add(image.url)
                         }
+                        state.value = state.value.copy(galleryImages = currentImages)
                     }
-                    state.value = state.value.copy(galleryImages = tempImagesList)
                 }
-
                 is DataState.Loading -> {
-                    state.value =
-                        state.value.copy(progressBarState = dataState.progressBarState)
+                    state.value = state.value.copy(progressBarState = dataState.progressBarState)
                 }
             }
         }.launchIn(viewModelScope)
     }
+
 
     private fun getProductInventory(supplierId: String, sku: String) {
         isLoading.value = true

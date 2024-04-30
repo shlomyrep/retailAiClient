@@ -365,16 +365,15 @@ class MainServiceImpl(
     }
 
     @OptIn(InternalAPI::class)
-    override suspend fun uploadImage(token: String, bitmap: ImageBitmap, sku: String): AddImageResult {
-        val imageUrl = "$BASE_URL product/picture"
+    override suspend fun uploadImage(token: String, bitmap: ImageBitmap, sku: String, productId: String): AddImageResult {
+        val imageUrl = "$BASE_URL/product/picture/$productId?sku=$sku"
         return httpClient.post {
             url(imageUrl)
             headers {
-                append(HttpHeaders.Authorization, "Bearer $token")
+                append(HttpHeaders.Authorization, token)
             }
             body = MultiPartFormDataContent(
                 formData {
-                    append("sku", sku)
                     append(
                         "picture",
                         bitmap.toBytes(),
@@ -387,8 +386,6 @@ class MainServiceImpl(
             )
         }.body<AddImageResult>()
     }
-
-
     override suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?> {
         return httpClient.get {
             url {

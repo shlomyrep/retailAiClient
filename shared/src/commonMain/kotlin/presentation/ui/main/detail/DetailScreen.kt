@@ -150,48 +150,41 @@ fun DetailScreen(
     viewModel: DetailViewModel
 ) {
     val showDialog = viewModel.showDialog
-
     val coroutineScope = rememberCoroutineScope()
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-    var launchCamera by remember { mutableStateOf(value = false) }
-    var launchGallery by remember { mutableStateOf(value = false) }
-    var launchSetting by remember { mutableStateOf(value = false) }
+    var launchCamera by remember { mutableStateOf(false) }
+    var launchGallery by remember { mutableStateOf(false) }
+    var launchSetting by remember { mutableStateOf(false) }
 
     val permissionsManager = createPermissionsManager(object : PermissionCallback {
-        override fun onPermissionStatus(
-            permissionType: PermissionType,
-            status: PermissionStatus
-        ) {
+        override fun onPermissionStatus(permissionType: PermissionType, status: PermissionStatus) {
             when (status) {
-                PermissionStatus.GRANTED -> {
-                    when (permissionType) {
-                        PermissionType.CAMERA -> launchCamera = true
-                        PermissionType.GALLERY -> launchGallery = true
-                    }
+                PermissionStatus.GRANTED -> when (permissionType) {
+                    PermissionType.CAMERA -> launchCamera = true
+                    PermissionType.GALLERY -> launchGallery = true
                 }
-
-                else -> {
-                    events(DetailEvent.OnUpdatePermissionDialog(UIComponentState.Show))
-                }
+                else -> events(DetailEvent.OnUpdatePermissionDialog(UIComponentState.Show))
             }
         }
     })
 
     val cameraManager = rememberCameraManager {
         coroutineScope.launch {
-            val bitmap = withContext(Dispatchers.Default) {
-                it?.toImageBitmap()
-            }
+            val bitmap = withContext(Dispatchers.Default) { it?.toImageBitmap() }
             imageBitmap = bitmap
         }
     }
 
     val galleryManager = rememberGalleryManager {
         coroutineScope.launch {
-            val bitmap = withContext(Dispatchers.Default) {
-                it?.toImageBitmap()
-            }
+            val bitmap = withContext(Dispatchers.Default) { it?.toImageBitmap() }
             imageBitmap = bitmap
+        }
+    }
+    LaunchedEffect(imageBitmap) {
+        imageBitmap?.let {
+            events(DetailEvent.OnAddImage(it)) // Trigger upload event
+            imageBitmap = null
         }
     }
     if (state.imageOptionDialog == UIComponentState.Show) {
@@ -224,19 +217,17 @@ fun DetailScreen(
         launchSetting = false
     }
     if (state.permissionDialog == UIComponentState.Show) {
-        GeneralAlertDialog(title = stringResource(Res.string.permission_required_dialog_title),
+        GeneralAlertDialog(
+            title = stringResource(Res.string.permission_required_dialog_title),
             message = stringResource(Res.string.camera_permission_message),
             positiveButtonText = stringResource(Res.string.settings),
             negativeButtonText = stringResource(Res.string.cancel),
             onDismissRequest = {
                 events(DetailEvent.OnUpdatePermissionDialog(UIComponentState.Hide))
             },
-            onPositiveClick = {
-                launchSetting = true
-
-            },
-            onNegativeClick = {
-            })
+            onPositiveClick = { launchSetting = true },
+            onNegativeClick = {}
+        )
     }
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -289,9 +280,9 @@ fun DetailScreen(
                                     modifier = Modifier.wrapContentWidth(),
                                     contentPadding = PaddingValues(8.dp)
                                 ) {
-                                    if (imageBitmap != null) {
-                                        events(DetailEvent.OnAddImage(imageBitmap))
-                                    }
+//                                    if (imageBitmap != null) {
+//                                        events(DetailEvent.OnAddImage(imageBitmap))
+//                                    }
                                     item {
                                         CameraButton {
                                             events(DetailEvent.OnUpdateImageOptionDialog(UIComponentState.Show))
@@ -834,7 +825,6 @@ fun InventoryStatusText(viewModel: DetailViewModel, onDialogRequest: () -> Unit)
             viewModel.formattedFreeQuantity
             inventoryStatus =
                 stringResource(Res.string.inventory) + ":" + viewModel.formattedQuantity + "," + stringResource(Res.string.available) + ":" + viewModel.formattedFreeQuantity
-//            "מלאי: $formattedQuantity, זמין: $formattedFreeQuantity"
         }
     }
 
