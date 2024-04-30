@@ -71,6 +71,7 @@ import business.datasource.network.main.responses.ColorSelectable
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
+import business.datasource.network.main.responses.getCustomizationSteps
 import business.domain.main.BatchItem
 import business.domain.main.Comment
 import common.PermissionCallback
@@ -163,6 +164,7 @@ fun DetailScreen(
                     PermissionType.CAMERA -> launchCamera = true
                     PermissionType.GALLERY -> launchGallery = true
                 }
+
                 else -> events(DetailEvent.OnUpdatePermissionDialog(UIComponentState.Show))
             }
         }
@@ -285,7 +287,11 @@ fun DetailScreen(
 //                                    }
                                     item {
                                         CameraButton {
-                                            events(DetailEvent.OnUpdateImageOptionDialog(UIComponentState.Show))
+                                            events(
+                                                DetailEvent.OnUpdateImageOptionDialog(
+                                                    UIComponentState.Show
+                                                )
+                                            )
                                         }
                                     }
                                     items(state.product.gallery) {
@@ -310,7 +316,10 @@ fun DetailScreen(
                         ) {
                             Text(
                                 text = state.product.title,
-                                style = MaterialTheme.typography.headlineMedium.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold),
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Bold
+                                ),
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -363,7 +372,8 @@ fun DetailScreen(
                         Spacer_8dp()
 
 
-                        val productDescription = getProductDescription(state.product, viewModel.heldInventoryText.value)
+                        val productDescription =
+                            getProductDescription(state.product, viewModel.heldInventoryText.value)
                         ExpandingText(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                             text = productDescription,
@@ -518,7 +528,10 @@ fun ProductGrid(selection: Selection, events: (DetailEvent) -> Unit) {
         selection.selector.selectionDesc?.let {
             Text(
                 text = it,
-                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(bottom = 8.dp, start = 12.dp)
@@ -717,7 +730,7 @@ fun CommentBox(comment: Comment, modifier: Modifier = Modifier.width(300.dp)) {
 
 @Composable
 fun Selections(product: ProductSelectable, events: (DetailEvent) -> Unit) {
-    product.selections.forEach {
+    getCustomizationSteps(product = product, originalProduct = product).forEach {
         SizeGrid(it, events, product)
         ColorGrid(it, events, product)
         ProductGrid(it, events)
@@ -730,7 +743,10 @@ fun SizeGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Produ
         selection.selector.selectionDesc?.let {
             Text(
                 text = it,
-                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 16.sp, fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(bottom = 8.dp, start = 12.dp),
@@ -824,7 +840,9 @@ fun InventoryStatusText(viewModel: DetailViewModel, onDialogRequest: () -> Unit)
 
             viewModel.formattedFreeQuantity
             inventoryStatus =
-                stringResource(Res.string.inventory) + ":" + viewModel.formattedQuantity + "," + stringResource(Res.string.available) + ":" + viewModel.formattedFreeQuantity
+                stringResource(Res.string.inventory) + ":" + viewModel.formattedQuantity + "," + stringResource(
+                    Res.string.available
+                ) + ":" + viewModel.formattedFreeQuantity
         }
     }
 
@@ -843,7 +861,8 @@ fun InventoryStatusText(viewModel: DetailViewModel, onDialogRequest: () -> Unit)
         dots = "    "
     }
 
-    val displayText = if (isLoading) stringResource(Res.string.update_inventory) + " $dots " else inventoryStatus
+    val displayText =
+        if (isLoading) stringResource(Res.string.update_inventory) + " $dots " else inventoryStatus
 
     val text = if (isUnderline) {
         buildAnnotatedString {
