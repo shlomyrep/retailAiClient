@@ -114,6 +114,9 @@ import shoping_by_kmp.shared.generated.resources.available
 import shoping_by_kmp.shared.generated.resources.batch
 import shoping_by_kmp.shared.generated.resources.camera_permission_message
 import shoping_by_kmp.shared.generated.resources.cancel
+import shoping_by_kmp.shared.generated.resources.cm
+import shoping_by_kmp.shared.generated.resources.color
+import shoping_by_kmp.shared.generated.resources.held_inventory
 import shoping_by_kmp.shared.generated.resources.inventory
 import shoping_by_kmp.shared.generated.resources.open_product_page
 import shoping_by_kmp.shared.generated.resources.permission_required_dialog_title
@@ -121,6 +124,7 @@ import shoping_by_kmp.shared.generated.resources.product_details
 import shoping_by_kmp.shared.generated.resources.product_diff_level
 import shoping_by_kmp.shared.generated.resources.settings
 import shoping_by_kmp.shared.generated.resources.sku
+import shoping_by_kmp.shared.generated.resources.supplier
 import shoping_by_kmp.shared.generated.resources.update_inventory
 import shoping_by_kmp.shared.generated.resources.v3
 import shoping_by_kmp.shared.generated.resources.v4
@@ -925,28 +929,31 @@ fun BatchListDialog(batches: List<BatchItem>, onDismiss: () -> Unit) {
     }
 }
 
+
+@Composable
+@OptIn(ExperimentalResourceApi::class)
 fun getProductDescription(product: ProductSelectable, heldInventory: String): AnnotatedString {
     return buildAnnotatedString {
         // Add supplier information if available
         if (product.supplier.companyName?.isNotEmpty() == true) {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append("ספק: ")
+                append(stringResource(Res.string.supplier) + ": ")
             }
             append("${product.supplier.companyName}\n")
         }
         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-            append("מוחזק מלאי: ")
+            append(stringResource(Res.string.held_inventory) + ": ")
         }
         append("$heldInventory\n")
         product.selections.forEach { selection ->
             when (val selected = selection.selector?.selected) {
                 is ColorSelectable -> {
-                    selected.name?.let {
-                        if (it.isNotEmpty()) {
+                    selected.name?.let { color ->
+                        if (color.isNotEmpty()) {
                             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                append("גוון: ")
+                                append(stringResource(Res.string.color) + ": ")
                             }
-                            append("$it\n")
+                            append("$color\n")
                         }
                     }
                 }
@@ -962,12 +969,12 @@ fun getProductDescription(product: ProductSelectable, heldInventory: String): An
                 }
 
                 is SizeSelectable -> {
-                    selected.size?.let {
-                        if (it.isNotEmpty() && it != "0") {
+                    selected.size?.let { size ->
+                        if (size.isNotEmpty() && size != "0") {
                             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                                 append("${selection.selector.selectionDesc}: ")
                             }
-                            append("$it ס״מ\n")
+                            append("$size ${stringResource(Res.string.cm)}\n")
                         }
                     }
                 }

@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.text.AnnotatedString
 import business.constants.CUSTOM_TAG
 import business.core.AppDataStore
 import business.core.DataState
@@ -29,7 +28,6 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
-import presentation.ui.main.detail.getProductDescription
 import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.vat_included
 import shoping_by_kmp.shared.generated.resources.vat_not_included
@@ -40,26 +38,14 @@ class DetailViewModel(
     private val likeInteractor: LikeInteractor,
     private val appDataStoreManager: AppDataStore
 ) : ViewModel() {
-
     val state: MutableState<DetailState> = mutableStateOf(DetailState())
-    val inventoryStatusText = mutableStateOf("מעדכן מלאי")
+    val inventoryStatusText = mutableStateOf("")
     val heldInventoryText = mutableStateOf("")
     val inventoryStatusColor = mutableStateOf(Color.Black)
     val inventoryClickable = mutableStateOf(false)
     val inventoryUnderLine = mutableStateOf(false)
     var showDialog by mutableStateOf(false)
     val isLoading = mutableStateOf(false)
-    private var productDescription by mutableStateOf<AnnotatedString?>(null)
-
-
-    private fun updateProductDescription(product: ProductSelectable, heldInventory: String) {
-        productDescription = getProductDescription(product, heldInventory)
-    }
-
-    init {
-        updateProductDescription(state.value.product, heldInventoryText.value)
-    }
-
 
     fun show() {
         showDialog = true
@@ -227,7 +213,6 @@ class DetailViewModel(
                             state.value.copy(selectedImage = product.gallery.firstOrNull() ?: "")
 
                         product.supplier.supplierId?.let { supplierId -> getProductInventory(supplierId, product.sku) }
-//                        getProductInventory("6358ea2f19992d304ce3821a", "117011212")
                     }
                 }
 
@@ -296,7 +281,6 @@ class DetailViewModel(
                             "לא"
                         }
                     }
-                    updateProductDescription(state.value.product, heldInventoryText.value)
                 }
 
                 is DataState.Loading -> {
