@@ -217,7 +217,7 @@ class DetailViewModel(
                         state.value =
                             state.value.copy(selectedImage = product.gallery.firstOrNull() ?: "")
 
-                        product.supplier.supplierId?.let { supplierId -> getProductInventory(supplierId, product.sku) }
+                        product.supplier.supplierId?.let { supplierId -> getProductInventory(supplierId, product.getCalculatedSku()) }
                     }
                 }
 
