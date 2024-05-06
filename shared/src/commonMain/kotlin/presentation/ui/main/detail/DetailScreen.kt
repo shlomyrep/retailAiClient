@@ -107,13 +107,8 @@ import presentation.theme.Transparent
 import presentation.theme.orange_400
 import presentation.ui.main.detail.view_model.DetailEvent
 import presentation.ui.main.detail.view_model.DetailState
+import presentation.ui.main.detail.view_model.DetailTexts
 import presentation.ui.main.detail.view_model.DetailViewModel
-import presentation.ui.main.detail.view_model.DetailViewModel.Companion.INVENTORY_LIST
-import presentation.ui.main.detail.view_model.DetailViewModel.Companion.INVENTORY_NOT_AVAILABLE
-import presentation.ui.main.detail.view_model.DetailViewModel.Companion.INVENTORY_UPDATE
-import presentation.ui.main.detail.view_model.DetailViewModel.Companion.NO
-import presentation.ui.main.detail.view_model.DetailViewModel.Companion.SINGLE_INVENTORY_RESULT
-import presentation.ui.main.detail.view_model.DetailViewModel.Companion.YES
 import presentation.util.convertDate
 import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.add_to_cart
@@ -824,19 +819,19 @@ fun InventoryStatusText(viewModel: DetailViewModel, onDialogRequest: () -> Unit)
     val isLoading = viewModel.isLoading.value
 
     when (inventoryStatus) {
-        INVENTORY_UPDATE -> {
+        DetailTexts().inventoryUpdate -> {
             inventoryStatus = stringResource(Res.string.update_inventory)
         }
 
-        INVENTORY_NOT_AVAILABLE -> {
+        DetailTexts().inventoryNotAvailable -> {
             inventoryStatus = stringResource(Res.string.no_inventory_for_this_product)
         }
 
-        INVENTORY_LIST -> {
+        DetailTexts().inventoryList -> {
             inventoryStatus = stringResource(Res.string.inventory_list)
         }
 
-        SINGLE_INVENTORY_RESULT -> {
+        DetailTexts().singleInventoryResult -> {
 
             viewModel.formattedFreeQuantity
             inventoryStatus =
@@ -976,11 +971,11 @@ fun BatchListDialog(batches: List<BatchItem>, onDismiss: () -> Unit) {
 fun getProductDescription(product: ProductSelectable, heldInventory: String): AnnotatedString {
 
     val isHeld = when (heldInventory) {
-        NO -> {
+        DetailTexts().no -> {
             stringResource(Res.string.no)
         }
 
-        YES -> {
+        DetailTexts().yes -> {
             stringResource(Res.string.yes)
         }
 

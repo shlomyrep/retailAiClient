@@ -50,14 +50,7 @@ class DetailViewModel(
     var formattedQuantity = ""
     var formattedFreeQuantity = ""
 
-    companion object {
-        const val INVENTORY_UPDATE = "INVENTORY_UPDATE"
-        const val INVENTORY_NOT_AVAILABLE = "INVENTORY_NOT_AVAILABLE"
-        const val SINGLE_INVENTORY_RESULT = "SINGLE_INVENTORY_RESULT"
-        const val YES = "YES"
-        const val NO = "NO"
-        const val INVENTORY_LIST = "INVENTORY_LIST"
-    }
+
 
     fun show() {
         showDialog = true
@@ -267,7 +260,7 @@ class DetailViewModel(
         inventoryStatusColor.value = Color.Black
         inventoryClickable.value = false
         inventoryUnderLine.value = false
-        inventoryStatusText.value = INVENTORY_UPDATE
+        inventoryStatusText.value = DetailTexts().inventoryUpdate
         productInteractor.getProductInventory(supplierId = supplierId, sku = sku).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {
@@ -284,10 +277,10 @@ class DetailViewModel(
                         state.value = state.value.copy(productInventoryBatch = batchItems)
                     }
                     heldInventoryText.value = when (dataState.data?.heldInventory) {
-                        0 -> NO
-                        1 -> YES
+                        0 -> DetailTexts().no
+                        1 -> DetailTexts().yes
                         else -> {
-                            NO
+                            DetailTexts().no
                         }
                     }
                 }
@@ -333,7 +326,7 @@ class DetailViewModel(
     private fun handleInventoryResponse(batchItemList: List<BatchItem>?) {
         when {
             batchItemList.isNullOrEmpty() -> {
-                inventoryStatusText.value = INVENTORY_NOT_AVAILABLE
+                inventoryStatusText.value = DetailTexts().inventoryNotAvailable
                 inventoryStatusColor.value = Color.Black
                 inventoryClickable.value = false
                 inventoryUnderLine.value = false
@@ -346,14 +339,14 @@ class DetailViewModel(
                 formattedQuantity = formatToOneDecimalPlace(quantity)
                 formattedFreeQuantity = formatToOneDecimalPlace(freeQuantity)
 
-                inventoryStatusText.value = SINGLE_INVENTORY_RESULT
+                inventoryStatusText.value = DetailTexts().singleInventoryResult
                 inventoryStatusColor.value = Color.Black
                 inventoryClickable.value = false
                 inventoryUnderLine.value = false
             }
 
             else -> {
-                inventoryStatusText.value = INVENTORY_LIST
+                inventoryStatusText.value = DetailTexts().inventoryList
                 inventoryStatusColor.value = Color.Blue
                 inventoryClickable.value = true
                 inventoryUnderLine.value = true
