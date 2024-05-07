@@ -29,6 +29,7 @@ import business.interactors.main.SearchInteractor
 import business.interactors.main.UpdateProfileInteractor
 import business.interactors.main.WishListInteractor
 import business.interactors.splash.CheckTokenInteractor
+import business.interactors.splash.CheckUserInteractor
 import business.interactors.splash.LoginInteractor
 import business.interactors.splash.RegisterInteractor
 import common.Context
@@ -64,7 +65,7 @@ fun appModule(context: Context) = module {
     single<MainService> { MainServiceImpl(get()) }
     single<AppDataStore> { AppDataStoreManager(context) }
     factory { SharedViewModel(get()) }
-    factory { LoginViewModel(get(), get(), get()) }
+    factory { LoginViewModel(get(), get(), get(), get(), get()) }
     factory { HomeViewModel(get(), get(), get(), get()) }
     factory { AddressViewModel(get(), get()) }
     factory { CategoriesViewModel(get()) }
@@ -102,6 +103,7 @@ fun appModule(context: Context) = module {
     single { LoginInteractor(get(), get()) }
     single { RegisterInteractor(get(), get()) }
     single { CheckTokenInteractor(get()) }
+    single { CheckUserInteractor(get()) }
     single { HomeInteractor(get(), get()) }
     single { BarcodeInteractor(get(), get()) }
     single { ProductInteractor(get(), get()) }

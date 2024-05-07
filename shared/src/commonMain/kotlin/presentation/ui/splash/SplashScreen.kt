@@ -36,7 +36,7 @@ internal fun SplashScreen(
 ) {
 
 
-    LaunchedEffect(state.navigateToMain) {
+    LaunchedEffect(state.navigateToMain && state.isSelectedSalesMan) {
         delay(750L)
         if (state.navigateToMain) {
             navigateToMain()

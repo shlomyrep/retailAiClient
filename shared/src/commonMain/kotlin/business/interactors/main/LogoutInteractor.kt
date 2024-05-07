@@ -25,7 +25,10 @@ class LogoutInteractor(
                 ""
             )
 
-
+            appDataStoreManager.setValue(
+                DataStoreKeys.SALES_MAN,
+                ""
+            )
 
             emit(DataState.Data(true))
 

@@ -3,15 +3,21 @@ package presentation.ui.splash.view_model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import business.constants.CUSTOM_TAG
+import business.constants.DataStoreKeys
+import business.core.AppDataStore
 import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
+import business.domain.main.SalesMan
 import business.interactors.splash.CheckTokenInteractor
+import business.interactors.splash.CheckUserInteractor
 import business.interactors.splash.LoginInteractor
 import business.interactors.splash.RegisterInteractor
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -19,6 +25,8 @@ class LoginViewModel(
     private val loginInteractor: LoginInteractor,
     private val registerInteractor: RegisterInteractor,
     private val checkTokenInteractor: CheckTokenInteractor,
+    private val checkUserInteractor: CheckUserInteractor,
+    private val appDataStoreManager: AppDataStore
 ) : ViewModel() {
 
 
@@ -63,11 +71,36 @@ class LoginViewModel(
             is LoginEvent.OnUpdateNetworkState -> {
                 onUpdateNetworkState(event.networkState)
             }
+
+            is LoginEvent.SelectSalesMan -> {
+                onSalesManSelected(event.salesMan)
+            }
         }
     }
 
     init {
         checkToken()
+        checkUser()
+    }
+
+    private fun checkUser() {
+        checkUserInteractor.execute().onEach { dataState ->
+            when (dataState) {
+                is DataState.NetworkStatus -> {}
+                is DataState.Response -> {
+                    onTriggerEvent(LoginEvent.Error(dataState.uiComponent))
+                }
+                is DataState.Data -> {
+                    state.value = state.value.copy(isSelectedSalesMan = dataState.data ?: false)
+                }
+
+                is DataState.Loading -> {
+                    state.value =
+                        state.value.copy(progressBarState = dataState.progressBarState)
+                }
+            }
+        }.launchIn(viewModelScope)
+
     }
 
     private fun checkToken() {
@@ -77,7 +110,6 @@ class LoginViewModel(
                 is DataState.Response -> {
                     onTriggerEvent(LoginEvent.Error(dataState.uiComponent))
                 }
-
                 is DataState.Data -> {
                     state.value = state.value.copy(isTokenValid = dataState.data ?: false)
                     state.value = state.value.copy(navigateToMain = dataState.data ?: false)
@@ -103,8 +135,9 @@ class LoginViewModel(
                 }
 
                 is DataState.Data -> {
+
                     state.value =
-                        state.value.copy(navigateToMain = !dataState.data.isNullOrEmpty())
+                        state.value.copy(salesMans = dataState.data)
                 }
 
                 is DataState.Loading -> {
@@ -188,4 +221,15 @@ class LoginViewModel(
     }
 
 
+    private fun onSalesManSelected(salesMan: SalesMan) {
+        state.value = state.value.copy(selectedSalesMan = salesMan)
+        val jsonSalesMan = Json.encodeToString(SalesMan.serializer(), salesMan)
+        viewModelScope.launch {
+            appDataStoreManager.setValue(
+                DataStoreKeys.SALES_MAN,
+                jsonSalesMan
+            )
+        }
+    }
 }
+

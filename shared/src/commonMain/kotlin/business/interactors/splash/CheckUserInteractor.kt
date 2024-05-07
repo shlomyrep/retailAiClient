@@ -5,25 +5,27 @@ import business.constants.DataStoreKeys
 import business.core.AppDataStore
 import business.core.DataState
 import business.core.ProgressBarState
+import business.domain.main.SalesMan
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
 
-class CheckTokenInteractor(
+class CheckUserInteractor(
     private val appDataStoreManager: AppDataStore,
 ) {
+
 
     fun execute(): Flow<DataState<Boolean>> = flow {
         try {
             emit(DataState.Loading(progressBarState = ProgressBarState.ButtonLoading))
 
+            val jsonSalesMan = appDataStoreManager.readValue(DataStoreKeys.SALES_MAN)
+            val user = jsonSalesMan?.let { Json.decodeFromString(SalesMan.serializer(), it) }
 
-            val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
+            val isSelectedUser = user != null && user.erpID.isNotEmpty() && user.username.isNotEmpty()
 
-            val isTokenValid = token.isNotEmpty()
-
-
-            emit(DataState.Data(isTokenValid))
+            emit(DataState.Data(isSelectedUser))
 
         } catch (e: Exception) {
             e.printStackTrace()

@@ -4,6 +4,7 @@ import business.constants.BASE_URL
 import business.datasource.network.common.MainGenericResponse
 import business.datasource.network.splash.responses.LoginRequestDTO
 import business.datasource.network.splash.responses.RegisterRequestDTO
+import business.domain.main.SalesMans
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
@@ -16,7 +17,7 @@ import io.ktor.http.takeFrom
 class SplashServiceImpl(
     private val httpClient: HttpClient
 ) : SplashService {
-    override suspend fun login(email: String, password: String): MainGenericResponse<String?> {
+    override suspend fun login(email: String, password: String): MainGenericResponse<SalesMans?> {
         return httpClient.post {
             url {
                 takeFrom(BASE_URL)

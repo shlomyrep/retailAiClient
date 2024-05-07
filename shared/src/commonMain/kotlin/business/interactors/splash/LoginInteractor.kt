@@ -1,14 +1,14 @@
 package business.interactors.splash
 
 
-import business.constants.AUTHORIZATION_BEARER_TOKEN
 import business.constants.DataStoreKeys
 import business.core.AppDataStore
 import business.core.DataState
 import business.core.ProgressBarState
 import business.core.UIComponent
-import business.util.handleUseCaseException
 import business.datasource.network.splash.SplashService
+import business.domain.main.SalesMans
+import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -16,23 +16,17 @@ class LoginInteractor(
     private val service: SplashService,
     private val appDataStoreManager: AppDataStore,
 ) {
-
-
     fun execute(
         email: String,
         password: String,
-    ): Flow<DataState<String>> = flow {
+    ): Flow<DataState<SalesMans>> = flow {
 
         try {
-
             emit(DataState.Loading(progressBarState = ProgressBarState.ButtonLoading))
-
             val apiResponse = service.login(email, password)
 
-
             val token = apiResponse.token
-
-
+            val users = apiResponse.result
             if (token != null) {
                 appDataStoreManager.setValue(
                     DataStoreKeys.TOKEN,
@@ -51,9 +45,7 @@ class LoginInteractor(
                     )
                 )
             }
-
-
-            emit(DataState.Data(token, apiResponse.status))
+            emit(DataState.Data(users, apiResponse.status))
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -62,9 +54,5 @@ class LoginInteractor(
         } finally {
             emit(DataState.Loading(progressBarState = ProgressBarState.Idle))
         }
-
-
     }
-
-
 }
