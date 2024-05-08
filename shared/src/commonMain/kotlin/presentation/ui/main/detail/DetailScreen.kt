@@ -513,43 +513,27 @@ fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Prod
 fun ProductGrid(selection: Selection, events: (DetailEvent) -> Unit) {
     val listState = rememberLazyListState()
     val selectedProduct = selection.selector?.selected as? ProductSelectable
-    val initialIndex = selection.selectionList?.indexOfFirst { it._id == selectedProduct?._id } ?: 0
+    val initialIndex = maxOf(0, selection.selectionList?.indexOfFirst { it._id == selectedProduct?._id } ?: 0)
 
-    LaunchedEffect(initialIndex) {
-        listState.scrollToItem(initialIndex)
+    LaunchedEffect(key1 = initialIndex, key2 = selection.selectionList) {
+        if (!selection.selectionList.isNullOrEmpty() && initialIndex < selection.selectionList.size) {
+            listState.scrollToItem(initialIndex)
+        }
     }
 
     if (selection.selector?.selected is ProductSelectable) {
-        selection.selector.selectionDesc?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(bottom = 8.dp, start = 12.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         LazyRow(
-            state = listState, // Attach the LazyListState
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            state = listState,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            itemsIndexed(selection.selectionList ?: listOf()) { index, selectable ->
-                val product = selectable as ProductSelectable
-
-                ProductCard(product, selection, events)
+            itemsIndexed(selection.selectionList ?: listOf()) { _, selectable ->
+                ProductCard(selectable as ProductSelectable, selection, events)
             }
         }
     }
 }
+
 
 @Composable
 fun ProductCard(product: ProductSelectable, selection: Selection, events: (DetailEvent) -> Unit) {
@@ -969,7 +953,7 @@ fun BatchListDialog(batches: List<BatchItem>, onDismiss: () -> Unit) {
 @Composable
 @OptIn(ExperimentalResourceApi::class)
 fun getProductDescription(product: ProductSelectable, heldInventory: String): AnnotatedString {
-
+    println("TAMIRRRR --> ${product.selections.size}")
     val isHeld = when (heldInventory) {
         DetailTexts().no -> {
             stringResource(Res.string.no)
