@@ -480,28 +480,24 @@ fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Prod
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            selection.selectionList?.forEach { color ->
-                item {
-                    Box(
-                        modifier = Modifier
-                            .clip(MaterialTheme.shapes.small)
-                            .clickable {
-                                color._id?.let { it1 ->
-                                    selection.selector.selected = color
-                                    events(DetailEvent.SelectColor(it1, product))
-                                }
+            items(selection.selectionList.orEmpty()) { color ->
+                Box(
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable {
+                            color._id?.let { it1 ->
+                                selection.selector.selected = color
+                                events(DetailEvent.SelectColor(it1, product))
                             }
-                            .padding(5.dp)
-                            .border(
-                                width = 2.dp,
-                                color = if ((selection.selector.selected as ColorSelectable)._id == color._id) Black else GrayBgOp,
-                                shape = MaterialTheme.shapes.small
-                            )
-                    ) {
-                        (color as ColorSelectable).hex?.let {
-                            ColorBox(it)
                         }
-                    }
+                        .padding(5.dp)
+                        .border(
+                            width = 2.dp,
+                            color = if ((selection.selector.selected as ColorSelectable)._id == color._id) Black else GrayBgOp,
+                            shape = MaterialTheme.shapes.small
+                        )
+                ) {
+                    ColorBox((color as ColorSelectable).hex, color.img)  // Now passing the image URL as well
                 }
             }
         }
@@ -597,25 +593,33 @@ fun String.toColorInt(): Int {
 }
 
 @Composable
-fun ColorBox(colorHex: String?) {
-    colorHex?.let {
-        val composeColor = Color(it.toColorInt())
-
-        if (composeColor != Color.Unspecified) {
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(composeColor) // Set background color
-                    .border(
-                        width = 1.dp,
-                        color = BorderColor,
-                        shape = RoundedCornerShape(8.dp)
-                    )
-            )
-        }
+fun ColorBox(colorHex: String?, imageUrl: String? = null) {
+    if (colorHex.isNullOrEmpty() && !imageUrl.isNullOrEmpty()) {
+        // Display the image if the hex code is empty but an image URL is provided
+        Image(
+            painter = rememberCustomImagePainter(imageUrl),
+            contentDescription = "Color Image", // Provide appropriate content description
+            modifier = Modifier
+                .size(32.dp) // Adjust size as needed
+                .clip(RoundedCornerShape(8.dp))
+        )
+    } else if (!colorHex.isNullOrEmpty()) {
+        // Parse the hex code to a color and display it
+        val composeColor = Color(colorHex.toColorInt())
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(composeColor) // Set background color
+                .border(
+                    width = 1.dp,
+                    color = BorderColor,
+                    shape = RoundedCornerShape(8.dp)
+                )
+        )
     }
 }
+
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -969,7 +973,6 @@ fun getProductDescription(product: ProductSelectable, heldInventory: String): An
     }
 
     return buildAnnotatedString {
-        // Add supplier information if available
         if (product.supplier.companyName?.isNotEmpty() == true) {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                 append(stringResource(Res.string.supplier) + ": ")
@@ -980,7 +983,10 @@ fun getProductDescription(product: ProductSelectable, heldInventory: String): An
             append(stringResource(Res.string.held_inventory) + ": ")
         }
         append("$isHeld\n")
-        product.selections.forEach { selection ->
+        val customizationSteps = getCustomizationSteps(
+            product = product, originalProduct = product
+        )
+        customizationSteps.map { selection ->
             when (val selected = selection.selector?.selected) {
                 is ColorSelectable -> {
                     selected.name?.let { color ->
@@ -1000,6 +1006,8 @@ fun getProductDescription(product: ProductSelectable, heldInventory: String): An
                             append("$selectionDesc: ")
                         }
                         append("${selected.name}\n")
+                    } else {
+                        println("selected name is Empty")
                     }
                 }
 

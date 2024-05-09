@@ -22,7 +22,7 @@ import presentation.theme.AppTheme
 import presentation.ui.main.MainNav
 import presentation.ui.splash.SplashNav
 
-@OptIn(ExperimentalCoilApi::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalCoilApi::class)
 @Composable
 internal fun App(context: Context) {
 
