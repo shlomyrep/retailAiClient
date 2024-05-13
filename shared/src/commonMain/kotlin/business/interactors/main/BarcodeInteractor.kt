@@ -16,19 +16,13 @@ class BarcodeInteractor(
     private val service: MainService,
     private val appDataStoreManager: AppDataStore,
 ) {
-
-
     fun execute(barcode: String): Flow<DataState<ProductSelectable>> = flow {
 
         try {
             emit(DataState.Loading(progressBarState = ProgressBarState.LoadingWithLogo))
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
             val apiResponse = service.productBySku(token = token, sku = barcode)
-            if (apiResponse.status == false || apiResponse.result == null) {
-//                throw Exception(
-//                    apiResponse.alert?.createException()
-//                )
-            }
+
             emit(DataState.NetworkStatus(NetworkState.Good))
             emit(DataState.Data(apiResponse.result))
 

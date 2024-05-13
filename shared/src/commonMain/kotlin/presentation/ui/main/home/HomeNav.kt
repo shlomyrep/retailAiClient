@@ -27,8 +27,8 @@ fun HomeNav(logout: () -> Unit) {
             HomeScreen(
                 state = viewModel.state.value,
                 getBarcode = {
-                    viewModel.openBarcodeScanner { productId ->
-                        navigator.navigate(HomeNavigation.Detail.route.plus("/$productId"))
+                    viewModel.openBarcodeScanner { productSku, isSKU: Boolean ->
+                        navigator.navigate(HomeNavigation.Detail.route.plus("/$productSku").plus("/$isSKU"))
                     }
                 },
                 events = viewModel::onTriggerEvent,
@@ -41,10 +41,11 @@ fun HomeNav(logout: () -> Unit) {
                 navigateToSetting = {
                     navigator.navigate(HomeNavigation.Settings.route)
                 },
-                navigateToDetail = {
+                navigateToDetail = { id: String, isSKU: Boolean ->
                     navigator.popBackStack()
-                    navigator.navigate(HomeNavigation.Detail.route.plus("/$it"))
-                }) { categoryId, sort ->
+                    navigator.navigate(HomeNavigation.Detail.route.plus("/$id").plus("/$isSKU"))
+                })
+            { categoryId, sort ->
                 navigator.navigate(
                     HomeNavigation.Search.route.plus("/${categoryId}").plus("/${sort}")
                 )
@@ -81,14 +82,16 @@ fun HomeNav(logout: () -> Unit) {
                 navigator.popBackStack()
             }
         }
-        scene(route = HomeNavigation.Detail.route.plus(HomeNavigation.Detail.objectPath)) { backStackEntry ->
-            val id: String? = backStackEntry.path<String>(HomeNavigation.Detail.objectName)
+        scene(route = HomeNavigation.Detail.route.plus("/{id}/{isSKU}")) { backStackEntry ->
+            val id: String? = backStackEntry.path<String>("id")
+            val isSKU: Boolean = backStackEntry.path<Boolean>("isSKU") ?: false
             id?.let {
-                DetailNav(it) {
+                DetailNav(it, isSKU) {
                     navigator.popBackStack()
                 }
             }
         }
+
         scene(route = HomeNavigation.Notification.route) {
             val viewModel: NotificationsViewModel = koinInject()
             NotificationsScreen(

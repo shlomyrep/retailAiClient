@@ -85,7 +85,7 @@ import shoping_by_kmp.shared.generated.resources.see_all
 @OptIn(ExperimentalFoundationApi::class, ExperimentalResourceApi::class)
 @Composable
 fun HomeScreen(
-    navigateToDetail: (String) -> Unit = {},
+    navigateToDetail: (String, Boolean) -> Unit = { _, _ -> },
     getBarcode: () -> Unit = {},
     state: HomeState,
     events: (HomeEvent) -> Unit = {},
@@ -315,7 +315,7 @@ fun HomeScreen(
                         items(state.home.flashSale.products, key = { it.id }) {
                             ProductBox(product = it, onLikeClick = {
                                 events(HomeEvent.Like(it.id))
-                            }) { navigateToDetail(it.id) }
+                            }) { navigateToDetail(it.id, false) }
                         }
                     }
 
@@ -351,7 +351,7 @@ fun HomeScreen(
                         items(state.home.mostSale, key = { it.id }) {
                             ProductBox(product = it, onLikeClick = {
                                 events(HomeEvent.Like(it.id))
-                            }) { navigateToDetail(it.id) }
+                            }) { navigateToDetail(it.id, false) }
                         }
                     }
 
@@ -388,7 +388,7 @@ fun HomeScreen(
                         items(state.home.newestProduct, key = { it.id }) {
                             ProductBox(product = it, onLikeClick = {
                                 events(HomeEvent.Like(it.id))
-                            }) { navigateToDetail(it.id) }
+                            }) { navigateToDetail(it.id, false) }
                         }
                     }
 

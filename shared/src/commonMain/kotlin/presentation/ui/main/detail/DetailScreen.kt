@@ -466,14 +466,16 @@ fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Prod
         selection.selector.selectionDesc?.let {
             Text(
                 text = it,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(bottom = 8.dp, start = 12.dp)
+                modifier = Modifier.padding(bottom = 8.dp, start = 12.dp),
             )
         }
         Spacer_8dp()
-
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
@@ -518,6 +520,19 @@ fun ProductGrid(selection: Selection, events: (DetailEvent) -> Unit) {
     }
 
     if (selection.selector?.selected is ProductSelectable) {
+        selection.selector.selectionDesc?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(bottom = 8.dp, start = 12.dp),
+            )
+        }
+        Spacer_8dp()
         LazyRow(
             state = listState,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -957,7 +972,6 @@ fun BatchListDialog(batches: List<BatchItem>, onDismiss: () -> Unit) {
 @Composable
 @OptIn(ExperimentalResourceApi::class)
 fun getProductDescription(product: ProductSelectable, heldInventory: String): AnnotatedString {
-    println("TAMIRRRR --> ${product.selections.size}")
     val isHeld = when (heldInventory) {
         DetailTexts().no -> {
             stringResource(Res.string.no)
@@ -986,6 +1000,10 @@ fun getProductDescription(product: ProductSelectable, heldInventory: String): An
         val customizationSteps = getCustomizationSteps(
             product = product, originalProduct = product
         )
+        println("TAMIRRRR --> ${customizationSteps.size}")
+        customizationSteps.forEach { selection ->
+            println("TAMIRRRR --> ${selection.selector?.selectionDesc}")
+        }
         customizationSteps.map { selection ->
             when (val selected = selection.selector?.selected) {
                 is ColorSelectable -> {

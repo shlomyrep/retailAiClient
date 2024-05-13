@@ -29,7 +29,7 @@ fun WishlistNav() {
         scene(route = WishlistNavigation.Detail.route.plus(WishlistNavigation.Detail.objectPath)) { backStackEntry ->
             val id: String? = backStackEntry.path<String>(WishlistNavigation.Detail.objectName)
             id?.let {
-                DetailNav(it){
+                DetailNav(it,false){
                     navigator.popBackStack()
                 }
             }

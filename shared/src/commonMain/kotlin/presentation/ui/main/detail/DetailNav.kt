@@ -15,7 +15,7 @@ import presentation.ui.main.detail.view_model.DetailEvent
 import presentation.ui.main.detail.view_model.DetailViewModel
 
 @Composable
-fun DetailNav(id: String, popUp: () -> Unit) {
+fun DetailNav(id: String,isSku: Boolean, popUp: () -> Unit) {
     val navigator = rememberNavigator()
     NavHost(
         navigator = navigator,
@@ -25,7 +25,7 @@ fun DetailNav(id: String, popUp: () -> Unit) {
 
             val viewModel: DetailViewModel = koinInject()
             LaunchedEffect(id) {
-                viewModel.onTriggerEvent(DetailEvent.GetProduct(id))
+                viewModel.onTriggerEvent(DetailEvent.GetProduct(id, isSku))
             }
             DetailScreen(state = viewModel.state.value,
                 events = viewModel::onTriggerEvent,
