@@ -26,8 +26,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -71,7 +69,6 @@ import presentation.ui.main.home.view_model.HomeEvent
 import presentation.ui.main.home.view_model.HomeState
 import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.barcode_scanner
-import shoping_by_kmp.shared.generated.resources.bell
 import shoping_by_kmp.shared.generated.resources.category
 import shoping_by_kmp.shared.generated.resources.default_image_loader
 import shoping_by_kmp.shared.generated.resources.flash_sale
@@ -135,27 +132,27 @@ fun HomeScreen(
                                     state.home.address.getLocation(),
                                     style = MaterialTheme.typography.labelMedium,
                                 )
-                                Icon(
-                                    Icons.Filled.KeyboardArrowDown,
-                                    null,
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
+//                                Icon(
+//                                    Icons.Filled.KeyboardArrowDown,
+//                                    null,
+//                                    tint = MaterialTheme.colorScheme.primary
+//                                )
 
                             }
                         }
-                        Box(
-                            modifier = Modifier.background(
-                                MaterialTheme.colorScheme.primary.copy(.2f),
-                                CircleShape
-                            ).size(45.dp).noRippleClickable { navigateToNotifications() },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                painterResource(Res.drawable.bell),
-                                null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
+//                        Box(
+//                            modifier = Modifier.background(
+//                                MaterialTheme.colorScheme.primary.copy(.2f),
+//                                CircleShape
+//                            ).size(45.dp).noRippleClickable { navigateToNotifications() },
+//                            contentAlignment = Alignment.Center
+//                        ) {
+//                            Icon(
+//                                painterResource(Res.drawable.bell),
+//                                null,
+//                                tint = MaterialTheme.colorScheme.primary
+//                            )
+//                        }
                     }
 
                     Spacer_32dp()
