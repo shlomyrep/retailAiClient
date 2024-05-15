@@ -486,8 +486,7 @@ fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Prod
                         .clip(MaterialTheme.shapes.small)
                         .clickable {
                             color._id?.let { it1 ->
-                                selection.selector.selected = color
-                                events(DetailEvent.SelectColor(it1, product))
+                                events(DetailEvent.MakeSelection(it1, selection))
                             }
                         }
                         .padding(5.dp)
@@ -497,7 +496,10 @@ fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Prod
                             shape = MaterialTheme.shapes.small
                         )
                 ) {
-                    ColorBox((color as ColorSelectable).hex, color.img)  // Now passing the image URL as well
+                    ColorBox(
+                        (color as ColorSelectable).hex,
+                        color.img
+                    )  // Now passing the image URL as well
                 }
             }
         }
@@ -507,17 +509,18 @@ fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Prod
 
 @Composable
 fun ProductGrid(selection: Selection, events: (DetailEvent) -> Unit) {
-    val listState = rememberLazyListState()
-    val selectedProduct = selection.selector?.selected as? ProductSelectable
-    val initialIndex = maxOf(0, selection.selectionList?.indexOfFirst { it._id == selectedProduct?._id } ?: 0)
-
-    LaunchedEffect(key1 = initialIndex, key2 = selection.selectionList) {
-        if (!selection.selectionList.isNullOrEmpty() && initialIndex < selection.selectionList.size) {
-            listState.scrollToItem(initialIndex)
-        }
-    }
-
     if (selection.selector?.selected is ProductSelectable) {
+        val listState = rememberLazyListState()
+        val selectedProduct = selection.selector?.selected as? ProductSelectable
+        val initialIndex =
+            maxOf(0, selection.selectionList?.indexOfFirst { it._id == selectedProduct?._id } ?: 0)
+
+        LaunchedEffect(key1 = initialIndex, key2 = selection.selectionList) {
+            if (!selection.selectionList.isNullOrEmpty() && initialIndex < selection.selectionList.size) {
+                listState.scrollToItem(initialIndex)
+            }
+        }
+
         LazyRow(
             state = listState,
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -540,8 +543,7 @@ fun ProductCard(product: ProductSelectable, selection: Selection, events: (Detai
             .width(135.dp)
             .clickable {
                 product._id?.let { productId ->
-                    selection.selector?.selected = product
-                    events(DetailEvent.SelectProduct(productId, product))
+                    events(DetailEvent.MakeSelection(productId, selection))
                 }
             }
             .border(
@@ -713,7 +715,8 @@ fun CommentBox(comment: Comment, modifier: Modifier = Modifier.width(300.dp)) {
 
 @Composable
 fun Selections(product: ProductSelectable, events: (DetailEvent) -> Unit) {
-    getCustomizationSteps(product = product, originalProduct = product).forEach {
+    val cs = getCustomizationSteps(product = product, originalProduct = product)
+    cs.forEach {
         SizeGrid(it, events, product)
         ColorGrid(it, events, product)
         ProductGrid(it, events)
@@ -752,10 +755,8 @@ fun SizeGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Produ
                                     .padding(4.dp)
                                     .clip(MaterialTheme.shapes.small)
                                     .clickable {
-                                        size._id?.let { it1 ->
-                                            selection.selector.selected = size
-                                            // Trigger your event here
-                                            events(DetailEvent.SelectSize(it1, product))
+                                        size._id?.let { id ->
+                                            events(DetailEvent.MakeSelection(id, selection))
                                         }
                                     }
                                     .border(

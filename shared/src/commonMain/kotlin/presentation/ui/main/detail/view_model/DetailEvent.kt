@@ -5,6 +5,7 @@ import business.core.NetworkState
 import business.core.UIComponent
 import business.core.UIComponentState
 import business.datasource.network.main.responses.ProductSelectable
+import business.datasource.network.main.responses.Selection
 
 sealed class DetailEvent {
 
@@ -36,12 +37,9 @@ sealed class DetailEvent {
         val networkState: NetworkState
     ) : DetailEvent()
 
-    data class SelectSize(val sizeSelectableId: String, val product: ProductSelectable) : DetailEvent()
-    data class SelectColor(val colorSelectableId: String, val product: ProductSelectable) : DetailEvent()
-    class SelectProduct(val productSelectableId: String, val product: ProductSelectable) : DetailEvent()
-
+    data class MakeSelection(val selectionId: String, val selection: Selection) : DetailEvent()
     data class OnUpdateImageOptionDialog(val value: UIComponentState) : DetailEvent()
     data class OnUpdatePermissionDialog(val value: UIComponentState) : DetailEvent()
-    data class OnAddImage(val imageBitmap: ImageBitmap?)  : DetailEvent()
+    data class OnAddImage(val imageBitmap: ImageBitmap?) : DetailEvent()
 
 }

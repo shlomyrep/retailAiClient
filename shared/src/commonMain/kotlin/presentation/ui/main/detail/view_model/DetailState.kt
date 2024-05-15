@@ -11,8 +11,6 @@ import business.domain.main.HeldInventoryBatch
 data class DetailState(
     val product: ProductSelectable = ProductSelectable(),
     val selectedImage: String = "",
-    val sizeSelectable: String = "",
-    val colorSelectable: String = "",
     val progressBarState: ProgressBarState = ProgressBarState.Idle,
     val networkState: NetworkState = NetworkState.Good,
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf()),

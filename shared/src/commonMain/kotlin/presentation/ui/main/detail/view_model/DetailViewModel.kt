@@ -17,6 +17,7 @@ import business.core.UIComponentState
 import business.datasource.network.main.responses.ColorSelectable
 import business.datasource.network.main.responses.PriceType
 import business.datasource.network.main.responses.ProductSelectable
+import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.BatchItem
 import business.interactors.main.AddBasketInteractor
@@ -51,7 +52,6 @@ class DetailViewModel(
     var formattedFreeQuantity = ""
 
 
-
     fun show() {
         showDialog = true
     }
@@ -74,12 +74,8 @@ class DetailViewModel(
                 onUpdateSelectedImage(event.value)
             }
 
-            is DetailEvent.SelectSize -> {
-                selectSize(event.sizeSelectableId, event.product)
-            }
-
-            is DetailEvent.SelectColor -> {
-                selectColor(event.colorSelectableId, event.product)
+            is DetailEvent.MakeSelection -> {
+                makeSelection(event.selection, event.selectionId)
             }
 
             is DetailEvent.GetProduct -> {
@@ -106,10 +102,6 @@ class DetailViewModel(
                 onUpdateNetworkState(event.networkState)
             }
 
-            is DetailEvent.SelectProduct -> {
-                selectProduct(event.productSelectableId, event.product)
-            }
-
             is DetailEvent.OnUpdateImageOptionDialog -> {
                 onUpdateImageOptionDialog(event.value)
             }
@@ -125,7 +117,7 @@ class DetailViewModel(
     }
 
     private fun addImage(imageBitmap: ImageBitmap) {
-        uploadImage(imageBitmap, state.value.product.getCalculatedSku(),state.value.product.id)
+        uploadImage(imageBitmap, state.value.product.getCalculatedSku(), state.value.product.id)
     }
 
     private fun onUpdateImageOptionDialog(value: UIComponentState) {
@@ -136,19 +128,39 @@ class DetailViewModel(
         state.value = state.value.copy(permissionDialog = value)
     }
 
-    private fun selectSize(sizeSelectable: String, product: ProductSelectable) {
-        state.value = sizeSelectable?.let { state.value.copy(sizeSelectable = it) }!!
-        getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
+    private fun makeSelection(selection: Selection, selectedId: String) {
+//        state.value = sizeSelectable?.let { state.value.copy(product = product) }!!
+        val updatedSelections = state.value.product.selections.map { sel ->
+            if (sel == selection) {
+                // Update the selected item in the selection
+                sel.copy(
+                    selector = sel.selector?.copy(
+                        selected = sel.selectionList?.firstOrNull { it._id == selectedId }
+                    )
+                )
+            } else {
+                sel
+            }
+        }
+
+        // Create a new product with the updated selections
+        val updatedProduct = state.value.product.copy(selections = updatedSelections)
+
+        // Update the state with the new product
+        state.value = state.value.copy(product = updatedProduct)
+
+
+//        getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
     }
 
-    private fun selectColor(colorSelectable: String, product: ProductSelectable) {
-        state.value = colorSelectable?.let { state.value.copy(colorSelectable = it) }!!
-        getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
-    }
+//    private fun selectColor(colorSelectable: String, product: ProductSelectable) {
+//        state.value = colorSelectable?.let { state.value.copy(colorSelectable = it) }!!
+//        getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
+//    }
 
-    private fun selectProduct(productSelectable: String, product: ProductSelectable) {
-        state.value = productSelectable?.let { state.value.copy(colorSelectable = it) }!!
-    }
+//    private fun selectProduct(productSelectable: String, product: ProductSelectable) {
+//        state.value = productSelectable?.let { state.value.copy(colorSelectable = it) }!!
+//    }
 
     private fun onUpdateSelectedImage(value: String) {
         state.value = state.value.copy(selectedImage = value)
@@ -217,7 +229,12 @@ class DetailViewModel(
                         state.value =
                             state.value.copy(selectedImage = product.gallery.firstOrNull() ?: "")
 
-                        product.supplier.supplierId?.let { supplierId -> getProductInventory(supplierId, product.getCalculatedSku()) }
+                        product.supplier.supplierId?.let { supplierId ->
+                            getProductInventory(
+                                supplierId,
+                                product.getCalculatedSku()
+                            )
+                        }
                     }
                 }
 
@@ -230,28 +247,33 @@ class DetailViewModel(
     }
 
     private fun uploadImage(bitmap: ImageBitmap, sku: String, id: String) {
-        productInteractor.uploadImage(bitmap = bitmap, sku = sku, productId = id).onEach { dataState ->
-            when (dataState) {
-                is DataState.NetworkStatus -> {
-                    onTriggerEvent(DetailEvent.OnUpdateNetworkState(dataState.networkState))
-                }
-                is DataState.Response -> {
-                    onTriggerEvent(DetailEvent.Error(dataState.uiComponent))
-                }
-                is DataState.Data -> {
-                    dataState.data?.let { addImageResult ->
-                        val currentImages = state.value.galleryImages.toMutableList()
-                        addImageResult.product.images.forEach { image ->
-                            currentImages.add(image.url)
+        productInteractor.uploadImage(bitmap = bitmap, sku = sku, productId = id)
+            .onEach { dataState ->
+                when (dataState) {
+                    is DataState.NetworkStatus -> {
+                        onTriggerEvent(DetailEvent.OnUpdateNetworkState(dataState.networkState))
+                    }
+
+                    is DataState.Response -> {
+                        onTriggerEvent(DetailEvent.Error(dataState.uiComponent))
+                    }
+
+                    is DataState.Data -> {
+                        dataState.data?.let { addImageResult ->
+                            val currentImages = state.value.galleryImages.toMutableList()
+                            addImageResult.product.images.forEach { image ->
+                                currentImages.add(image.url)
+                            }
+                            state.value = state.value.copy(galleryImages = currentImages)
                         }
-                        state.value = state.value.copy(galleryImages = currentImages)
+                    }
+
+                    is DataState.Loading -> {
+                        state.value =
+                            state.value.copy(progressBarState = dataState.progressBarState)
                     }
                 }
-                is DataState.Loading -> {
-                    state.value = state.value.copy(progressBarState = dataState.progressBarState)
-                }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
 
@@ -261,35 +283,36 @@ class DetailViewModel(
         inventoryClickable.value = false
         inventoryUnderLine.value = false
         inventoryStatusText.value = DetailTexts().inventoryUpdate
-        productInteractor.getProductInventory(supplierId = supplierId, sku = sku).onEach { dataState ->
-            when (dataState) {
-                is DataState.NetworkStatus -> {
+        productInteractor.getProductInventory(supplierId = supplierId, sku = sku)
+            .onEach { dataState ->
+                when (dataState) {
+                    is DataState.NetworkStatus -> {
 //                    onTriggerEvent(DetailEvent.OnUpdateNetworkState(dataState.networkState))
-                }
-
-                is DataState.Response -> {
-                    handleInventoryResponse(null)
-                }
-
-                is DataState.Data -> {
-                    dataState.data?.let { batchItems ->
-                        handleInventoryResponse(batchItems.batchesList)
-                        state.value = state.value.copy(productInventoryBatch = batchItems)
                     }
-                    heldInventoryText.value = when (dataState.data?.heldInventory) {
-                        0 -> DetailTexts().no
-                        1 -> DetailTexts().yes
-                        else -> {
-                            DetailTexts().no
+
+                    is DataState.Response -> {
+                        handleInventoryResponse(null)
+                    }
+
+                    is DataState.Data -> {
+                        dataState.data?.let { batchItems ->
+                            handleInventoryResponse(batchItems.batchesList)
+                            state.value = state.value.copy(productInventoryBatch = batchItems)
+                        }
+                        heldInventoryText.value = when (dataState.data?.heldInventory) {
+                            0 -> DetailTexts().no
+                            1 -> DetailTexts().yes
+                            else -> {
+                                DetailTexts().no
+                            }
                         }
                     }
-                }
 
-                is DataState.Loading -> {
+                    is DataState.Loading -> {
 //                    state.value = state.value.copy(progressBarState = dataState.progressBarState)
+                    }
                 }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     private fun appendToMessageQueue(uiComponent: UIComponent) {
@@ -393,7 +416,8 @@ class DetailViewModel(
                         val colorsMap = (selected as? SizeSelectable)?.colors
                         colorsMap?.let {
                             if (selectedColor != null) {
-                                if (useUpgradePrice) colorsMap[selectedColor._id]?.upgradePrice?.toInt() ?: 0
+                                if (useUpgradePrice) colorsMap[selectedColor._id]?.upgradePrice?.toInt()
+                                    ?: 0
                                 else colorsMap[selectedColor._id]?.basePrice?.toInt() ?: 0
                             } else 0
                         }
@@ -408,17 +432,20 @@ class DetailViewModel(
     @OptIn(ExperimentalResourceApi::class)
     fun getProductPrice(product: ProductSelectable): String {
         var price = getPrice(product)
-        product.selections.filter { it.selector?.selectionType == ProductSelectable.type }.forEach { selection ->
-            val subProduct = selection.selector?.selected as? ProductSelectable
-            subProduct?.let {
-                price += getPrice(it, product.priceIncludeSubProducts)
+        product.selections.filter { it.selector?.selectionType == ProductSelectable.type }
+            .forEach { selection ->
+                val subProduct = selection.selector?.selected as? ProductSelectable
+                subProduct?.let {
+                    price += getPrice(it, product.priceIncludeSubProducts)
+                }
             }
-        }
         if (product.supplier.shouldAddVatToPrice == true) {
             price = (price * 1.17).toInt()  // Apply VAT
         }
         val vatText =
-            if (product.supplier.shouldAddVatToPrice == true) stringResource(Res.string.vat_included) else stringResource(Res.string.vat_not_included)
+            if (product.supplier.shouldAddVatToPrice == true) stringResource(Res.string.vat_included) else stringResource(
+                Res.string.vat_not_included
+            )
         return "$price ₪ $vatText"
     }
 
