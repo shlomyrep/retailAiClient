@@ -15,12 +15,13 @@ import business.datasource.network.main.responses.CommentDTO
 import business.datasource.network.main.responses.CommentRequestDTO
 import business.datasource.network.main.responses.HeldInventoryBatchDTO
 import business.datasource.network.main.responses.HomeDTO
-import business.datasource.network.main.responses.OrderDTO
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
+import business.datasource.network.main.responses.Order
+import business.datasource.network.main.responses.OrderResponse
 import common.toBytes
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -46,7 +47,7 @@ import io.ktor.utils.io.core.writeFully
 class MainServiceImpl(
     private val httpClient: HttpClient
 ) : MainService {
-    override suspend fun getOrders(token: String): MainGenericResponse<List<OrderDTO>> {
+    override suspend fun getOrders(token: String): MainGenericResponse<List<Order>> {
         return httpClient.get {
             url {
                 headers {
@@ -364,6 +365,20 @@ class MainServiceImpl(
         }.body()
     }
 
+    override suspend fun sendSpecProducts(token: String, order: Order): MainGenericResponse<OrderResponse> {
+        return httpClient.post {
+            url {
+                headers {
+                    append(HttpHeaders.Authorization, token)
+                }
+                takeFrom(BASE_URL + "api/product/mail")
+            }
+            contentType(ContentType.Application.Json)
+            setBody(order)
+        }.body()
+    }
+
+
     @OptIn(InternalAPI::class)
     override suspend fun uploadImage(token: String, bitmap: ImageBitmap, sku: String, productId: String): AddImageResult {
         val imageUrl = "$BASE_URL/product/picture/$productId?sku=$sku"
@@ -386,6 +401,7 @@ class MainServiceImpl(
             )
         }.body<AddImageResult>()
     }
+
     override suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?> {
         return httpClient.get {
             url {

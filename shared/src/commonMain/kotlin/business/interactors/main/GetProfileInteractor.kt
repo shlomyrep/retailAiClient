@@ -9,10 +9,12 @@ import business.core.ProgressBarState
 import business.datasource.network.main.MainService
 import business.datasource.network.main.responses.toProfile
 import business.domain.main.Profile
+import business.domain.main.SalesMan
 import business.util.createException
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
 
 class GetProfileInteractor(
     private val service: MainService,
@@ -27,6 +29,8 @@ class GetProfileInteractor(
             emit(DataState.Loading(progressBarState = ProgressBarState.LoadingWithLogo))
 
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
+            val jsonSalesMan = appDataStoreManager.readValue(DataStoreKeys.SALES_MAN)
+            val user = jsonSalesMan?.let { Json.decodeFromString(SalesMan.serializer(), it) }
 
 
             val apiResponse = service.getProfile(
@@ -41,9 +45,8 @@ class GetProfileInteractor(
                 )
             }
 
-
             val result = apiResponse.result?.toProfile()
-
+            result?.name = user?.username ?: ""
 
             emit(DataState.NetworkStatus(NetworkState.Good))
             emit(DataState.Data(result))

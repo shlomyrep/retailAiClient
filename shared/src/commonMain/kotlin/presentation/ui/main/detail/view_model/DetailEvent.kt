@@ -18,7 +18,8 @@ sealed class DetailEvent {
     ) : DetailEvent()
 
     data class GetProduct(
-        val id: String
+        val id: String,
+        val isSku: Boolean
     ) : DetailEvent()
 
     data class GetProductInventory(

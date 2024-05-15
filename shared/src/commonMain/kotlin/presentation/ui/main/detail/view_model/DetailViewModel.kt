@@ -21,6 +21,7 @@ import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
 import business.domain.main.BatchItem
 import business.interactors.main.AddBasketInteractor
+import business.interactors.main.BarcodeInteractor
 import business.interactors.main.LikeInteractor
 import business.interactors.main.ProductInteractor
 import kotlinx.coroutines.flow.launchIn
@@ -34,6 +35,7 @@ import shoping_by_kmp.shared.generated.resources.vat_included
 import shoping_by_kmp.shared.generated.resources.vat_not_included
 
 class DetailViewModel(
+    private val barcodeInteractor: BarcodeInteractor,
     private val productInteractor: ProductInteractor,
     private val addBasketInteractor: AddBasketInteractor,
     private val likeInteractor: LikeInteractor,
@@ -79,7 +81,7 @@ class DetailViewModel(
             }
 
             is DetailEvent.GetProduct -> {
-                getProduct(event.id)
+                getProduct(event.id, event.isSku)
             }
 
             is DetailEvent.GetProductInventory -> {
@@ -129,15 +131,35 @@ class DetailViewModel(
     }
 
     private fun makeSelection(selection: Selection, selectedId: String) {
-//        state.value = sizeSelectable?.let { state.value.copy(product = product) }!!
+        // Helper function to recursively update selections
+        fun updateSelection(selection: Selection, selectedId: String): Selection {
+            // Update the selected item in the current selection
+            val updatedSelector = selection.selector?.copy(
+                selected = selection.selectionList?.firstOrNull { it._id == selectedId }
+            )
+
+            // Recursively update selections in the selection list
+            val updatedSelectionList = selection.selectionList?.map { selectable ->
+                if (selectable is ProductSelectable && selectable.selections != null) {
+                    val updatedSubSelections = selectable.selections.map { subSelection ->
+                        updateSelection(subSelection, selectedId)
+                    }
+                    selectable.copy(selections = updatedSubSelections)
+                } else {
+                    selectable
+                }
+            }
+
+            return selection.copy(
+                selector = updatedSelector,
+                selectionList = updatedSelectionList?.toMutableList()
+            )
+        }
+
+        // Update the top-level selections
         val updatedSelections = state.value.product.selections.map { sel ->
             if (sel == selection) {
-                // Update the selected item in the selection
-                sel.copy(
-                    selector = sel.selector?.copy(
-                        selected = sel.selectionList?.firstOrNull { it._id == selectedId }
-                    )
-                )
+                updateSelection(sel, selectedId)
             } else {
                 sel
             }
@@ -148,10 +170,8 @@ class DetailViewModel(
 
         // Update the state with the new product
         state.value = state.value.copy(product = updatedProduct)
-
-
-//        getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
     }
+
 
 //    private fun selectColor(colorSelectable: String, product: ProductSelectable) {
 //        state.value = colorSelectable?.let { state.value.copy(colorSelectable = it) }!!
@@ -212,38 +232,76 @@ class DetailViewModel(
             state.value.copy(product = state.value.product.copy(isLike = !state.value.product.isLike))
     }
 
-    private fun getProduct(id: String) {
-        productInteractor.execute(id = id).onEach { dataState ->
-            when (dataState) {
-                is DataState.NetworkStatus -> {
-                    onTriggerEvent(DetailEvent.OnUpdateNetworkState(dataState.networkState))
-                }
+    private fun getProduct(id: String, isSku: Boolean) {
+        if (isSku) {
+            barcodeInteractor.execute(id).onEach { dataState ->
+                when (dataState) {
+                    is DataState.NetworkStatus -> {
+                        onTriggerEvent(DetailEvent.OnUpdateNetworkState(dataState.networkState))
+                    }
 
-                is DataState.Response -> {
-                    onTriggerEvent(DetailEvent.Error(dataState.uiComponent))
-                }
+                    is DataState.Response -> {
+                        onTriggerEvent(DetailEvent.Error(dataState.uiComponent))
+                    }
 
-                is DataState.Data -> {
-                    dataState.data?.let { product ->
-                        state.value = state.value.copy(product = product)
-                        state.value =
-                            state.value.copy(selectedImage = product.gallery.firstOrNull() ?: "")
+                    is DataState.Data -> {
+                        dataState.data?.let { product ->
+                            state.value = state.value.copy(product = product)
+                            state.value =
+                                state.value.copy(
+                                    selectedImage = product.gallery.firstOrNull() ?: ""
+                                )
 
-                        product.supplier.supplierId?.let { supplierId ->
-                            getProductInventory(
-                                supplierId,
-                                product.getCalculatedSku()
-                            )
+                            product.supplier.supplierId?.let { supplierId ->
+                                getProductInventory(
+                                    supplierId,
+                                    product.getCalculatedSku()
+                                )
+                            }
                         }
                     }
-                }
 
-                is DataState.Loading -> {
-                    state.value =
-                        state.value.copy(progressBarState = dataState.progressBarState)
+                    is DataState.Loading -> {
+                        state.value =
+                            state.value.copy(progressBarState = dataState.progressBarState)
+                    }
                 }
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
+        } else {
+            productInteractor.execute(id = id).onEach { dataState ->
+                when (dataState) {
+                    is DataState.NetworkStatus -> {
+                        onTriggerEvent(DetailEvent.OnUpdateNetworkState(dataState.networkState))
+                    }
+
+                    is DataState.Response -> {
+                        onTriggerEvent(DetailEvent.Error(dataState.uiComponent))
+                    }
+
+                    is DataState.Data -> {
+                        dataState.data?.let { product ->
+                            state.value = state.value.copy(product = product)
+                            state.value =
+                                state.value.copy(
+                                    selectedImage = product.gallery.firstOrNull() ?: ""
+                                )
+
+                            product.supplier.supplierId?.let { supplierId ->
+                                getProductInventory(
+                                    supplierId,
+                                    product.getCalculatedSku()
+                                )
+                            }
+                        }
+                    }
+
+                    is DataState.Loading -> {
+                        state.value =
+                            state.value.copy(progressBarState = dataState.progressBarState)
+                    }
+                }
+            }.launchIn(viewModelScope)
+        }
     }
 
     private fun uploadImage(bitmap: ImageBitmap, sku: String, id: String) {
@@ -267,6 +325,7 @@ class DetailViewModel(
                             state.value = state.value.copy(galleryImages = currentImages)
                         }
                     }
+
 
                     is DataState.Loading -> {
                         state.value =
@@ -339,7 +398,7 @@ class DetailViewModel(
     }
 
     private fun onRetryNetwork() {
-        getProduct(state.value.product.id)
+        getProduct(state.value.product.id, false)
     }
 
     private fun onUpdateNetworkState(networkState: NetworkState) {
