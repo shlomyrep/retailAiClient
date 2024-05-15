@@ -1,10 +1,12 @@
 package presentation.ui.main.edit_profile
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -22,10 +25,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
-import presentation.component.CircleImage
 import presentation.component.DefaultScreenUI
 import presentation.component.Spacer_16dp
 import presentation.component.Spacer_32dp
+import presentation.component.rememberCustomImagePainter
 import presentation.theme.DefaultTextFieldTheme
 import presentation.ui.main.edit_profile.view_model.EditProfileEvent
 import presentation.ui.main.edit_profile.view_model.EditProfileState
@@ -153,8 +156,15 @@ fun EditProfileScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Image(
+                        painter = rememberCustomImagePainter(state.image),
+                        contentDescription = "Profile Image",
+                        modifier = Modifier
+                            .size(220.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                    )
 //                    if (imageBitmap == null) {
-                        CircleImage(state.image, modifier = Modifier.size(220.dp))
+//                        CircleImage(state.image, modifier = Modifier.size(220.dp))
 //                    }
 //                    else {
 //                        CircleImage(imageBitmap, modifier = Modifier.size(120.dp))
