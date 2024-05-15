@@ -9,12 +9,13 @@ import business.datasource.network.main.responses.BasketDTO
 import business.datasource.network.main.responses.CommentDTO
 import business.datasource.network.main.responses.HeldInventoryBatchDTO
 import business.datasource.network.main.responses.HomeDTO
-import business.datasource.network.main.responses.OrderDTO
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
+import business.domain.main.Order
+import business.domain.main.OrderResponse
 
 interface MainService {
     companion object {
@@ -38,7 +39,7 @@ interface MainService {
 
     suspend fun getOrders(
         token: String,
-    ): MainGenericResponse<List<OrderDTO>>
+    ): MainGenericResponse<List<Order>>
 
     suspend fun buyProduct(
         token: String,
@@ -98,6 +99,8 @@ interface MainService {
     suspend fun home(token: String): MainGenericResponse<HomeDTO>
     suspend fun productBySku(token: String,sku:String): MainGenericResponse<ProductSelectable>
     suspend fun product(token: String, id: String): MainGenericResponse<ProductSelectable>
+
+    suspend fun sendSpecProducts(token: String, order: Order): MainGenericResponse<OrderResponse>
 
     suspend fun productInventory(token: String, supplierId :String,sku: String): HeldInventoryBatchDTO
     suspend fun uploadImage(token: String,bitmap: ImageBitmap, sku: String, productId: String): AddImageResult

@@ -1,7 +1,7 @@
 package business.domain.main
 
 data class Profile(
-    val name: String = "",
+    var name: String = "",
     val age: String = "",
     val profileUrl: String = "",
 )

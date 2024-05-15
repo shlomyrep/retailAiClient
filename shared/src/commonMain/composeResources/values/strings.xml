@@ -73,9 +73,10 @@
     <string name="inventory_list">רשימת מלאי</string>
     <string name="vat_included">כולל מע״מ</string>
     <string name="vat_not_included">לא כולל מע״מ</string>
-    <string name="edit_profile">עריכת איזור אישי</string>
+    <string name="edit_profile">איזור אישי</string>
     <string name="select">בחר</string>
     <string name="age">גיל</string>
+    <string name="roll">תפקיד</string>
     <string name="email">דואר אלקטרוני</string>
     <string name="notifications">התראות</string>
     <string name="mark_all_as_read">סמן הכל כנקרא</string>

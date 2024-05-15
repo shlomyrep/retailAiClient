@@ -86,7 +86,7 @@ fun ProfileScreen(
 
                 CircleImage(
                     image = state.profile.profileUrl,
-                    modifier = Modifier.size(120.dp)
+                    modifier = Modifier.size(220.dp)
                 )
 
                 Spacer_16dp()

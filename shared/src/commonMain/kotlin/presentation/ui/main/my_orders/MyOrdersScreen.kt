@@ -61,7 +61,6 @@ import presentation.component.noRippleClickable
 import presentation.theme.BorderColor
 import presentation.ui.main.my_orders.view_model.MyOrdersEvent
 import presentation.ui.main.my_orders.view_model.MyOrdersState
-import presentation.util.convertDate
 import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.address
 import shoping_by_kmp.shared.generated.resources.amount
@@ -154,15 +153,15 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
                         when (index) {
 
                             SHIPPING_ACTIVE -> {
-                                MyOrdersList(list = state.orders.filter { it.status == SHIPPING_ACTIVE })
+                                MyOrdersList(list = state.orders.filter { it.orderStatus == "SHIPPING_ACTIVE" })
                             }
 
                             SHIPPING_SUCCESS -> {
-                                MyOrdersList(list = state.orders.filter { it.status == SHIPPING_SUCCESS })
+                                MyOrdersList(list = state.orders.filter { it.orderStatus == "SHIPPING_SUCCESS" })
                             }
 
                             SHIPPING_FAILED -> {
-                                MyOrdersList(list = state.orders.filter { it.status == SHIPPING_FAILED })
+                                MyOrdersList(list = state.orders.filter { it.orderStatus == "SHIPPING_FAILED" })
                             }
                         }
                     }
@@ -188,7 +187,7 @@ private fun MyOrdersList(list: List<Order>) {
     }
 
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
-        items(list, key = { it.createdAt }) {
+        items(list, key = { it.emailData.date }) {
             OrderBox(it)
         }
     }
@@ -217,7 +216,7 @@ private fun OrderBox(order: Order) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(order.createdAt.convertDate(), style = MaterialTheme.typography.bodyLarge)
+                Text(order.emailData.date, style = MaterialTheme.typography.bodyLarge)
                 Icon(
                     painter = painterResource(Res.drawable.arrow_down),
                     null,
@@ -231,7 +230,7 @@ private fun OrderBox(order: Order) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(stringResource(Res.string.promo_code), style = MaterialTheme.typography.bodyLarge)
-                Text(order.code, style = MaterialTheme.typography.bodyMedium)
+                Text(order.type.toString(), style = MaterialTheme.typography.bodyMedium)
             }
             Spacer_8dp()
 
@@ -239,9 +238,9 @@ private fun OrderBox(order: Order) {
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 8.dp)
             ) {
-                items(order.products) {
+                items(order.emailData.products) {
                     AsyncImage(
-                        it.image,
+                        it.main_images,
                         null,
                         modifier = Modifier.size(55.dp).padding(horizontal = 4.dp),
                         contentScale = ContentScale.Crop,
@@ -262,7 +261,7 @@ private fun OrderBox(order: Order) {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(stringResource(Res.string.amount), style = MaterialTheme.typography.bodyLarge)
-                            Text(order.getAmount(), style = MaterialTheme.typography.bodyMedium)
+                            Text(order.emailData.title, style = MaterialTheme.typography.bodyMedium)
                         }
                         Spacer_8dp()
 
@@ -273,7 +272,7 @@ private fun OrderBox(order: Order) {
                         ) {
                             Text(stringResource(Res.string.delivery_cost), style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                order.shippingType.getPrice(),
+                                order.emailData.title,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -286,7 +285,7 @@ private fun OrderBox(order: Order) {
                         ) {
                             Text(stringResource(Res.string.delivery_type), style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                order.shippingType.title,
+                                order.emailData.title,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -300,7 +299,7 @@ private fun OrderBox(order: Order) {
                         ) {
                             Text(stringResource(Res.string.address), style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                order.address.getShippingAddress(),
+                                order.emailData.title,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
