@@ -23,7 +23,7 @@ data class ProductSelectable(
     @SerialName("base_price") override val basePrice: Double = 0.0,
     @SerialName("upgrade_price") override val upgradePrice: Double = 0.0,
     @SerialName("price_type") val priceType: String = "",
-    @SerialName("selections") val selections: List<@Contextual Selection> = mutableListOf(),
+    @SerialName("selections") var selections: List<@Contextual Selection> = mutableListOf(),
     @SerialName("rate") val rate: Double? = 0.0,
     @SerialName("title") val title: String = "",
     @SerialName("sku") var sku: String = "",
@@ -75,6 +75,20 @@ data class ProductSelectable(
             else -> ""
         }
     }
+}
+
+fun ProductSelectable.deepCopy(): ProductSelectable {
+    return this.copy(
+        selections = this.selections?.map { it.deepCopy() }?.toMutableList() ?: mutableListOf()
+    )
+}
+
+fun Selection.deepCopy(): Selection {
+    return this.copy(
+        selectionList = this.selectionList?.map {
+            if (it is ProductSelectable) it.deepCopy() else it
+        }?.toMutableList() ?: mutableListOf()
+    )
 }
 
 
@@ -268,7 +282,7 @@ fun getCustomizationSteps(
             // place the right selection in case of inheritance
             originalProductSize?.let {
                 it.selector?.selected?.let { sl ->
-                    if (!(s.selector.selected as SizeSelectable).modified) {
+                    if (!(s.selector?.selected as SizeSelectable).modified) {
                         if (s.selectionList?.contains(sl) == true) {
                             s.selector.selected = sl
                         }

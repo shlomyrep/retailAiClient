@@ -19,6 +19,8 @@ import business.datasource.network.main.responses.PriceType
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
+import business.datasource.network.main.responses.deepCopy
+import business.datasource.network.main.responses.getCustomizationSteps
 import business.domain.main.BatchItem
 import business.interactors.main.AddBasketInteractor
 import business.interactors.main.BarcodeInteractor
@@ -131,45 +133,21 @@ class DetailViewModel(
     }
 
     private fun makeSelection(selection: Selection, selectedId: String) {
-        // Helper function to recursively update selections
-        fun updateSelection(selection: Selection, selectedId: String): Selection {
-            // Update the selected item in the current selection
-            val updatedSelector = selection.selector?.copy(
-                selected = selection.selectionList?.firstOrNull { it._id == selectedId }
-            )
+        // Step 1: Copy the current product
+        val currentProduct = state.value.product
 
-            // Recursively update selections in the selection list
-            val updatedSelectionList = selection.selectionList?.map { selectable ->
-                if (selectable is ProductSelectable && selectable.selections != null) {
-                    val updatedSubSelections = selectable.selections.map { subSelection ->
-                        updateSelection(subSelection, selectedId)
-                    }
-                    selectable.copy(selections = updatedSubSelections)
-                } else {
-                    selectable
-                }
-            }
+        // Step 2: Get customization steps (flat list of selections)
+        val customizationSteps =
+            getCustomizationSteps(currentProduct, mutableListOf(), currentProduct)
 
-            return selection.copy(
-                selector = updatedSelector,
-                selectionList = updatedSelectionList?.toMutableList()
-            )
+        // Step 3: Find and update the specific selection in the customization steps
+        customizationSteps.find { it == selection }?.let { foundSelection ->
+            foundSelection.selector?.selected =
+                foundSelection.selectionList?.firstOrNull { it._id == selectedId }
         }
 
-        // Update the top-level selections
-        val updatedSelections = state.value.product.selections.map { sel ->
-            if (sel == selection) {
-                updateSelection(sel, selectedId)
-            } else {
-                sel
-            }
-        }
-
-        // Create a new product with the updated selections
-        val updatedProduct = state.value.product.copy(selections = updatedSelections)
-
-        // Update the state with the new product
-        state.value = state.value.copy(product = updatedProduct)
+        // Step 4: Update the state with the new product
+        state.value = state.value.copy(product = currentProduct, lastSelection = selectedId)
     }
 
 
