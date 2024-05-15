@@ -14,8 +14,8 @@ import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
-import business.domain.main.Order
-import business.domain.main.OrderResponse
+import business.datasource.network.main.responses.Order
+import business.datasource.network.main.responses.OrderResponse
 
 interface MainService {
     companion object {

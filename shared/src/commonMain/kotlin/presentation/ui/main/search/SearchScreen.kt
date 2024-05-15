@@ -90,7 +90,6 @@ fun SearchScreen(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
 
-
                 Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
                     CircleButton(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -120,7 +119,7 @@ fun SearchScreen(
                                 null,
                                 modifier = Modifier.size(24.dp)
                             )
-                            Text("מיון")
+                            stringResource(Res.string.sort)
                         }
                     }
                     TextButton(onClick = {
@@ -140,7 +139,7 @@ fun SearchScreen(
                                 null,
                                 modifier = Modifier.size(24.dp)
                             )
-                            Text("פילטר")
+                            stringResource(Res.string.filter)
                         }
                     }
                 }
@@ -153,7 +152,7 @@ fun SearchScreen(
                         contentPadding = PaddingValues(16.dp)
                     ) {
                         items(
-                            // Implement a better regex find mechanizm
+                            // Implement a better regex find mechanizm TAMIR
                             state.search.products.filter { it.title.contains(state.searchText) },
                             key = {
                                 it.id

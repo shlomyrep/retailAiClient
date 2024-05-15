@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import business.constants.SHIPPING_ACTIVE
 import business.constants.SHIPPING_FAILED
 import business.constants.SHIPPING_SUCCESS
-import business.domain.main.Order
+import business.datasource.network.main.responses.Order
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi

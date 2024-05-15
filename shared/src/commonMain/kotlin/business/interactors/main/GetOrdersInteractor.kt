@@ -7,7 +7,7 @@ import business.core.DataState
 import business.core.NetworkState
 import business.core.ProgressBarState
 import business.datasource.network.main.MainService
-import business.domain.main.Order
+import business.datasource.network.main.responses.Order
 import business.util.createException
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
