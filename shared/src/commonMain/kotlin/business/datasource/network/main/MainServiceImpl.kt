@@ -313,7 +313,10 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun basketDelete(token: String, id: String): MainGenericResponse<JRNothing?> {
+    override suspend fun basketDelete(
+        token: String, id: String,
+        sales: SalesMan
+    ): MainGenericResponse<JRNothing?> {
         return httpClient.post {
             url {
                 headers {
@@ -323,7 +326,7 @@ class MainServiceImpl(
                 encodedPath += MainService.BASKET_DELETE
             }
             contentType(ContentType.Application.Json)
-            setBody(BasketDeleteRequestDTO(product = id))
+            setBody(BasketDeleteRequestDTO(product = id, salesMan = sales))
         }.body()
     }
 

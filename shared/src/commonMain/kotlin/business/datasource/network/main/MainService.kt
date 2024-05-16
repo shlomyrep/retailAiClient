@@ -104,7 +104,12 @@ interface MainService {
         count: Int
     ): MainGenericResponse<JRNothing?>
 
-    suspend fun basketDelete(token: String, id: String): MainGenericResponse<JRNothing?>
+    suspend fun basketDelete(
+        token: String,
+        id: String,
+        sales: SalesMan
+    ): MainGenericResponse<JRNothing?>
+
     suspend fun home(token: String): MainGenericResponse<HomeDTO>
     suspend fun productBySku(token: String, sku: String): MainGenericResponse<ProductSelectable>
     suspend fun product(token: String, id: String): MainGenericResponse<ProductSelectable>

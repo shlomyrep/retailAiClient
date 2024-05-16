@@ -7,9 +7,11 @@ import business.core.DataState
 import business.core.ProgressBarState
 import business.core.UIComponent
 import business.datasource.network.main.MainService
+import business.domain.main.SalesMan
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
 
 class DeleteBasketInteractor(
     private val service: MainService,
@@ -24,11 +26,14 @@ class DeleteBasketInteractor(
             emit(DataState.Loading(progressBarState = ProgressBarState.FullScreenLoading))
 
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
+            val jsonSalesMan = appDataStoreManager.readValue(DataStoreKeys.SALES_MAN)
+            val user = jsonSalesMan?.let { Json.decodeFromString(SalesMan.serializer(), it) }
 
 
             val apiResponse = service.basketDelete(
                 token = token,
                 id = id,
+                sales = user ?: SalesMan()
             )
 
 
