@@ -27,7 +27,7 @@ interface MainService {
         const val BASKET_ADD = "cart/add"
         const val BASKET_DELETE = "cart/delete"
         const val HOME = "home"
-        const val ORDERS = "orders"
+        const val ORDERS = "cart/all"
         const val PRODUCT = "search/product"
         const val PRODUCT_SKU = "search/sku"
         const val LIKE = "like"
