@@ -33,7 +33,6 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,9 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import business.datasource.network.main.responses.ColorSelectable
@@ -62,6 +59,7 @@ import presentation.component.Spacer_4dp
 import presentation.component.noRippleClickable
 import presentation.component.rememberCustomImagePainter
 import presentation.theme.BorderColor
+import presentation.theme.Red
 import presentation.ui.main.cart.view_model.CartEvent
 import presentation.ui.main.cart.view_model.CartState
 import shoping_by_kmp.shared.generated.resources.Res
@@ -79,7 +77,7 @@ fun CartScreen(
     navigateToCheckout: () -> Unit,
 ) {
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+//    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         DefaultScreenUI(
             queue = state.errorQueue,
             onRemoveHeadFromQueue = { events(CartEvent.OnRemoveHeadFromQueue) },
@@ -134,7 +132,7 @@ fun CartScreen(
             }
         }
     }
-}
+//}
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -324,9 +322,11 @@ fun constructSelections(selections: List<Selection>): String {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
 fun DismissBackground(dismissState: SwipeToDismissBoxState) {
-    val color = MaterialTheme.colorScheme.primary.copy(alpha = .2f)
-    val direction = dismissState.dismissDirection
-
+    val color = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+        Red.copy(alpha = .2f)
+    } else {
+        MaterialTheme.colorScheme.primary.copy(alpha = .2f)
+    }
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -335,14 +335,17 @@ fun DismissBackground(dismissState: SwipeToDismissBoxState) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End
     ) {
-        if (direction == SwipeToDismissBoxValue.EndToStart) Icon(
-            Icons.Default.Delete,
-            tint = MaterialTheme.colorScheme.primary,
-            contentDescription = stringResource(Res.string.delete)
-        )
+        if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+            Icon(
+                Icons.Default.Delete,
+                tint = Red,
+                contentDescription = stringResource(Res.string.delete)
+            )
+        }
         Spacer(modifier = Modifier)
     }
 }
+
 
 
 
