@@ -4,7 +4,7 @@ import business.core.NetworkState
 import business.core.ProgressBarState
 import business.core.Queue
 import business.core.UIComponent
-import business.datasource.network.main.responses.Order
+import business.domain.main.Order
 
 data class MyOrdersState(
     val orders: List<Order> = listOf(),

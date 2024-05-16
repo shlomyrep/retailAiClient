@@ -33,7 +33,6 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,9 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import business.datasource.network.main.responses.ColorSelectable
@@ -62,6 +59,7 @@ import presentation.component.Spacer_4dp
 import presentation.component.noRippleClickable
 import presentation.component.rememberCustomImagePainter
 import presentation.theme.BorderColor
+import presentation.theme.Red
 import presentation.ui.main.cart.view_model.CartEvent
 import presentation.ui.main.cart.view_model.CartState
 import shoping_by_kmp.shared.generated.resources.Res
@@ -79,62 +77,59 @@ fun CartScreen(
     navigateToCheckout: () -> Unit,
 ) {
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        DefaultScreenUI(
-            queue = state.errorQueue,
-            onRemoveHeadFromQueue = { events(CartEvent.OnRemoveHeadFromQueue) },
-            progressBarState = state.progressBarState,
-            networkState = state.networkState,
-            onTryAgain = { events(CartEvent.OnRetryNetwork) }
-        ) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize().align(Alignment.Center)
-                        .padding(bottom = 100.dp) // Adjust this value as needed to accommodate the floating button area
-                ) {
-                    items(state.baskets) {
-                        CartBox(
-                            it,
-                            addMoreProduct = {
-                                events(CartEvent.AddProduct(it.product))
-                            },
-                            navigateToDetail = navigateToDetail
-                        ) {
-                            events(CartEvent.DeleteFromBasket(it.product.id))
-                        }
-                    }
-                }
 
-                if (state.baskets.isNotEmpty()) {
-                    Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
-                        ProceedButtonBox(
-                            state.totalCost
-                        ) {
-                            navigateToCheckout()
-                        }
-                    }
-                }
-
-
-                if (state.baskets.isEmpty()) {
-                    Box(
-                        modifier = Modifier.align(Alignment.Center).fillMaxWidth(),
-                        contentAlignment = Alignment.Center
+    DefaultScreenUI(
+        queue = state.errorQueue,
+        onRemoveHeadFromQueue = { events(CartEvent.OnRemoveHeadFromQueue) },
+        progressBarState = state.progressBarState,
+        networkState = state.networkState,
+        onTryAgain = { events(CartEvent.OnRetryNetwork) }
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().align(Alignment.Center)
+                    .padding(bottom = 100.dp) // Adjust this value as needed to accommodate the floating button area
+            ) {
+                items(state.baskets) {
+                    CartBox(
+                        it,
+                        navigateToDetail = navigateToDetail
                     ) {
-                        Text(
-                            fontSize = 30.sp,
-                            text = stringResource(Res.string.basket_is_empty),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = BorderColor,
-                        )
+                        events(CartEvent.DeleteFromBasket(it.product.id))
                     }
                 }
-
-
             }
+
+            if (state.baskets.isNotEmpty()) {
+                Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
+                    ProceedButtonBox(
+                        state.totalCost
+                    ) {
+                        navigateToCheckout()
+                    }
+                }
+            }
+
+
+            if (state.baskets.isEmpty()) {
+                Box(
+                    modifier = Modifier.align(Alignment.Center).fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        fontSize = 30.sp,
+                        text = stringResource(Res.string.basket_is_empty),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = BorderColor,
+                    )
+                }
+            }
+
+
         }
     }
 }
+//}
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -177,7 +172,6 @@ fun ProceedButtonBox(totalCost: String, onClick: () -> Unit) {
 fun CartBox(
     basket: Basket,
     navigateToDetail: (String) -> Unit,
-    addMoreProduct: () -> Unit,
     deleteFromBasket: () -> Unit
 ) {
     var show by remember { mutableStateOf(true) }
@@ -204,7 +198,6 @@ fun CartBox(
             content = {
                 DismissCartContent(
                     basket,
-                    addMoreProduct = addMoreProduct,
                     navigateToDetail = navigateToDetail
                 )
             })
@@ -214,13 +207,12 @@ fun CartBox(
 @Composable
 fun DismissCartContent(
     basket: Basket,
-    addMoreProduct: () -> Unit,
     navigateToDetail: (String) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background)) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
-                .height(150.dp),
+                .height(200.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -246,7 +238,7 @@ fun DismissCartContent(
             Column(modifier = Modifier.weight(.4f)) {
                 Text(
                     basket.title,
-                    maxLines = 1,
+                    maxLines = 4,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -265,44 +257,44 @@ fun DismissCartContent(
                     style = MaterialTheme.typography.labelMedium
                 )
             }
-            Row(
-                modifier = Modifier.fillMaxHeight()
-                    .weight(.3f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Card(
-                    modifier = Modifier.size(25.dp),
-                    shape = MaterialTheme.shapes.small,
-                    onClick = {},
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                ) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("-")
-                    }
-                }
-                Spacer_4dp()
-                Text(basket.count.toString())
-                Spacer_4dp()
-                Card(
-                    modifier = Modifier.size(25.dp),
-                    shape = MaterialTheme.shapes.small,
-                    onClick = {
-                        addMoreProduct()
-                    },
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.background
-                    )
-                ) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(
-                            "+",
-                        )
-                    }
-                }
-
-            }
+//            Row(
+//                modifier = Modifier.fillMaxHeight()
+//                    .weight(.3f),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.Center
+//            ) {
+//                Card(
+//                    modifier = Modifier.size(25.dp),
+//                    shape = MaterialTheme.shapes.small,
+//                    onClick = {},
+//                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+//                ) {
+//                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                        Text("-")
+//                    }
+//                }
+//                Spacer_4dp()
+//                Text(basket.count.toString())
+//                Spacer_4dp()
+//                Card(
+//                    modifier = Modifier.size(25.dp),
+//                    shape = MaterialTheme.shapes.small,
+//                    onClick = {
+//                        addMoreProduct()
+//                    },
+//                    colors = CardDefaults.cardColors(
+//                        containerColor = MaterialTheme.colorScheme.primary,
+//                        contentColor = MaterialTheme.colorScheme.background
+//                    )
+//                ) {
+//                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                        Text(
+//                            "+",
+//                        )
+//                    }
+//                }
+//
+//            }
         }
         HorizontalDivider(modifier = Modifier.fillMaxWidth())
     }
@@ -320,13 +312,14 @@ fun constructSelections(selections: List<Selection>): String {
     return selectionDescriptions.joinToString("\n")
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
 fun DismissBackground(dismissState: SwipeToDismissBoxState) {
-    val color = MaterialTheme.colorScheme.primary.copy(alpha = .2f)
-    val direction = dismissState.dismissDirection
-
+    val color = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+        Red.copy(alpha = .2f)
+    } else {
+        MaterialTheme.colorScheme.primary.copy(alpha = .2f)
+    }
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -335,11 +328,14 @@ fun DismissBackground(dismissState: SwipeToDismissBoxState) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.End
     ) {
-        if (direction == SwipeToDismissBoxValue.EndToStart) Icon(
-            Icons.Default.Delete,
-            tint = MaterialTheme.colorScheme.primary,
-            contentDescription = stringResource(Res.string.delete)
-        )
+        if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+            Icon(
+                Icons.Default.Delete,
+                tint = Red,
+                contentDescription = stringResource(Res.string.delete),
+                modifier = Modifier.size(48.dp)
+            )
+        }
         Spacer(modifier = Modifier)
     }
 }
