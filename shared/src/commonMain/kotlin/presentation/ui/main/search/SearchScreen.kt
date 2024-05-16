@@ -152,7 +152,7 @@ fun SearchScreen(
                         contentPadding = PaddingValues(16.dp)
                     ) {
                         items(
-                            // Implement a better regex find mechanizm TAMIR
+                            // TODO Implement a better regex find mechanizm
                             state.search.products.filter { it.title.contains(state.searchText) },
                             key = {
                                 it.id

@@ -230,9 +230,9 @@ fun CheckoutButtonBox(
             DefaultButton(
                 modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
                 text = stringResource(Res.string.save_spec),
-                enabled = firstName.isNotEmpty() && lastName.isNotEmpty() && customerID.isEmpty() && customerID.isNotEmpty() || isValidCustomerId(
+                enabled = firstName.isNotEmpty() && lastName.isNotEmpty() && (customerID.isEmpty() || isValidCustomerId(
                     customerID
-                )
+                ))
             ) {
                 onClick()
             }
@@ -240,8 +240,8 @@ fun CheckoutButtonBox(
     }
 }
 
+// TODO(Replace with regex from customer config file)
 val regex = Regex("^(|[45]\\d{7})$")
-
 fun isValidCustomerId(customerId: String): Boolean {
     return regex.matches(customerId)
 }
