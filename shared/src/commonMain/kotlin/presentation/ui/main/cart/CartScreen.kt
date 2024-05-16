@@ -46,6 +46,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import business.datasource.network.main.responses.ColorSelectable
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.Selection
@@ -65,9 +66,8 @@ import presentation.ui.main.cart.view_model.CartEvent
 import presentation.ui.main.cart.view_model.CartState
 import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.basket_is_empty
+import shoping_by_kmp.shared.generated.resources.continued
 import shoping_by_kmp.shared.generated.resources.delete
-import shoping_by_kmp.shared.generated.resources.save_spec
-import shoping_by_kmp.shared.generated.resources.total_cost
 
 
 @OptIn(ExperimentalResourceApi::class)
@@ -122,6 +122,7 @@ fun CartScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
+                            fontSize = 30.sp,
                             text = stringResource(Res.string.basket_is_empty),
                             style = MaterialTheme.typography.labelLarge,
                             color = BorderColor,
@@ -150,20 +151,20 @@ fun ProceedButtonBox(totalCost: String, onClick: () -> Unit) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(stringResource(Res.string.total_cost), style = MaterialTheme.typography.titleMedium)
-                Text(totalCost, style = MaterialTheme.typography.titleLarge)
-            }
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Text(stringResource(Res.string.total_cost), style = MaterialTheme.typography.titleMedium)
+//                Text(totalCost, style = MaterialTheme.typography.titleLarge)
+//            }
 
             Spacer_16dp()
 
             DefaultButton(
                 modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
-                text = stringResource(Res.string.save_spec)
+                text = stringResource(Res.string.continued)
             ) {
                 onClick()
             }

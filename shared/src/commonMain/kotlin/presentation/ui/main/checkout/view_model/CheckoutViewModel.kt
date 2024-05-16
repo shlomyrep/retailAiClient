@@ -69,12 +69,16 @@ class CheckoutViewModel(
             is CheckoutEvent.OnUpdateNetworkState -> {
                 onUpdateNetworkState(event.networkState)
             }
+
+            is CheckoutEvent.OnUpdateCustomerID -> onUpdateCustomerID(event.value)
+            is CheckoutEvent.OnUpdateFirstName -> onUpdateFirstName(event.value)
+            is CheckoutEvent.OnUpdateLastName -> onUpdateLastName(event.value)
         }
     }
 
 
     init {
-        getAddresses()
+//        getAddresses()
         getCart()
     }
 
@@ -169,6 +173,18 @@ class CheckoutViewModel(
 
         state.value =
             state.value.copy(totalCost = state.value.totalBasket + state.value.selectedShipping.price)
+    }
+
+    private fun onUpdateCustomerID(value: String) {
+        state.value = state.value.copy(customerID = value)
+    }
+
+    private fun onUpdateFirstName(value: String) {
+        state.value = state.value.copy(firstName = value)
+    }
+
+    private fun onUpdateLastName(value: String) {
+        state.value = state.value.copy(lastName = value)
     }
 
     private fun onUpdateSelectedShipping(value: ShippingType) {

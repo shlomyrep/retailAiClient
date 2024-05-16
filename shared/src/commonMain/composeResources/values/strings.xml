@@ -33,7 +33,7 @@
     <string name="delete">מחק</string>
     <string name="total_cost">סה״כ</string>
     <string name="save_spec">שמור מפרט</string>
-    <string name="basket_is_empty">הסל ריק!</string>
+    <string name="basket_is_empty">מפרט ריק!</string>
     <string name="active">פעיל</string>
     <string name="כשןךקג">בוטל</string>
     <string name="success">הושלמה</string>
@@ -100,5 +100,11 @@
     <string name="name">שם</string>
     <string name="enter_valid_password">סיסמה לא תקינה</string>
     <string name="enter_valid_email">יש להזין כתובת אימייל תקינה</string>
-    <string name="sign_in">להתחבר</string>
+    <string name="sign_in">התחבר</string>
+    <string name="continued">המשך</string>
+    <string name="spec_info">פרטי מפרט</string>
+    <string name="first_name">שם פרטי</string>
+    <string name="last_name">שם משפחה</string>
+    <string name="customer_id">מספר לקוח</string>
+
 </resources>

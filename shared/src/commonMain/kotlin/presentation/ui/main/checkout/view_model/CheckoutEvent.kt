@@ -13,6 +13,9 @@ sealed class CheckoutEvent {
     data class OnUpdateSelectShippingDialogState(val value: UIComponentState) : CheckoutEvent()
 
     data class OnUpdateSelectedAddress(val value: Address) : CheckoutEvent()
+    data class OnUpdateFirstName(val value: String) : CheckoutEvent()
+    data class OnUpdateLastName(val value: String) : CheckoutEvent()
+    data class OnUpdateCustomerID(val value: String) : CheckoutEvent()
 
     data object BuyProduct : CheckoutEvent()
 
