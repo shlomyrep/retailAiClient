@@ -182,7 +182,7 @@ fun CheckoutButtonBox(
             DefaultButton(
                 modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
                 text = stringResource(Res.string.submit),
-                enabled = selectedAddress != Address()
+                enabled =true
             ) {
                 onClick()
             }

@@ -66,7 +66,7 @@ import presentation.ui.main.cart.view_model.CartState
 import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.basket_is_empty
 import shoping_by_kmp.shared.generated.resources.delete
-import shoping_by_kmp.shared.generated.resources.proceed_to_checkout
+import shoping_by_kmp.shared.generated.resources.save_spec
 import shoping_by_kmp.shared.generated.resources.total_cost
 
 
@@ -163,7 +163,7 @@ fun ProceedButtonBox(totalCost: String, onClick: () -> Unit) {
 
             DefaultButton(
                 modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
-                text = stringResource(Res.string.proceed_to_checkout)
+                text = stringResource(Res.string.save_spec)
             ) {
                 onClick()
             }
