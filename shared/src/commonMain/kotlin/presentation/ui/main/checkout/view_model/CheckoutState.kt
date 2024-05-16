@@ -10,6 +10,7 @@ import business.domain.main.ShippingType
 
 data class CheckoutState(
     val buyingSuccess: Boolean = false,
+    val cartId: String = "",
     val totalCost: Int = 0,
     val totalBasket: Int = 0,
     val addresses: List<Address> = listOf(),

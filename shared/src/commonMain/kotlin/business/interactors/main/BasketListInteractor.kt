@@ -9,10 +9,12 @@ import business.core.ProgressBarState
 import business.datasource.network.main.MainService
 import business.datasource.network.main.responses.toBasket
 import business.domain.main.Basket
+import business.domain.main.SalesMan
 import business.util.createException
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
 
 class BasketListInteractor(
     private val service: MainService,
@@ -28,12 +30,13 @@ class BasketListInteractor(
 
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
 
+            val jsonSalesMan = appDataStoreManager.readValue(DataStoreKeys.SALES_MAN)
+            val user = jsonSalesMan?.let { Json.decodeFromString(SalesMan.serializer(), it) }
 
             val apiResponse = service.basket(
-                token = token
+                token = token,
+                salesMan = user ?: SalesMan()
             )
-
-
 
             if (apiResponse.status == false) {
                 throw Exception(

@@ -22,6 +22,7 @@ import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
 import business.datasource.network.main.responses.Order
 import business.datasource.network.main.responses.OrderResponse
+import business.domain.main.SalesMan
 import common.toBytes
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -62,8 +63,7 @@ class MainServiceImpl(
 
     override suspend fun buyProduct(
         token: String,
-        addressId: Int,
-        shippingType: Int
+        salesMan: SalesMan
     ): MainGenericResponse<JRNothing> {
         return httpClient.post {
             url {
@@ -76,8 +76,7 @@ class MainServiceImpl(
             contentType(ContentType.Application.Json)
             setBody(
                 BuyRequestDTO(
-                    addressId = addressId,
-                    shippingType = shippingType
+                    salesMan = salesMan
                 )
             )
         }.body()
@@ -265,7 +264,10 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun basket(token: String): MainGenericResponse<List<BasketDTO>> {
+    override suspend fun basket(
+        token: String,
+        salesMan: SalesMan
+    ): MainGenericResponse<List<BasketDTO>> {
         return httpClient.get {
             url {
                 headers {
@@ -273,6 +275,7 @@ class MainServiceImpl(
                 }
                 takeFrom(BASE_URL)
                 encodedPath += MainService.BASKET
+                parameters.append("sales", salesMan.erpID)
             }
             contentType(ContentType.Application.Json)
         }.body()
@@ -280,6 +283,7 @@ class MainServiceImpl(
 
     override suspend fun basketAdd(
         token: String,
+        salesMan: SalesMan,
         id: ProductSelectable,
         count: Int
     ): MainGenericResponse<JRNothing?> {
@@ -292,7 +296,14 @@ class MainServiceImpl(
                 encodedPath += MainService.BASKET_ADD
             }
             contentType(ContentType.Application.Json)
-            setBody(BasketAddRequestDTO(count = count, productId = id.id, selections = id.selections))
+            setBody(
+                BasketAddRequestDTO(
+                    count = count,
+                    productId = id.id,
+                    selections = id.selections,
+                    user = salesMan
+                )
+            )
         }.body()
     }
 
@@ -323,7 +334,10 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun product(token: String, id: String): MainGenericResponse<ProductSelectable> {
+    override suspend fun product(
+        token: String,
+        id: String
+    ): MainGenericResponse<ProductSelectable> {
         return httpClient.get {
             url {
                 headers {
@@ -337,7 +351,10 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun productBySku(token: String, sku: String): MainGenericResponse<ProductSelectable> {
+    override suspend fun productBySku(
+        token: String,
+        sku: String
+    ): MainGenericResponse<ProductSelectable> {
         return httpClient.get {
             url {
                 headers {
@@ -351,7 +368,11 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun productInventory(token: String, supplierId: String, sku: String): HeldInventoryBatchDTO {
+    override suspend fun productInventory(
+        token: String,
+        supplierId: String,
+        sku: String
+    ): HeldInventoryBatchDTO {
         return httpClient.get {
             headers {
                 append(HttpHeaders.Authorization, token)
@@ -365,7 +386,10 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun sendSpecProducts(token: String, order: Order): MainGenericResponse<OrderResponse> {
+    override suspend fun sendSpecProducts(
+        token: String,
+        order: Order
+    ): MainGenericResponse<OrderResponse> {
         return httpClient.post {
             url {
                 headers {
@@ -380,7 +404,12 @@ class MainServiceImpl(
 
 
     @OptIn(InternalAPI::class)
-    override suspend fun uploadImage(token: String, bitmap: ImageBitmap, sku: String, productId: String): AddImageResult {
+    override suspend fun uploadImage(
+        token: String,
+        bitmap: ImageBitmap,
+        sku: String,
+        productId: String
+    ): AddImageResult {
         val imageUrl = "$BASE_URL/product/picture/$productId?sku=$sku"
         return httpClient.post {
             url(imageUrl)
@@ -393,7 +422,10 @@ class MainServiceImpl(
                         "picture",
                         bitmap.toBytes(),
                         Headers.build {
-                            append(HttpHeaders.ContentDisposition, "form-data; name=\"picture\"; filename=\"image.jpg\"")
+                            append(
+                                HttpHeaders.ContentDisposition,
+                                "form-data; name=\"picture\"; filename=\"image.jpg\""
+                            )
                             append(HttpHeaders.ContentType, "image/jpeg")
                         }
                     )

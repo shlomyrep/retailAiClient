@@ -16,6 +16,7 @@ import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
 import business.datasource.network.main.responses.Order
 import business.datasource.network.main.responses.OrderResponse
+import business.domain.main.SalesMan
 
 interface MainService {
     companion object {
@@ -43,8 +44,7 @@ interface MainService {
 
     suspend fun buyProduct(
         token: String,
-        addressId: Int,
-        shippingType: Int,
+        salesMan: SalesMan,
     ): MainGenericResponse<JRNothing>
 
     suspend fun getAddresses(
@@ -93,17 +93,34 @@ interface MainService {
         image: ByteArray?,
     ): MainGenericResponse<Boolean>
 
-    suspend fun basket(token: String): MainGenericResponse<List<BasketDTO>>
-    suspend fun basketAdd(token: String, id: ProductSelectable, count: Int): MainGenericResponse<JRNothing?>
+    suspend fun basket(token: String, salesMan: SalesMan): MainGenericResponse<List<BasketDTO>>
+    suspend fun basketAdd(
+        token: String,
+        salesMan: SalesMan,
+        id: ProductSelectable,
+        count: Int
+    ): MainGenericResponse<JRNothing?>
+
     suspend fun basketDelete(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun home(token: String): MainGenericResponse<HomeDTO>
-    suspend fun productBySku(token: String,sku:String): MainGenericResponse<ProductSelectable>
+    suspend fun productBySku(token: String, sku: String): MainGenericResponse<ProductSelectable>
     suspend fun product(token: String, id: String): MainGenericResponse<ProductSelectable>
 
     suspend fun sendSpecProducts(token: String, order: Order): MainGenericResponse<OrderResponse>
 
-    suspend fun productInventory(token: String, supplierId :String,sku: String): HeldInventoryBatchDTO
-    suspend fun uploadImage(token: String,bitmap: ImageBitmap, sku: String, productId: String): AddImageResult
+    suspend fun productInventory(
+        token: String,
+        supplierId: String,
+        sku: String
+    ): HeldInventoryBatchDTO
+
+    suspend fun uploadImage(
+        token: String,
+        bitmap: ImageBitmap,
+        sku: String,
+        productId: String
+    ): AddImageResult
+
     suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun wishlist(
         token: String,
