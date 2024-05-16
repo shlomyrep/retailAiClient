@@ -20,8 +20,9 @@ import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
-import business.datasource.network.main.responses.Order
-import business.datasource.network.main.responses.OrderResponse
+import business.domain.main.Order
+import business.domain.main.OrderResponse
+import business.domain.main.Quote
 import business.domain.main.SalesMan
 import common.toBytes
 import io.ktor.client.HttpClient
@@ -397,7 +398,7 @@ class MainServiceImpl(
 
     override suspend fun sendSpecProducts(
         token: String,
-        order: Order
+        quote: Quote
     ): MainGenericResponse<OrderResponse> {
         return httpClient.post {
             url {
@@ -407,7 +408,7 @@ class MainServiceImpl(
                 takeFrom(BASE_URL + "api/product/mail")
             }
             contentType(ContentType.Application.Json)
-            setBody(order)
+            setBody(quote)
         }.body()
     }
 
