@@ -45,6 +45,9 @@ interface MainService {
     suspend fun buyProduct(
         token: String,
         salesMan: SalesMan,
+        customerFirstName: String,
+        customerLastName: String,
+        customerId: String
     ): MainGenericResponse<JRNothing>
 
     suspend fun getAddresses(

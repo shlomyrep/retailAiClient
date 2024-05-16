@@ -63,7 +63,10 @@ class MainServiceImpl(
 
     override suspend fun buyProduct(
         token: String,
-        salesMan: SalesMan
+        salesMan: SalesMan,
+        customerFirstName: String,
+        customerLastName: String,
+        customerId: String
     ): MainGenericResponse<JRNothing> {
         return httpClient.post {
             url {
@@ -76,7 +79,10 @@ class MainServiceImpl(
             contentType(ContentType.Application.Json)
             setBody(
                 BuyRequestDTO(
-                    salesMan = salesMan
+                    salesMan = salesMan,
+                    firstName = customerFirstName,
+                    lastName = customerLastName,
+                    customerId = customerId
                 )
             )
         }.body()

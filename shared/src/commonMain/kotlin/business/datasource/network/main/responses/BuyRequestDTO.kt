@@ -7,7 +7,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BuyRequestDTO(
-    @SerialName("address_id") val addressId: Int = 0,
-    @SerialName("shipping_type") val shippingType: Int = 0,
+    @SerialName("first_name") val firstName: String = "",
+    @SerialName("last_name") val lastName: String = "",
+    @SerialName("customer_id") val customerId: String = "",
     @SerialName("sales_man") val salesMan: SalesMan,
 )

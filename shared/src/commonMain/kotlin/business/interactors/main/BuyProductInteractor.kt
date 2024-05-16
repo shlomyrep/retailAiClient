@@ -20,8 +20,9 @@ class BuyProductInteractor(
 
 
     fun execute(
-        addressId: Int,
-        shippingType: Int,
+        firstName: String,
+        lastName: String,
+        customerId: String,
     ): Flow<DataState<Boolean>> = flow {
 
         try {
@@ -34,7 +35,10 @@ class BuyProductInteractor(
 
             val apiResponse = service.buyProduct(
                 token = token,
-                user ?: SalesMan()
+                salesMan = user ?: SalesMan(),
+                customerId = customerId,
+                customerLastName = lastName,
+                customerFirstName = firstName
             )
 
 

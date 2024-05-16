@@ -84,8 +84,9 @@ class CheckoutViewModel(
 
     private fun buyProduct() {
         buyProductInteractor.execute(
-            addressId = state.value.selectedAddress.id,
-            shippingType = shippingType_global.indexOf(state.value.selectedShipping)
+            firstName = state.value.firstName,
+            lastName = state.value.lastName,
+            customerId = state.value.customerID
         ).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {
