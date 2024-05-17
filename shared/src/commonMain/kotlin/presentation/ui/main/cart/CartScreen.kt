@@ -1,5 +1,6 @@
 package presentation.ui.main.cart
 
+import ExpandingText
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeOut
@@ -41,13 +42,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import business.datasource.network.main.responses.ColorSelectable
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
+import business.datasource.network.main.responses.getCustomizationSteps
 import business.domain.main.Basket
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
@@ -64,8 +71,11 @@ import presentation.ui.main.cart.view_model.CartEvent
 import presentation.ui.main.cart.view_model.CartState
 import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.basket_is_empty
+import shoping_by_kmp.shared.generated.resources.cm
+import shoping_by_kmp.shared.generated.resources.color
 import shoping_by_kmp.shared.generated.resources.continued
 import shoping_by_kmp.shared.generated.resources.delete
+import shoping_by_kmp.shared.generated.resources.supplier
 
 
 @OptIn(ExperimentalResourceApi::class)
@@ -77,7 +87,6 @@ fun CartScreen(
     navigateToCheckout: () -> Unit,
 ) {
 
-
     DefaultScreenUI(
         queue = state.errorQueue,
         onRemoveHeadFromQueue = { events(CartEvent.OnRemoveHeadFromQueue) },
@@ -87,8 +96,7 @@ fun CartScreen(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().align(Alignment.Center)
-                    .padding(bottom = 100.dp) // Adjust this value as needed to accommodate the floating button area
+                modifier = Modifier.fillMaxSize().align(Alignment.Center).padding(bottom = 100.dp)
             ) {
                 items(state.baskets) {
                     CartBox(
@@ -250,12 +258,19 @@ fun DismissCartContent(
                     style = MaterialTheme.typography.bodySmall
                 )
                 Spacer_4dp()
-                Text(
-                    constructSelections(basket.product.selections),
-                    maxLines = 5,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.labelMedium
-                )
+                val productDescription = getProductDescription(basket.product)
+                ExpandingText(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    text = productDescription,
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 16.sp)
+
+                ) {}
+//                Text(
+//                    constructSelections(basket.product.selections),
+//                    maxLines = 5,
+//                    overflow = TextOverflow.Ellipsis,
+//                    style = MaterialTheme.typography.labelMedium
+//                )
             }
 //            Row(
 //                modifier = Modifier.fillMaxHeight()
@@ -337,6 +352,67 @@ fun DismissBackground(dismissState: SwipeToDismissBoxState) {
             )
         }
         Spacer(modifier = Modifier)
+    }
+}
+
+@Composable
+@OptIn(ExperimentalResourceApi::class)
+fun getProductDescription(product: ProductSelectable): AnnotatedString {
+
+    return buildAnnotatedString {
+        if (product.supplier.companyName?.isNotEmpty() == true) {
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append(stringResource(Res.string.supplier) + ": ")
+            }
+            append("${product.supplier.companyName}\n")
+        }
+
+        val customizationSteps = getCustomizationSteps(
+            product = product, originalProduct = product
+        )
+        println("TAMIRRRR --> ${customizationSteps.size}")
+        customizationSteps.forEach { selection ->
+            println("TAMIRRRR --> ${selection.selector?.selectionDesc}")
+        }
+        customizationSteps.map { selection ->
+            when (val selected = selection.selector?.selected) {
+                is ColorSelectable -> {
+                    selected.name?.let { color ->
+                        if (color.isNotEmpty()) {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append(stringResource(Res.string.color) + ": ")
+                            }
+                            append("$color\n")
+                        }
+                    }
+                }
+
+                is ProductSelectable -> {
+                    if (selected.name.isNotEmpty()) {
+                        val selectionDesc = selection.selector.selectionDesc ?: ""
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append("$selectionDesc: ")
+                        }
+                        append("${selected.name}\n")
+                    } else {
+                        println("selected name is Empty")
+                    }
+                }
+
+                is SizeSelectable -> {
+                    selected.size?.let { size ->
+                        if (size.isNotEmpty() && size != "0") {
+                            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                append("${selection.selector.selectionDesc}: ")
+                            }
+                            append("$size ${stringResource(Res.string.cm)}\n")
+                        }
+                    }
+                }
+
+                null -> {}
+            }
+        }
     }
 }
 
