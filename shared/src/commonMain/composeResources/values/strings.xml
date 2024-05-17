@@ -28,7 +28,6 @@
     <string name="price">מחיר</string>
     <string name="home">בית</string>
     <string name="wishlist">מועדפים</string>
-    <string name="profile">איזור אישי</string>
     <string name="cart">עגלת</string>
     <string name="delete">מחק</string>
     <string name="total_cost">סה״כ</string>
@@ -103,8 +102,8 @@
     <string name="sign_in">התחבר</string>
     <string name="continued">המשך</string>
     <string name="spec_info">פרטי מפרט</string>
+    <string name="spec">מפרט</string>
     <string name="first_name">שם פרטי</string>
     <string name="last_name">שם משפחה</string>
     <string name="customer_id">מספר לקוח</string>
-
 </resources>

@@ -75,6 +75,7 @@ import shoping_by_kmp.shared.generated.resources.cm
 import shoping_by_kmp.shared.generated.resources.color
 import shoping_by_kmp.shared.generated.resources.continued
 import shoping_by_kmp.shared.generated.resources.delete
+import shoping_by_kmp.shared.generated.resources.spec
 import shoping_by_kmp.shared.generated.resources.supplier
 
 
@@ -92,6 +93,7 @@ fun CartScreen(
         onRemoveHeadFromQueue = { events(CartEvent.OnRemoveHeadFromQueue) },
         progressBarState = state.progressBarState,
         networkState = state.networkState,
+        titleToolbar = stringResource(Res.string.spec),
         onTryAgain = { events(CartEvent.OnRetryNetwork) }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
