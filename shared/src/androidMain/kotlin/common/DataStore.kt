@@ -25,11 +25,13 @@ actual suspend fun Context.putData(key: String, `object`: String) {
     }
 }
 
-actual fun Context.openNativeScreen(onScanResult: (String) -> Unit) {
+actual fun Context.openNativeScreen(skuRegex: String, onScanResult: (String) -> Unit) {
     ScannerOpenerBridge.handleScanResult = onScanResult
 
-    val intent = Intent(this, ScannerActivity::class.java)
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    val intent = Intent(this, ScannerActivity::class.java).apply {
+        putExtra("SKU_REGEX", skuRegex)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
     startActivity(intent)
 }
 

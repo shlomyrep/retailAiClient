@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.flow
 class HomeInteractor(
     private val service: MainService,
     private val appDataStoreManager: AppDataStore,
- ) {
+) {
 
 
     fun execute(): Flow<DataState<Home>> = flow {
@@ -28,17 +28,19 @@ class HomeInteractor(
 
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
 
-
             val apiResponse = service.home(token = token)
-
-
 
             if (apiResponse.status == false || apiResponse.result == null) {
                 throw Exception(
                     apiResponse.alert?.createException()
                 )
             }
-
+//            val settingsResult = apiResponse.result?.settings
+//
+//            if (settingsResult != null) {
+//                val jsonSettings = Json.encodeToString(Settings.serializer(), settingsResult)
+//                appDataStoreManager.setValue(DataStoreKeys.SETTINGS, jsonSettings)
+//            }
 
             val result = apiResponse.result?.toHome()
 

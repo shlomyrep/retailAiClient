@@ -12,6 +12,6 @@ interface AppDataStore {
         key: String,
     ): String?
 
-    fun openActivity(onScanResult: (String) -> Unit)
+    fun openActivity(skuRegex: String,onScanResult: (String) -> Unit)
     fun openPdfUrl(url:String)
 }

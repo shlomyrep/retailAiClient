@@ -16,8 +16,8 @@ actual suspend inline fun Context.getData(key: String): String? {
 }
 
 
-actual fun Context.openNativeScreen(onScanResult: (String) -> Unit) {
-    ScannerOpenerBridge.openScannerScreenFunc?.invoke()
+actual fun Context.openNativeScreen(skuRegex: String, onScanResult: (String) -> Unit) {
+    ScannerOpenerBridge.openScannerScreenFunc?.invoke(skuRegex)
     ScannerOpenerBridge.handleScanResult = onScanResult
     NSLog("TAMIR IOS --> Scan result back in common: $onScanResult")
 }
