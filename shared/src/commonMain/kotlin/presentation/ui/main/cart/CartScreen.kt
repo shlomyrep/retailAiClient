@@ -371,7 +371,7 @@ fun DismissCartContent(
                                         basket.product.roomName = roomName
                                         events(CartEvent.AddProduct(basket.product))
                                         expanded = false
-                                        focusManager.clearFocus() // Clear focus from TextField
+                                        focusManager.clearFocus()
                                     },
                                     text = { Text(roomName) }
                                 )
@@ -460,10 +460,6 @@ fun getProductDescription(product: ProductSelectable): AnnotatedString {
         val customizationSteps = getCustomizationSteps(
             product = product, originalProduct = product
         )
-        println("TAMIRRRR --> ${customizationSteps.size}")
-        customizationSteps.forEach { selection ->
-            println("TAMIRRRR --> ${selection.selector?.selectionDesc}")
-        }
         customizationSteps.map { selection ->
             when (val selected = selection.selector?.selected) {
                 is ColorSelectable -> {

@@ -187,7 +187,7 @@ class DetailViewModel(
     }
 
     private fun addBasket(id: ProductSelectable) {
-        addBasketInteractor.execute(productSelectable = id, 1).onEach { dataState ->
+        addBasketInteractor.execute(productSelectable = id).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {}
                 is DataState.Response -> {
@@ -430,8 +430,8 @@ class DetailViewModel(
     private fun getPrice(product: ProductSelectable, useUpgradePrice: Boolean = false): Int {
         return when (product.priceType) {
             PriceType.SINGLE_PRICE.toString() -> {
-                if (useUpgradePrice) product.upgradePrice?.toInt() ?: 0
-                else product.basePrice?.toInt() ?: 0
+                if (useUpgradePrice) product.upgradePrice.toInt() ?: 0
+                else product.basePrice.toInt() ?: 0
             }
 
             PriceType.SIZES_PRICE.toString() -> {

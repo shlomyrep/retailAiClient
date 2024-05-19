@@ -4,6 +4,7 @@ package business.interactors.main
 import business.constants.DataStoreKeys
 import business.core.AppDataStore
 import business.core.DataState
+import business.core.NetworkState
 import business.core.ProgressBarState
 import business.core.UIComponent
 import business.datasource.network.main.MainService
@@ -20,9 +21,9 @@ class AddBasketInteractor(
 ) {
 
 
-    fun execute(productSelectable: ProductSelectable, count: Int): Flow<DataState<Boolean>> = flow {
+    fun execute(productSelectable: ProductSelectable): Flow<DataState<Boolean>> = flow {
         try {
-            emit(DataState.Loading(progressBarState = ProgressBarState.FullScreenLoading))
+            emit(DataState.Loading(progressBarState = ProgressBarState.LoadingWithLogo))
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
 
             val jsonSalesMan = appDataStoreManager.readValue(DataStoreKeys.SALES_MAN)
@@ -31,7 +32,6 @@ class AddBasketInteractor(
             val apiResponse = service.basketAdd(
                 token = token,
                 productSelectable = productSelectable,
-                count = count,
                 salesMan = user ?: SalesMan()
             )
             apiResponse.alert?.let { alert ->
@@ -43,6 +43,7 @@ class AddBasketInteractor(
                     )
                 )
             }
+            emit(DataState.NetworkStatus(NetworkState.Good))
             emit(DataState.Data(apiResponse.status))
 
         } catch (e: Exception) {
