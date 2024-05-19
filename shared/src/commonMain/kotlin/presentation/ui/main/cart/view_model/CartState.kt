@@ -9,6 +9,7 @@ import business.domain.main.Basket
 data class CartState(
     val baskets: List<Basket> = listOf(),
     val totalCost: String = "",
+    val roomName: String = "",
     val progressBarState: ProgressBarState = ProgressBarState.Idle,
     val networkState: NetworkState = NetworkState.Good,
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf()),

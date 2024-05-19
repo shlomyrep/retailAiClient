@@ -6,24 +6,29 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -32,8 +37,10 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,17 +49,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import business.datasource.network.main.responses.ColorSelectable
 import business.datasource.network.main.responses.ProductSelectable
-import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
 import business.datasource.network.main.responses.getCustomizationSteps
 import business.domain.main.Basket
@@ -61,11 +71,11 @@ import org.jetbrains.compose.resources.stringResource
 import presentation.component.DEFAULT__BUTTON_SIZE
 import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
-import presentation.component.Spacer_16dp
-import presentation.component.Spacer_4dp
+import presentation.component.Spacer_8dp
 import presentation.component.noRippleClickable
 import presentation.component.rememberCustomImagePainter
 import presentation.theme.BorderColor
+import presentation.theme.DefaultTextFieldTheme
 import presentation.theme.Red
 import presentation.ui.main.cart.view_model.CartEvent
 import presentation.ui.main.cart.view_model.CartState
@@ -75,6 +85,23 @@ import shoping_by_kmp.shared.generated.resources.cm
 import shoping_by_kmp.shared.generated.resources.color
 import shoping_by_kmp.shared.generated.resources.continued
 import shoping_by_kmp.shared.generated.resources.delete
+import shoping_by_kmp.shared.generated.resources.general_bath
+import shoping_by_kmp.shared.generated.resources.general_bath_first_floor
+import shoping_by_kmp.shared.generated.resources.general_bath_sanitary_fixtures
+import shoping_by_kmp.shared.generated.resources.general_bathroom
+import shoping_by_kmp.shared.generated.resources.general_flooring
+import shoping_by_kmp.shared.generated.resources.general_room_text
+import shoping_by_kmp.shared.generated.resources.guest_shower_ground_floor
+import shoping_by_kmp.shared.generated.resources.guest_toilet
+import shoping_by_kmp.shared.generated.resources.guest_toilet_sanitary_fixtures
+import shoping_by_kmp.shared.generated.resources.it_corner
+import shoping_by_kmp.shared.generated.resources.kitchen
+import shoping_by_kmp.shared.generated.resources.living_kitchen_and_passages
+import shoping_by_kmp.shared.generated.resources.parents_bathroom
+import shoping_by_kmp.shared.generated.resources.parents_shower
+import shoping_by_kmp.shared.generated.resources.parents_shower_first_floor
+import shoping_by_kmp.shared.generated.resources.parents_shower_sanitary_fixtures
+import shoping_by_kmp.shared.generated.resources.room_name_header_text
 import shoping_by_kmp.shared.generated.resources.spec
 import shoping_by_kmp.shared.generated.resources.supplier
 
@@ -102,6 +129,7 @@ fun CartScreen(
             ) {
                 items(state.baskets) {
                     CartBox(
+                        state,
                         it,
                         navigateToDetail = navigateToDetail
                     ) {
@@ -112,9 +140,7 @@ fun CartScreen(
 
             if (state.baskets.isNotEmpty()) {
                 Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
-                    ProceedButtonBox(
-                        state.totalCost
-                    ) {
+                    ProceedButtonBox() {
                         navigateToCheckout()
                     }
                 }
@@ -134,16 +160,14 @@ fun CartScreen(
                     )
                 }
             }
-
-
         }
     }
 }
-//}
+
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun ProceedButtonBox(totalCost: String, onClick: () -> Unit) {
+fun ProceedButtonBox(onClick: () -> Unit) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -156,17 +180,8 @@ fun ProceedButtonBox(totalCost: String, onClick: () -> Unit) {
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
         ) {
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Text(stringResource(Res.string.total_cost), style = MaterialTheme.typography.titleMedium)
-//                Text(totalCost, style = MaterialTheme.typography.titleLarge)
-//            }
 
-            Spacer_16dp()
-
+            Spacer_8dp()
             DefaultButton(
                 modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
                 text = stringResource(Res.string.continued)
@@ -180,6 +195,7 @@ fun ProceedButtonBox(totalCost: String, onClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartBox(
+    state: CartState,
     basket: Basket,
     navigateToDetail: (String) -> Unit,
     deleteFromBasket: () -> Unit
@@ -207,6 +223,7 @@ fun CartBox(
             },
             content = {
                 DismissCartContent(
+                    state,
                     basket,
                     navigateToDetail = navigateToDetail
                 )
@@ -214,120 +231,150 @@ fun CartBox(
     }
 }
 
+@OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun DismissCartContent(
+    state: CartState,
     basket: Basket,
     navigateToDetail: (String) -> Unit
 ) {
+
+    val roomNames = listOf(
+        stringResource(Res.string.general_room_text),
+        stringResource(Res.string.general_bath),
+        stringResource(Res.string.parents_shower),
+        stringResource(Res.string.kitchen),
+        stringResource(Res.string.general_bathroom),
+        stringResource(Res.string.guest_toilet),
+        stringResource(Res.string.parents_bathroom),
+        stringResource(Res.string.general_bath_sanitary_fixtures),
+        stringResource(Res.string.parents_shower_sanitary_fixtures),
+        stringResource(Res.string.general_flooring),
+        stringResource(Res.string.parents_shower_first_floor),
+        stringResource(Res.string.it_corner),
+        stringResource(Res.string.guest_shower_ground_floor),
+        stringResource(Res.string.general_bath_first_floor),
+        stringResource(Res.string.living_kitchen_and_passages),
+        stringResource(Res.string.guest_toilet_sanitary_fixtures),
+
+    )
+
+    var expanded by remember { mutableStateOf(false) }
+    var selectedRoomName by remember { mutableStateOf("") }
+
+
     Column(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background)) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
-                .height(200.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-
             Box(
-                modifier = Modifier.fillMaxHeight().padding(vertical = 16.dp)
-                    .weight(.3f)
-                    .clip(MaterialTheme.shapes.small)
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.primary)
                     .noRippleClickable {
                         navigateToDetail(basket.product.id)
                     }
             ) {
                 Image(
                     painter = rememberCustomImagePainter(basket.image),
-                    null,
+                    contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
             }
 
-            Spacer_16dp()
+            Spacer(modifier = Modifier.width(16.dp))
 
-            Column(modifier = Modifier.weight(.4f)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 8.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.End
+            ) {
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    Box {
+                        TextField(
+                            value = selectedRoomName,
+                            onValueChange = { selectedRoomName = it },
+                            enabled = true,
+                            label = {
+                                Text(stringResource(Res.string.room_name_header_text))
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = DefaultTextFieldTheme(),
+                            shape = MaterialTheme.shapes.small,
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Next,
+                                keyboardType = KeyboardType.Text,
+                            ),
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = null,
+                                    modifier = Modifier.clickable { expanded = !expanded }
+                                )
+                            }
+                        )
+
+
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            roomNames.forEach { roomName ->
+                                DropdownMenuItem(
+                                    onClick = {
+                                        selectedRoomName = roomName
+                                        expanded = false
+                                    },
+                                    text = { Text(roomName) }
+                                )
+                            }
+                        }
+                    }
+                }
                 Text(
-                    basket.title,
-                    maxLines = 4,
+                    text = basket.title,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
+                    color = MaterialTheme.colorScheme.onBackground
                 )
-                Spacer_4dp()
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    basket.category.name,
+                    text = basket.category.name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall.copy(fontSize = 18.sp),
+                    color = MaterialTheme.colorScheme.onBackground
                 )
-                Spacer_4dp()
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 val productDescription = getProductDescription(basket.product)
                 ExpandingText(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     text = productDescription,
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 16.sp)
-
                 ) {}
-//                Text(
-//                    constructSelections(basket.product.selections),
-//                    maxLines = 5,
-//                    overflow = TextOverflow.Ellipsis,
-//                    style = MaterialTheme.typography.labelMedium
-//                )
             }
-//            Row(
-//                modifier = Modifier.fillMaxHeight()
-//                    .weight(.3f),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.Center
-//            ) {
-//                Card(
-//                    modifier = Modifier.size(25.dp),
-//                    shape = MaterialTheme.shapes.small,
-//                    onClick = {},
-//                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-//                ) {
-//                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                        Text("-")
-//                    }
-//                }
-//                Spacer_4dp()
-//                Text(basket.count.toString())
-//                Spacer_4dp()
-//                Card(
-//                    modifier = Modifier.size(25.dp),
-//                    shape = MaterialTheme.shapes.small,
-//                    onClick = {
-//                        addMoreProduct()
-//                    },
-//                    colors = CardDefaults.cardColors(
-//                        containerColor = MaterialTheme.colorScheme.primary,
-//                        contentColor = MaterialTheme.colorScheme.background
-//                    )
-//                ) {
-//                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                        Text(
-//                            "+",
-//                        )
-//                    }
-//                }
-//
-//            }
         }
+        Spacer(modifier = Modifier.height(8.dp))
+
         HorizontalDivider(modifier = Modifier.fillMaxWidth())
     }
 }
 
-fun constructSelections(selections: List<Selection>): String {
-    val selectionDescriptions = selections.mapNotNull { selection ->
-        when (val selected = selection.selector?.selected) {
-            is ColorSelectable -> selected.name
-            is ProductSelectable -> selected.name
-            is SizeSelectable -> if (selected.size == "0") "" else selected.size
-            else -> null
-        }
-    }
-    return selectionDescriptions.joinToString("\n")
-}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
