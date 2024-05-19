@@ -176,6 +176,7 @@ fun CheckoutScreen(
                         state.firstName,
                         state.lastName,
                         state.customerID,
+                        state.customerIdRegex
                     ) {
                         events(CheckoutEvent.BuyProduct)
                     }
@@ -193,6 +194,7 @@ fun CheckoutButtonBox(
     firstName: String,
     lastName: String,
     customerID: String,
+    customerIdRegex: String,
     onClick: () -> Unit
 ) {
 
@@ -231,7 +233,7 @@ fun CheckoutButtonBox(
                 modifier = Modifier.fillMaxWidth().height(DEFAULT__BUTTON_SIZE),
                 text = stringResource(Res.string.save_spec),
                 enabled = firstName.isNotEmpty() && lastName.isNotEmpty() && (customerID.isEmpty() || isValidCustomerId(
-                    customerID
+                    customerIdRegex, customerID
                 ))
             ) {
                 onClick()
@@ -241,8 +243,9 @@ fun CheckoutButtonBox(
 }
 
 // TODO(Replace with regex from customer config file)
-val regex = Regex("^(|[45]\\d{7})$")
-fun isValidCustomerId(customerId: String): Boolean {
+fun isValidCustomerId(customerIdRegex: String, customerId: String): Boolean {
+    val regex = Regex("^(|[45]\\d{7})$")
+//    val regex = Regex(customerIdRegex)
     return regex.matches(customerId)
 }
 

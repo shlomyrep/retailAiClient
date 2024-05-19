@@ -3,18 +3,23 @@ package presentation.ui.main.checkout.view_model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import business.constants.CUSTOM_TAG
+import business.constants.DataStoreKeys
+import business.core.AppDataStore
 import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
 import business.core.UIComponentState
 import business.domain.main.Address
+import business.domain.main.Settings
 import business.domain.main.ShippingType
 import business.interactors.main.BasketListInteractor
 import business.interactors.main.BuyProductInteractor
 import business.interactors.main.GetAddressesInteractor
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -29,6 +34,7 @@ class CheckoutViewModel(
     private val getAddressesInteractor: GetAddressesInteractor,
     private val basketListInteractor: BasketListInteractor,
     private val buyProductInteractor: BuyProductInteractor,
+    private val appDataStoreManager: AppDataStore
 ) : ViewModel() {
 
 
@@ -78,6 +84,7 @@ class CheckoutViewModel(
 
 
     init {
+        getCustomerIdRegex()
 //        getAddresses()
         getCart()
     }
@@ -220,6 +227,22 @@ class CheckoutViewModel(
         }
     }
 
+    private fun getCustomerIdRegex() {
+        viewModelScope.launch {
+            val jsonSettings = appDataStoreManager.readValue(DataStoreKeys.SETTINGS)
+            val settings = jsonSettings?.takeIf { it.isNotEmpty() }?.let {
+                try {
+                    Json.decodeFromString(Settings.serializer(), it)
+                } catch (e: Exception) {
+                    // Log the error and return null if deserialization fails
+                    null
+                }
+            }
+            val customerIdRegex = settings?.customerIdRegex ?: "^(|[45]\\d{7})$"
+            state.value = state.value.copy(customerIdRegex = customerIdRegex)
+        }
+    }
+
 
     private fun onRetryNetwork() {
         getAddresses()
@@ -229,6 +252,4 @@ class CheckoutViewModel(
     private fun onUpdateNetworkState(networkState: NetworkState) {
         state.value = state.value.copy(networkState = networkState)
     }
-
-
 }

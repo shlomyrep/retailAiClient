@@ -23,8 +23,8 @@ class AppDataStoreManager(val context: Context) : AppDataStore {
         return context.getData(key)
     }
 
-    override fun openActivity(onScanResult: (String) -> Unit) {
-        context.openNativeScreen(onScanResult)
+    override fun openActivity(skuRegex: String, onScanResult: (String) -> Unit) {
+        context.openNativeScreen(skuRegex,onScanResult)
     }
 
     override fun openPdfUrl(url: String) {

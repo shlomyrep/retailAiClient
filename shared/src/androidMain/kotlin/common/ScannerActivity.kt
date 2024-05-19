@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +39,7 @@ class ScannerActivity : AppCompatActivity() {
     private lateinit var previewView: PreviewView
     private lateinit var barcodeButtonContainer: LinearLayout
     private lateinit var progressBar: ProgressBar
-
+    private var skuRegex: String = ""
 
     companion object {
         const val CAMERA_PERMISSION_REQUEST_CODE = 101
@@ -51,6 +52,9 @@ class ScannerActivity : AppCompatActivity() {
         previewView = findViewById(R.id.previewView)
         barcodeButtonContainer = findViewById(R.id.barcodeButtonContainer)
         progressBar = findViewById(R.id.progressBar)
+
+        skuRegex = intent.getStringExtra("SKU_REGEX") as String
+        Log.i("TAMIRRRR", "onCreate: $skuRegex")
 
         if (allPermissionsGranted()) {
             startCamera()
@@ -138,7 +142,7 @@ class ScannerActivity : AppCompatActivity() {
     }
 
     private fun handleTextRecognitionResult(texts: com.google.mlkit.vision.text.Text) {
-        val nineDigitPattern = Regex("^\\d{9}$")
+        val nineDigitPattern = Regex(skuRegex)
         val matchedTexts = texts.textBlocks.mapNotNull { it.text }
             .filter { nineDigitPattern.matches(it) }
 

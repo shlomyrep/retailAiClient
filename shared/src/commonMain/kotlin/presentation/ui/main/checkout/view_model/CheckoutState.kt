@@ -18,6 +18,7 @@ data class CheckoutState(
     val firstName: String = "",
     val lastName: String = "",
     val customerID: String = "",
+    val customerIdRegex: String = "",
     val selectedShipping: ShippingType = shippingType_global.first(),
     val selectShippingDialogState: UIComponentState = UIComponentState.Hide,
     val progressBarState: ProgressBarState = ProgressBarState.Idle,

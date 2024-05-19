@@ -28,7 +28,6 @@
     <string name="price">מחיר</string>
     <string name="home">בית</string>
     <string name="wishlist">מועדפים</string>
-    <string name="profile">איזור אישי</string>
     <string name="cart">עגלת</string>
     <string name="delete">מחק</string>
     <string name="total_cost">סה״כ</string>
@@ -103,8 +102,27 @@
     <string name="sign_in">התחבר</string>
     <string name="continued">המשך</string>
     <string name="spec_info">פרטי מפרט</string>
+    <string name="spec">מפרט</string>
     <string name="first_name">שם פרטי</string>
     <string name="last_name">שם משפחה</string>
     <string name="customer_id">מספר לקוח</string>
+    <string name="room_name_header_text"> שם חדר:</string>
 
+    <!--    room names list-->
+    <string name="general_bath">אמבטיה כללית</string>
+    <string name="parents_shower">מקלחת הורים</string>
+    <string name="kitchen">מטבח</string>
+    <string name="general_bathroom">חדר רחצה כללי</string>
+    <string name="guest_toilet">שירותי אורחים</string>
+    <string name="parents_bathroom">חדר רחצה הורים</string>
+    <string name="general_bath_sanitary_fixtures">אמבטיה כללית כלים סניטרים</string>
+    <string name="parents_shower_sanitary_fixtures">מקלחת הורים כלים סניטרים</string>
+    <string name="general_flooring">ריצוף כללי</string>
+    <string name="parents_shower_first_floor">מקלחת הורים קומה א</string>
+    <string name="it_corner">פינת נט"י</string>
+    <string name="guest_shower_ground_floor">מקלחת אורחים ק.קרקע</string>
+    <string name="general_bath_first_floor">אמבטיה כללית קומה א</string>
+    <string name="living_kitchen_and_passages">סלון מטבח ומעברים</string>
+    <string name="guest_toilet_sanitary_fixtures">שירותי אורחים כלים סניטרים</string>
+    <string name="general_room_text">חדר כללי</string>
 </resources>

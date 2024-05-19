@@ -42,7 +42,6 @@ import shoping_by_kmp.shared.generated.resources.edit_profile
 import shoping_by_kmp.shared.generated.resources.help_center
 import shoping_by_kmp.shared.generated.resources.order
 import shoping_by_kmp.shared.generated.resources.orders
-import shoping_by_kmp.shared.generated.resources.profile
 import shoping_by_kmp.shared.generated.resources.profile2
 import shoping_by_kmp.shared.generated.resources.setting2
 import shoping_by_kmp.shared.generated.resources.settings
@@ -75,11 +74,7 @@ fun ProfileScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Spacer_16dp()
-
-                Text(stringResource(Res.string.profile), style = MaterialTheme.typography.titleLarge)
-
-                Spacer_16dp()
+                Spacer_32dp()
 
                 Image(
                     painter = rememberCustomImagePainter(state.profile.profileUrl),

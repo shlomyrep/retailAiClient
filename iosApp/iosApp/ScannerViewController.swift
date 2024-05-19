@@ -15,6 +15,7 @@ import Foundation
     var buttonsStackView: UIStackView!
     var numberOccurrencesMap = [String: Int]()
     var textRecognitionRequest: VNRecognizeTextRequest!
+    var skuRegex: String! 
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -144,9 +145,8 @@ import Foundation
     }
 
     private func handleTextRecognitionResults(_ texts: [String]) {
-        let nineDigitPattern = "^\\d{9}$"
-        let regex = try! NSRegularExpression(pattern: nineDigitPattern, options: [])
-
+        guard let skuRegex = skuRegex else { return } 
+        let regex = try! NSRegularExpression(pattern: skuRegex, options: [])
         for text in texts {
             let range = NSRange(location: 0, length: text.utf16.count)
             if regex.firstMatch(in: text, options: [], range: range) != nil {

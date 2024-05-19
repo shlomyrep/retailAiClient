@@ -3,18 +3,22 @@ package presentation.ui.main.home.view_model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import business.constants.CUSTOM_TAG
+import business.constants.DataStoreKeys
 import business.core.AppDataStore
 import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
+import business.domain.main.Settings
 import business.interactors.main.HomeInteractor
 import business.interactors.main.LikeInteractor
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.serialization.json.Json
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -223,8 +227,22 @@ class HomeViewModel(
     }
 
     fun openBarcodeScanner(navigateToDetail: (String, Boolean) -> Unit) {
-        appDataStoreManager.openActivity { result ->
-            navigateToDetail(result, true)
+        var skuRegex: String
+        viewModelScope.launch {
+            val jsonSettings = appDataStoreManager.readValue(DataStoreKeys.SETTINGS)
+            val settings = jsonSettings?.takeIf { it.isNotEmpty() }?.let {
+                try {
+                    Json.decodeFromString(Settings.serializer(), it)
+                } catch (e: Exception) {
+                    // Log the error and handle it gracefully
+                    null
+                }
+            }
+            skuRegex = settings?.skuRegex ?: "^\\d{9}$"
+            appDataStoreManager.openActivity(skuRegex) { result ->
+                navigateToDetail(result, true)
+            }
         }
     }
+
 }
