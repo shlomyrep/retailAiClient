@@ -42,7 +42,8 @@ data class ProductSelectable(
     @SerialName("filter") var filter: Map<String, FilterTags> = mutableMapOf(),
     @SerialName("tags") val tags: List<String> = mutableListOf(),
     @SerialName("final_sale") var finalSale: Int = FinalSale.ZERO.ordinal,
-    @SerialName("pdf_url") val pdfUrl: String = ""
+    @SerialName("pdf_url") val pdfUrl: String = "",
+    @SerialName("room_name") var roomName: String = ""
 ) : Selectable {
     companion object {
         const val type = "product"

@@ -1,8 +1,6 @@
 package business.datasource.network.main.responses
 
-import business.domain.main.Product
 import business.domain.main.SalesMan
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

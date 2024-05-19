@@ -103,7 +103,7 @@ interface MainService {
     suspend fun basketAdd(
         token: String,
         salesMan: SalesMan,
-        id: ProductSelectable,
+        productSelectable: ProductSelectable,
         count: Int
     ): MainGenericResponse<JRNothing?>
 

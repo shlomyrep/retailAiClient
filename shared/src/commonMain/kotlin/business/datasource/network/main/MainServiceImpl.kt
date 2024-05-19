@@ -291,7 +291,7 @@ class MainServiceImpl(
     override suspend fun basketAdd(
         token: String,
         salesMan: SalesMan,
-        id: ProductSelectable,
+        productSelectable: ProductSelectable,
         count: Int
     ): MainGenericResponse<JRNothing?> {
         return httpClient.post {
@@ -306,8 +306,8 @@ class MainServiceImpl(
             setBody(
                 BasketAddRequestDTO(
                     count = count,
-                    productId = id.id,
-                    selections = id.selections,
+                    productId = productSelectable.id,
+                    selections = productSelectable.selections,
                     user = salesMan
                 )
             )

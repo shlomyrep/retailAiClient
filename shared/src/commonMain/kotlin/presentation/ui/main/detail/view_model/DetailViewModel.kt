@@ -19,7 +19,6 @@ import business.datasource.network.main.responses.PriceType
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
-import business.datasource.network.main.responses.deepCopy
 import business.datasource.network.main.responses.getCustomizationSteps
 import business.domain.main.BatchItem
 import business.interactors.main.AddBasketInteractor
@@ -188,7 +187,7 @@ class DetailViewModel(
     }
 
     private fun addBasket(id: ProductSelectable) {
-        addBasketInteractor.execute(id = id, 1).onEach { dataState ->
+        addBasketInteractor.execute(productSelectable = id, 1).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {}
                 is DataState.Response -> {

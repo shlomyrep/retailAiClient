@@ -49,7 +49,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -132,7 +136,7 @@ fun CartScreen(
             ) {
                 items(state.baskets) {
                     CartBox(
-                        state,
+                        events,
                         it,
                         navigateToDetail = navigateToDetail
                     ) {
@@ -198,7 +202,7 @@ fun ProceedButtonBox(onClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartBox(
-    state: CartState,
+    events: (CartEvent) -> Unit,
     basket: Basket,
     navigateToDetail: (String) -> Unit,
     deleteFromBasket: () -> Unit
@@ -226,7 +230,7 @@ fun CartBox(
             },
             content = {
                 DismissCartContent(
-                    state,
+                    events,
                     basket,
                     navigateToDetail = navigateToDetail
                 )
@@ -237,11 +241,10 @@ fun CartBox(
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun DismissCartContent(
-    state: CartState,
+    events: (CartEvent) -> Unit,
     basket: Basket,
-    navigateToDetail: (String) -> Unit
+    navigateToDetail: (String) -> Unit,
 ) {
-
     val roomNames = listOf(
         stringResource(Res.string.general_room_text),
         stringResource(Res.string.general_bath),
@@ -258,15 +261,22 @@ fun DismissCartContent(
         stringResource(Res.string.guest_shower_ground_floor),
         stringResource(Res.string.general_bath_first_floor),
         stringResource(Res.string.living_kitchen_and_passages),
-        stringResource(Res.string.guest_toilet_sanitary_fixtures),
-
-        )
+        stringResource(Res.string.guest_toilet_sanitary_fixtures)
+    )
 
     var expanded by remember { mutableStateOf(false) }
     var selectedRoomName by remember { mutableStateOf("") }
 
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+    var isFocused by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.background)) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background)
+            .clickable { focusManager.clearFocus() }
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -304,12 +314,27 @@ fun DismissCartContent(
                     Box {
                         OutlinedTextField(
                             value = selectedRoomName,
-                            onValueChange = { selectedRoomName = it },
+                            onValueChange = {
+                                selectedRoomName = it
+                            },
                             enabled = true,
                             label = {
                                 Text(stringResource(Res.string.room_name_header_text))
                             },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .focusRequester(focusRequester)
+                                .onFocusChanged { focusState ->
+                                    if (isFocused && !focusState.isFocused) {
+                                        if (selectedRoomName.isNotEmpty()){
+                                            basket.product.roomName = selectedRoomName
+                                            events(CartEvent.AddProduct(basket.product))
+                                            isFocused = false
+                                        }
+                                    } else if (focusState.isFocused) {
+                                        isFocused = true
+                                    }
+                                },
                             colors = ExposedDropdownMenuDefaults.textFieldColors(
                                 focusedContainerColor = Transparent,
                                 unfocusedContainerColor = Transparent,
@@ -343,7 +368,10 @@ fun DismissCartContent(
                                 DropdownMenuItem(
                                     onClick = {
                                         selectedRoomName = roomName
+                                        basket.product.roomName = roomName
+                                        events(CartEvent.AddProduct(basket.product))
                                         expanded = false
+                                        focusManager.clearFocus() // Clear focus from TextField
                                     },
                                     text = { Text(roomName) }
                                 )
@@ -385,6 +413,8 @@ fun DismissCartContent(
         HorizontalDivider(modifier = Modifier.fillMaxWidth())
     }
 }
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
