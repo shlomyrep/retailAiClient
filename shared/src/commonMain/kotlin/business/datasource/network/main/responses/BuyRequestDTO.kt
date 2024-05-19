@@ -11,4 +11,6 @@ data class BuyRequestDTO(
     @SerialName("last_name") val lastName: String = "",
     @SerialName("customer_id") val customerId: String = "",
     @SerialName("sales_man") val salesMan: SalesMan,
+    // the map holds a string key for the room name and a list of productId's
+    @SerialName("rooms") val rooms: MutableMap<String, List<String>>
 )
