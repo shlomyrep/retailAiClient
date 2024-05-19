@@ -7,6 +7,7 @@ import business.core.DataState
 import business.core.NetworkState
 import business.core.ProgressBarState
 import business.datasource.network.main.MainService
+import business.datasource.network.main.responses.toOrder
 import business.domain.main.Order
 import business.util.createException
 import business.util.handleUseCaseException
@@ -39,7 +40,7 @@ class GetOrdersInteractor(
             }
 
 
-            val result = apiResponse.result?.map { it }
+            val result = apiResponse.result?.map { it.toOrder() }
 
 
             emit(DataState.NetworkStatus(NetworkState.Good))

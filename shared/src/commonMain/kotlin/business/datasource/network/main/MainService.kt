@@ -9,6 +9,7 @@ import business.datasource.network.main.responses.BasketDTO
 import business.datasource.network.main.responses.CommentDTO
 import business.datasource.network.main.responses.HeldInventoryBatchDTO
 import business.datasource.network.main.responses.HomeDTO
+import business.datasource.network.main.responses.OrderDTO
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
@@ -43,7 +44,7 @@ interface MainService {
 
     suspend fun getOrders(
         token: String,
-    ): MainGenericResponse<List<Order>>
+    ): MainGenericResponse<List<OrderDTO>>
 
     suspend fun buyProduct(
         token: String,

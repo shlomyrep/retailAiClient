@@ -273,7 +273,7 @@ private fun OrderBox(order: Order) {
                         ) {
                             Text(stringResource(Res.string.delivery_cost), style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                order.shippingType.getPrice(),
+                                "ShippingType",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -286,7 +286,7 @@ private fun OrderBox(order: Order) {
                         ) {
                             Text(stringResource(Res.string.delivery_type), style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                order.shippingType.title,
+                                "order.shippingType.title",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -300,7 +300,7 @@ private fun OrderBox(order: Order) {
                         ) {
                             Text(stringResource(Res.string.address), style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                order.address.getShippingAddress(),
+                                "order.address.getShippingAddress()",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }

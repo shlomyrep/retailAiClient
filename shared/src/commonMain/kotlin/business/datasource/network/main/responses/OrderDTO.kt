@@ -20,9 +20,7 @@ data class OrderDTO(
 fun OrderDTO.toOrder() = Order(
     code = code ?: "",
     createdAt = createdAt ?: "",
-    shippingType = shippingType_global[shippingType?:0] ,
     status = status ?: 0,
-    address = address?.toAddress() ?: Address(),
-    products = products?.map { it.toProduct() } ?: listOf(),
+    products = products ?: listOf(),
 )
 
