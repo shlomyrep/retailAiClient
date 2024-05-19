@@ -106,7 +106,7 @@
     <string name="first_name">שם פרטי</string>
     <string name="last_name">שם משפחה</string>
     <string name="customer_id">מספר לקוח</string>
-    <string name="room_name_header_text">רשום שם חדר או בחר מהרשימה:</string>
+    <string name="room_name_header_text"> שם חדר:</string>
 
     <!--    room names list-->
     <string name="general_bath">אמבטיה כללית</string>

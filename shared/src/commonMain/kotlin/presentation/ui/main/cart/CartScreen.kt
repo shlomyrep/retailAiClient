@@ -30,14 +30,15 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -75,8 +76,10 @@ import presentation.component.Spacer_8dp
 import presentation.component.noRippleClickable
 import presentation.component.rememberCustomImagePainter
 import presentation.theme.BorderColor
-import presentation.theme.DefaultTextFieldTheme
+import presentation.theme.ProgressBarColor
 import presentation.theme.Red
+import presentation.theme.TextFieldColor
+import presentation.theme.Transparent
 import presentation.ui.main.cart.view_model.CartEvent
 import presentation.ui.main.cart.view_model.CartState
 import shoping_by_kmp.shared.generated.resources.Res
@@ -257,7 +260,7 @@ fun DismissCartContent(
         stringResource(Res.string.living_kitchen_and_passages),
         stringResource(Res.string.guest_toilet_sanitary_fixtures),
 
-    )
+        )
 
     var expanded by remember { mutableStateOf(false) }
     var selectedRoomName by remember { mutableStateOf("") }
@@ -299,7 +302,7 @@ fun DismissCartContent(
             ) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                     Box {
-                        TextField(
+                        OutlinedTextField(
                             value = selectedRoomName,
                             onValueChange = { selectedRoomName = it },
                             enabled = true,
@@ -307,7 +310,16 @@ fun DismissCartContent(
                                 Text(stringResource(Res.string.room_name_header_text))
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            colors = DefaultTextFieldTheme(),
+                            colors = ExposedDropdownMenuDefaults.textFieldColors(
+                                focusedContainerColor = Transparent,
+                                unfocusedContainerColor = Transparent,
+                                cursorColor = MaterialTheme.colorScheme.onBackground,
+                                focusedIndicatorColor = ProgressBarColor,
+                                unfocusedIndicatorColor = ProgressBarColor,
+                                disabledContainerColor = TextFieldColor,
+                                disabledTextColor = MaterialTheme.colorScheme.onBackground,
+                                disabledIndicatorColor = ProgressBarColor,
+                            ),
                             shape = MaterialTheme.shapes.small,
                             singleLine = true,
                             keyboardOptions = KeyboardOptions(
@@ -322,7 +334,6 @@ fun DismissCartContent(
                                 )
                             }
                         )
-
 
                         DropdownMenu(
                             expanded = expanded,
