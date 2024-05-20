@@ -166,8 +166,6 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
                         }
                     }
                 }
-
-
             }
         }
     }
