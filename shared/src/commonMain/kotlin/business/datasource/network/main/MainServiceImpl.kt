@@ -307,7 +307,7 @@ class MainServiceImpl(
             contentType(ContentType.Application.Json)
             setBody(
                 BasketAddRequestDTO(
-                    productId = productSelectable.id,
+                    product = productSelectable,
                     selections = productSelectable.selections,
                     user = salesMan
                 )

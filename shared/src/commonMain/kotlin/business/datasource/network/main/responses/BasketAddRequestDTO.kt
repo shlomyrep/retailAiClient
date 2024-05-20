@@ -8,6 +8,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class BasketAddRequestDTO(
     @SerialName("selections") val selections: List<Selection>,
-    @SerialName("product_id") val productId: String,
+    @SerialName("product") val product: ProductSelectable,
     @SerialName("sales_man") val user: SalesMan,
 )
