@@ -11,7 +11,7 @@ import business.core.Queue
 import business.core.UIComponent
 import business.core.UIComponentState
 import business.domain.main.Address
-import business.domain.main.Settings
+import business.domain.main.CustomerConfig
 import business.domain.main.ShippingType
 import business.interactors.main.BasketListInteractor
 import business.interactors.main.BuyProductInteractor
@@ -229,16 +229,16 @@ class CheckoutViewModel(
 
     private fun getCustomerIdRegex() {
         viewModelScope.launch {
-            val jsonSettings = appDataStoreManager.readValue(DataStoreKeys.SETTINGS)
-            val settings = jsonSettings?.takeIf { it.isNotEmpty() }?.let {
+            val jsonSettings = appDataStoreManager.readValue(DataStoreKeys.CUSTOMER_CONFIG)
+            val customerConfig = jsonSettings?.takeIf { it.isNotEmpty() }?.let {
                 try {
-                    Json.decodeFromString(Settings.serializer(), it)
+                    Json.decodeFromString(CustomerConfig.serializer(), it)
                 } catch (e: Exception) {
                     // Log the error and return null if deserialization fails
                     null
                 }
             }
-            val customerIdRegex = settings?.customerIdRegex ?: "^(|[45]\\d{7})$"
+            val customerIdRegex = customerConfig?.customerIdRegex ?: "^(|[45]\\d{7})$"
             state.value = state.value.copy(customerIdRegex = customerIdRegex)
         }
     }

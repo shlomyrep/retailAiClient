@@ -5,5 +5,5 @@ object DataStoreKeys {
     const val EMAIL = "com.razzaghi.shoppingbykmp.EMAIL"
 
     const val SALES_MAN = "com.razzaghi.shoppingbykmp.SALES_MAN"
-    const val SETTINGS = "com.razzaghi.shoppingbykmp.SETTINGS"
+    const val CUSTOMER_CONFIG = "com.razzaghi.shoppingbykmp.CUSTOMER_CONFIG"
 }
