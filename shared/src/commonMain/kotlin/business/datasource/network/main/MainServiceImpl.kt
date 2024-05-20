@@ -50,7 +50,9 @@ import io.ktor.utils.io.core.writeFully
 class MainServiceImpl(
     private val httpClient: HttpClient
 ) : MainService {
-    override suspend fun getOrders(token: String): MainGenericResponse<List<OrderDTO>> {
+    override suspend fun getOrders(
+        token: String, salesMan: SalesMan
+    ): MainGenericResponse<List<OrderDTO>> {
         return httpClient.get {
             url {
                 headers {
@@ -58,6 +60,7 @@ class MainServiceImpl(
                 }
                 takeFrom(BASE_URL)
                 encodedPath += MainService.ORDERS
+                parameter("sales", salesMan.erpID)
             }
             contentType(ContentType.Application.Json)
         }.body()

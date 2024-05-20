@@ -44,6 +44,7 @@ interface MainService {
 
     suspend fun getOrders(
         token: String,
+        salesMan: SalesMan
     ): MainGenericResponse<List<OrderDTO>>
 
     suspend fun buyProduct(

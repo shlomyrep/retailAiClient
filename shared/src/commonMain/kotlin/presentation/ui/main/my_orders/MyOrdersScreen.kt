@@ -72,6 +72,7 @@ import shoping_by_kmp.shared.generated.resources.delivery_type
 import shoping_by_kmp.shared.generated.resources.no_orders
 import shoping_by_kmp.shared.generated.resources.orders
 import shoping_by_kmp.shared.generated.resources.promo_code
+import kotlin.random.Random
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalResourceApi::class)
@@ -188,7 +189,7 @@ private fun MyOrdersList(list: List<Order>) {
     }
 
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
-        items(list, key = { it.createdAt }) {
+        items(list, key = { Random.nextInt().toString() }) {
             OrderBox(it)
         }
     }

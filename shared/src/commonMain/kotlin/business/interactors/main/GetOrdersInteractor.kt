@@ -9,10 +9,12 @@ import business.core.ProgressBarState
 import business.datasource.network.main.MainService
 import business.datasource.network.main.responses.toOrder
 import business.domain.main.Order
+import business.domain.main.SalesMan
 import business.util.createException
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
 
 class GetOrdersInteractor(
     private val service: MainService,
@@ -27,9 +29,11 @@ class GetOrdersInteractor(
             emit(DataState.Loading(progressBarState = ProgressBarState.LoadingWithLogo))
 
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
+            val jsonSalesMan = appDataStoreManager.readValue(DataStoreKeys.SALES_MAN)
+            val user = jsonSalesMan?.let { Json.decodeFromString(SalesMan.serializer(), it) }
 
 
-            val apiResponse = service.getOrders(token = token)
+            val apiResponse = service.getOrders(token = token,salesMan= user ?: SalesMan())
 
 
 
