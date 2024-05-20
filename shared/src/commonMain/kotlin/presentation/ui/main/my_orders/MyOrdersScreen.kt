@@ -22,10 +22,15 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
@@ -39,10 +44,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -52,38 +58,48 @@ import business.constants.ORDER_SUCCESS
 import business.domain.main.Order
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import presentation.component.DEFAULT__BUTTON_SIZE
 import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
+import presentation.component.Spacer_32dp
+import presentation.component.Spacer_4dp
 import presentation.component.Spacer_8dp
-import presentation.component.noRippleClickable
 import presentation.theme.BorderColor
+import presentation.theme.ProgressBarColor
+import presentation.theme.TextFieldColor
+import presentation.theme.Transparent
 import presentation.ui.main.my_orders.view_model.MyOrdersEvent
 import presentation.ui.main.my_orders.view_model.MyOrdersState
-import presentation.util.convertDate
 import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.add_to_cart
 import shoping_by_kmp.shared.generated.resources.address
 import shoping_by_kmp.shared.generated.resources.amount
-import shoping_by_kmp.shared.generated.resources.arrow_down
+import shoping_by_kmp.shared.generated.resources.cancel
+import shoping_by_kmp.shared.generated.resources.created_bid
+import shoping_by_kmp.shared.generated.resources.created_pdf
+import shoping_by_kmp.shared.generated.resources.customer_id
+import shoping_by_kmp.shared.generated.resources.customer_name
+import shoping_by_kmp.shared.generated.resources.date
 import shoping_by_kmp.shared.generated.resources.default_image_loader
 import shoping_by_kmp.shared.generated.resources.delivery_cost
 import shoping_by_kmp.shared.generated.resources.delivery_type
+import shoping_by_kmp.shared.generated.resources.enter_customer_id
 import shoping_by_kmp.shared.generated.resources.no_orders
+import shoping_by_kmp.shared.generated.resources.ok
 import shoping_by_kmp.shared.generated.resources.orders
-import shoping_by_kmp.shared.generated.resources.promo_code
+import shoping_by_kmp.shared.generated.resources.please_enter_customer_id
 import kotlin.random.Random
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalResourceApi::class)
 @Composable
 fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup: () -> Unit) {
-
     val scope = rememberCoroutineScope()
-
     val tabList by remember {
         mutableStateOf(
             listOf(
@@ -93,8 +109,6 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
             )
         )
     }
-
-
     val pagerState = rememberPagerState { tabList.size }
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         DefaultScreenUI(
@@ -156,15 +170,15 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
                         when (index) {
 
                             ORDER_ACTIVE -> {
-                                MyOrdersList(events, list = state.orders.filter { it.status == ORDER_ACTIVE })
+                                MyOrdersList(events, list = state.orders.filter { it.status == ORDER_ACTIVE }, state)
                             }
 
                             ORDER_SUCCESS -> {
-                                MyOrdersList(events, list = state.orders.filter { it.status == ORDER_SUCCESS })
+                                MyOrdersList(events, list = state.orders.filter { it.status == ORDER_SUCCESS }, state)
                             }
 
                             ORDER_CANCELED -> {
-                                MyOrdersList(events, list = state.orders.filter { it.status == ORDER_CANCELED })
+                                MyOrdersList(events, list = state.orders.filter { it.status == ORDER_CANCELED }, state)
                             }
                         }
                     }
@@ -176,7 +190,7 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-private fun MyOrdersList(events: (MyOrdersEvent) -> Unit, list: List<Order>) {
+private fun MyOrdersList(events: (MyOrdersEvent) -> Unit, list: List<Order>, state: MyOrdersState) {
     if (list.isEmpty()) {
         Text(
             stringResource(Res.string.no_orders),
@@ -189,59 +203,123 @@ private fun MyOrdersList(events: (MyOrdersEvent) -> Unit, list: List<Order>) {
 
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
         items(list, key = { Random.nextInt().toString() }) {
-            OrderBox(events, it)
+            OrderBox(events, it, state)
         }
     }
 
 }
 
-@OptIn(ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order) {
+private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order, state: MyOrdersState) {
     var isExpanded by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var customerId by remember { mutableStateOf("") }
 
     val rotationState by animateFloatAsState(
         targetValue = if (isExpanded) 180f else 0f,
         animationSpec = tween(350, easing = LinearEasing)
     )
 
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = stringResource(Res.string.enter_customer_id)) },
+            text = {
+                Column {
+                    Text(text = stringResource(Res.string.please_enter_customer_id))
+                    OutlinedTextField(
+                        value = customerId,
+                        onValueChange = { customerId = it },
+                        label = { Text(text = stringResource(Res.string.customer_id)) },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(
+                            focusedContainerColor = Transparent,
+                            unfocusedContainerColor = Transparent,
+                            cursorColor = MaterialTheme.colorScheme.onBackground,
+                            focusedIndicatorColor = ProgressBarColor,
+                            unfocusedIndicatorColor = ProgressBarColor,
+                            disabledContainerColor = TextFieldColor,
+                            disabledTextColor = MaterialTheme.colorScheme.onBackground,
+                            disabledIndicatorColor = ProgressBarColor,
+                        ),
+                        shape = MaterialTheme.shapes.small,
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Next,
+                            keyboardType = KeyboardType.Text,
+                        )
+                    )
+                }
+            },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(onClick = { showDialog = false }) {
+                        Text(text = stringResource(Res.string.cancel))
+                    }
+                    Spacer_32dp()
+                    Button(onClick = {
+                        if (customerId.isNotEmpty() && isValidCustomerId(
+                                state.customerIdRegex, customerId
+                            )
+                        ) {
+                            order.customerId = customerId
+                            events(MyOrdersEvent.OnSendQuote(1, order))
+                            showDialog = false
+                        }
+                    }) {
+                        Text(text = stringResource(Res.string.ok))
+                    }
+                }
+            }
+        )
+
+    }
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
                 .border(1.dp, BorderColor, MaterialTheme.shapes.medium)
                 .animateContentSize()
         ) {
+            Spacer_8dp()
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(order.createdAt.convertDate(), style = MaterialTheme.typography.bodyLarge)
-                Icon(
-                    painter = painterResource(Res.drawable.arrow_down),
-                    null,
-                    modifier = Modifier.size(35.dp).padding(4.dp).rotate(rotationState)
-                        .noRippleClickable { isExpanded = !isExpanded })
+                Text(
+                    "${stringResource(Res.string.date)}:  ${formatIsoStringToHebrew(order.createdAt)}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+//                Icon(
+//                    painter = painterResource(Res.drawable.arrow_down),
+//                    null,
+//                    modifier = Modifier.size(35.dp).padding(4.dp).rotate(rotationState)
+//                        .noRippleClickable { isExpanded = !isExpanded })
             }
-            Spacer_8dp()
+            Spacer_4dp()
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(stringResource(Res.string.promo_code), style = MaterialTheme.typography.bodyLarge)
-                Text(order.code, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    "${stringResource(Res.string.customer_name)}:  ${order.firstName} ${order.lastName}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
-            DefaultButton(
-                modifier = Modifier.fillMaxWidth(.7f).height(DEFAULT__BUTTON_SIZE),
-                text = stringResource(Res.string.add_to_cart)
-            ) {
-                events(MyOrdersEvent.OnSendQuote(2, order))
-            }
-
             Spacer_8dp()
-
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 8.dp)
@@ -250,7 +328,9 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order) {
                     AsyncImage(
                         it.image,
                         null,
-                        modifier = Modifier.size(55.dp).padding(horizontal = 4.dp),
+                        modifier = Modifier
+                            .size(55.dp)
+                            .padding(horizontal = 4.dp),
                         contentScale = ContentScale.Crop,
                         error = painterResource(Res.drawable.default_image_loader),
                         placeholder = painterResource(Res.drawable.default_image_loader)
@@ -258,27 +338,72 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order) {
                 }
             }
             Spacer_8dp()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                DefaultButton(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(DEFAULT__BUTTON_SIZE)
+                        .padding(end = 5.dp),
+                    text = stringResource(Res.string.created_pdf)
+                ) {
+                    events(MyOrdersEvent.OnSendQuote(2, order))
+                }
+
+                DefaultButton(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(DEFAULT__BUTTON_SIZE)
+                        .padding(start = 5.dp),
+                    text = stringResource(Res.string.created_bid)
+                ) {
+                    if (order.customerId.isNotEmpty()) {
+                        events(MyOrdersEvent.OnSendQuote(1, order))
+                    } else {
+                        showDialog = true
+                    }
+                }
+            }
 
             if (isExpanded) {
-                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                ) {
                     Column(modifier = Modifier.fillMaxWidth()) {
 
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(stringResource(Res.string.amount), style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                stringResource(Res.string.amount),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
 //                            Text(order.getAmount(), style = MaterialTheme.typography.bodyMedium)
                         }
                         Spacer_8dp()
 
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(stringResource(Res.string.delivery_cost), style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                stringResource(Res.string.delivery_cost),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
                             Text(
                                 order.shippingType.getPrice(),
                                 style = MaterialTheme.typography.bodyMedium
@@ -287,11 +412,16 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order) {
                         Spacer_8dp()
 
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(stringResource(Res.string.delivery_type), style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                stringResource(Res.string.delivery_type),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
                             Text(
                                 order.shippingType.title,
                                 style = MaterialTheme.typography.bodyMedium
@@ -299,13 +429,17 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order) {
                         }
                         Spacer_8dp()
 
-
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
                             horizontalAlignment = Alignment.Start,
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Text(stringResource(Res.string.address), style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                stringResource(Res.string.address),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
                             Text(
                                 order.address.getShippingAddress(),
                                 style = MaterialTheme.typography.bodyMedium
@@ -315,7 +449,24 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order) {
                 }
             }
             Spacer_8dp()
-
         }
     }
 }
+
+fun formatIsoStringToHebrew(isoString: String): String {
+    val instant = Instant.parse(isoString)
+    val localDateTime = instant.toLocalDateTime(TimeZone.UTC)
+
+    val hebrewMonths =
+        listOf("ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר")
+    val month = hebrewMonths[localDateTime.monthNumber - 1]
+    return "$month ${localDateTime.dayOfMonth},  ${localDateTime.hour}:${localDateTime.minute}:${localDateTime.second}"
+}
+
+fun isValidCustomerId(customerIdRegex: String, customerId: String): Boolean {
+    val regex = Regex("^(|[45]\\d{7})$")
+//    val regex = Regex(customerIdRegex)
+    return regex.matches(customerId)
+}
+
+

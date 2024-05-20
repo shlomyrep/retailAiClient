@@ -14,6 +14,7 @@ import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.SizeSelectable
 import business.datasource.network.main.responses.getCustomizationSteps
 import business.domain.main.Content
+import business.domain.main.CustomerConfig
 import business.domain.main.EmailData
 import business.domain.main.Line
 import business.domain.main.Order
@@ -45,7 +46,6 @@ class MyOrdersViewModel(
 
     fun onTriggerEvent(event: MyOrdersEvent) {
         when (event) {
-
 
             is MyOrdersEvent.OnRemoveHeadFromQueue -> {
                 removeHeadMessage()
@@ -90,6 +90,7 @@ class MyOrdersViewModel(
 
     init {
         getOrders()
+        getCustomerIdRegex()
     }
 
     private fun getOrders() {
@@ -408,5 +409,20 @@ class MyOrdersViewModel(
         }
         emailData.products = products
         return emailData
+    }
+    private fun getCustomerIdRegex() {
+        viewModelScope.launch {
+            val jsonSettings = appDataStoreManager.readValue(DataStoreKeys.CUSTOMER_CONFIG)
+            val customerConfig = jsonSettings?.takeIf { it.isNotEmpty() }?.let {
+                try {
+                    Json.decodeFromString(CustomerConfig.serializer(), it)
+                } catch (e: Exception) {
+                    // Log the error and return null if deserialization fails
+                    null
+                }
+            }
+            val customerIdRegex = customerConfig?.customerIdRegex ?: "^(|[45]\\d{7})$"
+            state.value = state.value.copy(customerIdRegex = customerIdRegex)
+        }
     }
 }
