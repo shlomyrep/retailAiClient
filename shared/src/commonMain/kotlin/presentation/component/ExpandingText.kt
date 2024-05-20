@@ -1,4 +1,3 @@
-
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -30,7 +29,7 @@ fun ExpandingText(
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     var isClickable by remember { mutableStateOf(false) }
-    val textLayoutResultState = remember { mutableStateOf<TextLayoutResult?>(null)}
+    val textLayoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
 
     val arrowRotation by animateFloatAsState(
         targetValue = if (isExpanded) 180f else 0f, // Flip arrow 180 degrees when expanded
@@ -58,12 +57,15 @@ fun ExpandingText(
             onTextLayout = { textLayoutResultState.value = it },
             modifier = Modifier.weight(1f)
         )
-        Icon(
-            imageVector = Icons.Filled.ArrowDropDown,
-            contentDescription = "Expand or collapse",
-            modifier = Modifier.graphicsLayer(rotationZ = arrowRotation)
-        )
+        if (isClickable) {
+            Icon(
+                imageVector = Icons.Filled.ArrowDropDown,
+                contentDescription = "Expand or collapse",
+                modifier = Modifier.graphicsLayer(rotationZ = arrowRotation)
+            )
+        }
     }
 }
+
 
 private const val MINIMIZED_MAX_LINES = 3

@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -67,7 +69,6 @@ import org.jetbrains.compose.resources.stringResource
 import presentation.component.DEFAULT__BUTTON_SIZE
 import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
-import presentation.component.Spacer_32dp
 import presentation.component.Spacer_4dp
 import presentation.component.Spacer_8dp
 import presentation.theme.BorderColor
@@ -89,6 +90,7 @@ import shoping_by_kmp.shared.generated.resources.default_image_loader
 import shoping_by_kmp.shared.generated.resources.delivery_cost
 import shoping_by_kmp.shared.generated.resources.delivery_type
 import shoping_by_kmp.shared.generated.resources.enter_customer_id
+import shoping_by_kmp.shared.generated.resources.invalid_customer_id
 import shoping_by_kmp.shared.generated.resources.no_orders
 import shoping_by_kmp.shared.generated.resources.ok
 import shoping_by_kmp.shared.generated.resources.orders
@@ -215,6 +217,7 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order, state: MyOrd
     var isExpanded by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
     var customerId by remember { mutableStateOf("") }
+    var customerIdError by remember { mutableStateOf<String?>(null) }
 
     val rotationState by animateFloatAsState(
         targetValue = if (isExpanded) 180f else 0f,
@@ -228,12 +231,20 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order, state: MyOrd
             text = {
                 Column {
                     Text(text = stringResource(Res.string.please_enter_customer_id))
+                    val errorMessages = stringResource(Res.string.invalid_customer_id)
+
                     OutlinedTextField(
                         value = customerId,
-                        onValueChange = { customerId = it },
+                        onValueChange = { customerIdInput ->
+                            customerId = customerIdInput
+                            customerIdError = if (customerIdInput.isEmpty() || isValidCustomerId(state.customerIdRegex, customerIdInput)) {
+                                null
+                            } else {
+                                errorMessages
+                            }
+                        },
                         label = { Text(text = stringResource(Res.string.customer_id)) },
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         colors = ExposedDropdownMenuDefaults.textFieldColors(
                             focusedContainerColor = Transparent,
                             unfocusedContainerColor = Transparent,
@@ -248,9 +259,17 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order, state: MyOrd
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Next,
-                            keyboardType = KeyboardType.Text,
+                            keyboardType = KeyboardType.Number,
                         )
                     )
+                    if (customerIdError != null) {
+                        Text(
+                            text = customerIdError ?: "",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
             },
             confirmButton = {
@@ -261,12 +280,9 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order, state: MyOrd
                     Button(onClick = { showDialog = false }) {
                         Text(text = stringResource(Res.string.cancel))
                     }
-                    Spacer_32dp()
+                    Spacer(modifier = Modifier.width(8.dp)) // Add spacing between buttons
                     Button(onClick = {
-                        if (customerId.isNotEmpty() && isValidCustomerId(
-                                state.customerIdRegex, customerId
-                            )
-                        ) {
+                        if (customerId.isNotEmpty() && isValidCustomerId(state.customerIdRegex, customerId)) {
                             order.customerId = customerId
                             events(MyOrdersEvent.OnSendQuote(1, order))
                             showDialog = false
@@ -277,7 +293,6 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order, state: MyOrd
                 }
             }
         )
-
     }
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -468,5 +483,6 @@ fun isValidCustomerId(customerIdRegex: String, customerId: String): Boolean {
 //    val regex = Regex(customerIdRegex)
     return regex.matches(customerId)
 }
+
 
 

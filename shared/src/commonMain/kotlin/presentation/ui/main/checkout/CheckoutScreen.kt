@@ -18,6 +18,10 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -25,13 +29,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import business.core.UIComponentState
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import presentation.component.DEFAULT__BUTTON_SIZE
 import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
-import presentation.component.SelectShippingDialog
 import presentation.component.Spacer_16dp
 import presentation.component.Spacer_32dp
 import presentation.theme.DefaultTextFieldTheme
@@ -40,6 +42,7 @@ import presentation.ui.main.checkout.view_model.CheckoutState
 import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.customer_id
 import shoping_by_kmp.shared.generated.resources.first_name
+import shoping_by_kmp.shared.generated.resources.invalid_customer_id
 import shoping_by_kmp.shared.generated.resources.last_name
 import shoping_by_kmp.shared.generated.resources.save_spec
 import shoping_by_kmp.shared.generated.resources.spec_info
@@ -53,16 +56,12 @@ fun CheckoutScreen(
     navigateToAddress: () -> Unit,
     popup: () -> Unit
 ) {
+    var customerIdError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(key1 = state.buyingSuccess) {
         if (state.buyingSuccess) {
             popup()
         }
-    }
-
-
-    if (state.selectShippingDialogState == UIComponentState.Show) {
-        SelectShippingDialog(state = state, events = events)
     }
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -76,9 +75,13 @@ fun CheckoutScreen(
             startIconToolbar = Icons.AutoMirrored.Filled.ArrowBack,
             onClickStartIconToolbar = popup
         ) {
-
             Box(modifier = Modifier.fillMaxSize()) {
-                Column(modifier = Modifier.fillMaxSize().padding(16.dp).align(Alignment.TopCenter)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .align(Alignment.TopCenter)
+                ) {
                     Spacer_32dp()
                     TextField(
                         value = state.firstName,
@@ -120,11 +123,16 @@ fun CheckoutScreen(
                     )
 
                     Spacer_16dp()
-
+                    val errorMessages = stringResource(Res.string.invalid_customer_id)
                     TextField(
                         value = state.customerID,
                         onValueChange = {
                             events(CheckoutEvent.OnUpdateCustomerID(it))
+                            customerIdError = if (it.isEmpty() || isValidCustomerId(state.customerIdRegex, it)) {
+                                null
+                            } else {
+                                errorMessages
+                            }
                         },
                         enabled = true,
                         modifier = Modifier.fillMaxWidth(),
@@ -140,35 +148,15 @@ fun CheckoutScreen(
                         ),
                     )
 
+                    if (customerIdError != null) {
+                        Text(
+                            text = customerIdError ?: "",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                     Spacer_32dp()
-
-
-//                    Spacer_32dp()
-//
-//                    Text(stringResource(Res.string.shipping_ddress), style = MaterialTheme.typography.titleLarge)
-//                    Spacer_12dp()
-//                    ShippingBox(
-//                        title = stringResource(Res.string.home),
-//                        image = Res.drawable.location2, detail = state.selectedAddress.getShippingAddress()
-//                    ) {
-//                        navigateToAddress()
-//                    }
-//
-//                    Spacer_16dp()
-//                    HorizontalDivider(color = BorderColor)
-//                    Spacer_16dp()
-//
-//                    Text(stringResource(Res.string.choose_shipping_type), style = MaterialTheme.typography.titleLarge)
-//                    Spacer_12dp()
-//                    ShippingBox(
-//                        title = state.selectedShipping.title,
-//                        image = Res.drawable.shipping,
-//                        detail = state.selectedShipping.getEstimatedDay(),
-//                    ) {
-//                        events(CheckoutEvent.OnUpdateSelectShippingDialogState(UIComponentState.Show))
-//                    }
-//
-
                 }
 
                 Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
@@ -182,7 +170,6 @@ fun CheckoutScreen(
                     }
                 }
             }
-
         }
     }
 }

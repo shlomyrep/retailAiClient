@@ -114,6 +114,8 @@
     <string name="created_bid">הצעת מחיר</string>
     <string name="enter_customer_id">מספר לקוח</string>
     <string name="please_enter_customer_id">הזן מספר לקוח</string>
+    <string name="invalid_customer_id">יש להזין מספר לקוח תקין</string>
+
 
     <!--    room names list-->
     <string name="general_bath">אמבטיה כללית</string>
