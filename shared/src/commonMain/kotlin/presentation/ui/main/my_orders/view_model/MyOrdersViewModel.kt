@@ -56,7 +56,7 @@ class MyOrdersViewModel(
             is MyOrdersEvent.OnUpdateNetworkState -> {
                 onUpdateNetworkState(event.networkState)
             }
-            
+
             is MyOrdersEvent.OnSendQuote -> {
                 onSendQuote(event.orderType, event.customerId, event.erpCodeID, event.firstName, event.lastName, event.order)
             }
@@ -164,7 +164,7 @@ class MyOrdersViewModel(
         val emailData = EmailData()
         val products = mutableListOf<OrderProduct>()
         val orderProduct = OrderProduct()
-        emailData.title = lastName
+        emailData.title ="$firstName $lastName"
         emailData.date = order.createdAt
 
         // טובול לוגו
