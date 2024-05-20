@@ -15,6 +15,7 @@ import business.datasource.network.main.responses.CommentDTO
 import business.datasource.network.main.responses.CommentRequestDTO
 import business.datasource.network.main.responses.HeldInventoryBatchDTO
 import business.datasource.network.main.responses.HomeDTO
+import business.datasource.network.main.responses.OrderDTO
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
@@ -49,7 +50,7 @@ import io.ktor.utils.io.core.writeFully
 class MainServiceImpl(
     private val httpClient: HttpClient
 ) : MainService {
-    override suspend fun getOrders(token: String): MainGenericResponse<List<Order>> {
+    override suspend fun getOrders(token: String): MainGenericResponse<List<OrderDTO>> {
         return httpClient.get {
             url {
                 headers {
