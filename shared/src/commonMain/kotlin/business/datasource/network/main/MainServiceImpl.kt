@@ -294,7 +294,8 @@ class MainServiceImpl(
     override suspend fun basketAdd(
         token: String,
         salesMan: SalesMan,
-        productSelectable: ProductSelectable
+        productSelectable: ProductSelectable,
+        cartItemId:String
     ): MainGenericResponse<JRNothing?> {
         return httpClient.post {
             url {
@@ -309,7 +310,8 @@ class MainServiceImpl(
                 BasketAddRequestDTO(
                     product = productSelectable,
                     selections = productSelectable.selections,
-                    user = salesMan
+                    user = salesMan,
+                    cartItemId = cartItemId
                 )
             )
         }.body()

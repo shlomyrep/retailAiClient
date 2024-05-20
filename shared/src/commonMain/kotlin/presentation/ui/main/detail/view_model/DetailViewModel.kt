@@ -70,7 +70,7 @@ class DetailViewModel(
             }
 
             is DetailEvent.AddBasket -> {
-                addBasket(id = event.product)
+                addBasket(id = event.product, cartItemId = event.cartItemId)
             }
 
             is DetailEvent.OnUpdateSelectedImage -> {
@@ -186,8 +186,8 @@ class DetailViewModel(
             }.launchIn(viewModelScope)
     }
 
-    private fun addBasket(id: ProductSelectable) {
-        addBasketInteractor.execute(productSelectable = id).onEach { dataState ->
+    private fun addBasket(id: ProductSelectable, cartItemId: String) {
+        addBasketInteractor.execute(productSelectable = id, cartItemId).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {}
                 is DataState.Response -> {

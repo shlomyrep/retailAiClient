@@ -21,7 +21,7 @@ class AddBasketInteractor(
 ) {
 
 
-    fun execute(productSelectable: ProductSelectable): Flow<DataState<Boolean>> = flow {
+    fun execute(productSelectable: ProductSelectable, cartItemId:String): Flow<DataState<Boolean>> = flow {
         try {
             emit(DataState.Loading(progressBarState = ProgressBarState.LoadingWithLogo))
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
@@ -32,6 +32,7 @@ class AddBasketInteractor(
             val apiResponse = service.basketAdd(
                 token = token,
                 productSelectable = productSelectable,
+                cartItemId = cartItemId,
                 salesMan = user ?: SalesMan()
             )
             apiResponse.alert?.let { alert ->

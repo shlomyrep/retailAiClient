@@ -104,6 +104,7 @@ interface MainService {
         token: String,
         salesMan: SalesMan,
         productSelectable: ProductSelectable,
+        cartItemId:String
     ): MainGenericResponse<JRNothing?>
 
     suspend fun basketDelete(

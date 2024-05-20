@@ -11,7 +11,7 @@ sealed class DetailEvent {
 
 
     data class Like(val id: String) : DetailEvent()
-    data class AddBasket(val product: ProductSelectable) : DetailEvent()
+    data class AddBasket(val product: ProductSelectable,val cartItemId:String ) : DetailEvent()
 
     data class OnUpdateSelectedImage(
         val value: String
