@@ -406,7 +406,7 @@ class MainServiceImpl(
                 headers {
                     append(HttpHeaders.Authorization, token)
                 }
-                takeFrom(BASE_URL + "api/product/mail")
+                takeFrom(BASE_URL + "product/mail")
             }
             contentType(ContentType.Application.Json)
             setBody(quote)

@@ -3,6 +3,8 @@ package presentation.ui.main.my_orders.view_model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import business.constants.CUSTOM_TAG
+import business.constants.DataStoreKeys
+import business.core.AppDataStore
 import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
@@ -17,10 +19,13 @@ import business.domain.main.Line
 import business.domain.main.Order
 import business.domain.main.OrderProduct
 import business.domain.main.Quote
+import business.domain.main.SalesMan
 import business.interactors.main.GetOrdersInteractor
 import business.interactors.main.QuoteInteractor
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -30,7 +35,8 @@ import shoping_by_kmp.shared.generated.resources.sku
 
 class MyOrdersViewModel(
     private val getOrdersInteractor: GetOrdersInteractor,
-    private val quoteInteractor: QuoteInteractor
+    private val quoteInteractor: QuoteInteractor,
+    private val appDataStoreManager: AppDataStore
 ) : ViewModel() {
 
 
@@ -58,17 +64,26 @@ class MyOrdersViewModel(
             }
 
             is MyOrdersEvent.OnSendQuote -> {
-                onSendQuote(event.orderType, event.customerId, event.erpCodeID, event.firstName, event.lastName, event.order)
+                onSendQuote(
+                    event.orderType,
+                    event.order
+                )
             }
         }
     }
 
-    private fun onSendQuote(orderType: Int, customerId: String, erpCodeID: String, firstName: String, lastName: String, order: Order) {
+    private fun onSendQuote(orderType: Int, order: Order) {
+        var erpCodeID = ""
+        viewModelScope.launch {
+            val jsonSalesMan = appDataStoreManager.readValue(DataStoreKeys.SALES_MAN)
+            val user = jsonSalesMan?.let { Json.decodeFromString(SalesMan.serializer(), it) }
+            erpCodeID = user?.erpID ?: ""
+        }
         val quote = Quote(
             orderType,
-            customerId,
+            order.customerId,
             erpCodeID,
-            setEmailDataObject(firstName, lastName, order)
+            setEmailDataObject(order.firstName, order.lastName, order)
         )
         sendQuote(quote)
     }
@@ -164,7 +179,7 @@ class MyOrdersViewModel(
         val emailData = EmailData()
         val products = mutableListOf<OrderProduct>()
         val orderProduct = OrderProduct()
-        emailData.title ="$firstName $lastName"
+        emailData.title = "$firstName $lastName"
         emailData.date = order.createdAt
 
         // טובול לוגו
@@ -394,6 +409,4 @@ class MyOrdersViewModel(
         emailData.products = products
         return emailData
     }
-
-
 }

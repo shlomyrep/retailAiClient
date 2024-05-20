@@ -55,6 +55,8 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import presentation.component.DEFAULT__BUTTON_SIZE
+import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
 import presentation.component.Spacer_8dp
 import presentation.component.noRippleClickable
@@ -63,6 +65,7 @@ import presentation.ui.main.my_orders.view_model.MyOrdersEvent
 import presentation.ui.main.my_orders.view_model.MyOrdersState
 import presentation.util.convertDate
 import shoping_by_kmp.shared.generated.resources.Res
+import shoping_by_kmp.shared.generated.resources.add_to_cart
 import shoping_by_kmp.shared.generated.resources.address
 import shoping_by_kmp.shared.generated.resources.amount
 import shoping_by_kmp.shared.generated.resources.arrow_down
@@ -153,15 +156,15 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
                         when (index) {
 
                             ORDER_ACTIVE -> {
-                                MyOrdersList(list = state.orders.filter { it.status == ORDER_ACTIVE })
+                                MyOrdersList(events, list = state.orders.filter { it.status == ORDER_ACTIVE })
                             }
 
                             ORDER_SUCCESS -> {
-                                MyOrdersList(list = state.orders.filter { it.status == ORDER_SUCCESS })
+                                MyOrdersList(events, list = state.orders.filter { it.status == ORDER_SUCCESS })
                             }
 
                             ORDER_CANCELED -> {
-                                MyOrdersList(list = state.orders.filter { it.status == ORDER_CANCELED })
+                                MyOrdersList(events, list = state.orders.filter { it.status == ORDER_CANCELED })
                             }
                         }
                     }
@@ -173,7 +176,7 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-private fun MyOrdersList(list: List<Order>) {
+private fun MyOrdersList(events: (MyOrdersEvent) -> Unit, list: List<Order>) {
     if (list.isEmpty()) {
         Text(
             stringResource(Res.string.no_orders),
@@ -186,7 +189,7 @@ private fun MyOrdersList(list: List<Order>) {
 
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
         items(list, key = { Random.nextInt().toString() }) {
-            OrderBox(it)
+            OrderBox(events, it)
         }
     }
 
@@ -194,7 +197,7 @@ private fun MyOrdersList(list: List<Order>) {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-private fun OrderBox(order: Order) {
+private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order) {
     var isExpanded by remember { mutableStateOf(false) }
 
     val rotationState by animateFloatAsState(
@@ -230,6 +233,13 @@ private fun OrderBox(order: Order) {
                 Text(stringResource(Res.string.promo_code), style = MaterialTheme.typography.bodyLarge)
                 Text(order.code, style = MaterialTheme.typography.bodyMedium)
             }
+            DefaultButton(
+                modifier = Modifier.fillMaxWidth(.7f).height(DEFAULT__BUTTON_SIZE),
+                text = stringResource(Res.string.add_to_cart)
+            ) {
+                events(MyOrdersEvent.OnSendQuote(2, order))
+            }
+
             Spacer_8dp()
 
             LazyRow(
