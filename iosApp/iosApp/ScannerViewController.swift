@@ -4,7 +4,6 @@ import Vision
 import shared
 import Foundation
 
-
 @objc class ScannerViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureMetadataOutputObjectsDelegate {
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
@@ -15,7 +14,7 @@ import Foundation
     var buttonsStackView: UIStackView!
     var numberOccurrencesMap = [String: Int]()
     var textRecognitionRequest: VNRecognizeTextRequest!
-    var skuRegex: String! 
+    var skuRegex: String!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -145,7 +144,7 @@ import Foundation
     }
 
     private func handleTextRecognitionResults(_ texts: [String]) {
-        guard let skuRegex = skuRegex else { return } 
+        guard let skuRegex = skuRegex else { return }
         let regex = try! NSRegularExpression(pattern: skuRegex, options: [])
         for text in texts {
             let range = NSRange(location: 0, length: text.utf16.count)
@@ -161,7 +160,6 @@ import Foundation
         }
     }
 
-
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard isProcessingEnabled else { return }
         let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
@@ -171,11 +169,24 @@ import Foundation
     }
 
     @objc func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
-     
+        guard isProcessingEnabled else { return }
+        
         if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
            let stringValue = metadataObject.stringValue {
-            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-            createBarcodeButton(barcode: stringValue)
+            
+            // Validate the barcode with the regex
+            if let skuRegex = skuRegex {
+                let regex = try! NSRegularExpression(pattern: skuRegex, options: [])
+                let range = NSRange(location: 0, length: stringValue.utf16.count)
+                if regex.firstMatch(in: stringValue, options: [], range: range) != nil {
+                    AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+                    createBarcodeButton(barcode: stringValue)
+                }
+            } else {
+                // Fallback if skuRegex is not set
+                AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+                createBarcodeButton(barcode: stringValue)
+            }
         }
     }
 
@@ -199,8 +210,6 @@ import Foundation
         button.heightAnchor.constraint(equalToConstant: 50).isActive = true
     }
 
-
-
     @objc func barcodeButtonTapped(_ sender: UIButton) {
         guard let title = sender.title(for: .normal),
               let prefixRange = title.range(of: "פתח מוצר ") else { return }
@@ -216,8 +225,6 @@ import Foundation
         closeViewController()
     }
 
-
-    
     private func closeViewController() {
         if let navigationController = navigationController, navigationController.viewControllers.first != self {
             // If part of a navigation stack and not the root, pop the view controller.
