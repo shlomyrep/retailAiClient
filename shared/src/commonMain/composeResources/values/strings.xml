@@ -107,6 +107,7 @@
     <string name="last_name">שם משפחה</string>
     <string name="customer_id">מספר לקוח</string>
     <string name="room_name_header_text"> שם חדר:</string>
+    <string name="model_text"> דגם </string>
 
     <!--    room names list-->
     <string name="general_bath">אמבטיה כללית</string>

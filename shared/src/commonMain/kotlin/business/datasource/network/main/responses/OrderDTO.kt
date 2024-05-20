@@ -23,6 +23,6 @@ fun OrderDTO.toOrder() = Order(
     shippingType = shippingType_global[shippingType?:0] ,
     status = status ?: 0,
     address = address?.toAddress() ?: Address(),
-    products = products?.map { it.toProduct() } ?: listOf(),
+    products = products ?: listOf()
 )
 

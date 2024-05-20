@@ -1,5 +1,6 @@
 package business.datasource.network.main
 
+
 import androidx.compose.ui.graphics.ImageBitmap
 import business.datasource.network.common.JRNothing
 import business.datasource.network.common.MainGenericResponse
@@ -15,9 +16,6 @@ import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
-
-
-import business.domain.main.Order
 import business.domain.main.OrderResponse
 import business.domain.main.Quote
 import business.domain.main.SalesMan
@@ -118,13 +116,15 @@ interface MainService {
     suspend fun productBySku(token: String, sku: String): MainGenericResponse<ProductSelectable>
     suspend fun product(token: String, id: String): MainGenericResponse<ProductSelectable>
 
-    suspend fun sendSpecProducts(token: String, quote: Quote): MainGenericResponse<OrderResponse>
+    suspend fun sendQuote(token: String, quote: Quote): MainGenericResponse<OrderResponse>
 
     suspend fun productInventory(
         token: String,
         supplierId: String,
         sku: String
     ): HeldInventoryBatchDTO
+
+
 
     suspend fun uploadImage(
         token: String,

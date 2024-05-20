@@ -46,9 +46,9 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import business.constants.SHIPPING_ACTIVE
-import business.constants.SHIPPING_FAILED
-import business.constants.SHIPPING_SUCCESS
+import business.constants.ORDER_ACTIVE
+import business.constants.ORDER_CANCELED
+import business.constants.ORDER_SUCCESS
 import business.domain.main.Order
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
@@ -106,8 +106,6 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
         ) {
 
             Column(modifier = Modifier.fillMaxSize()) {
-
-
                 TabRow(modifier = Modifier.height(50.dp).fillMaxWidth(),
                     selectedTabIndex = pagerState.currentPage,
                     contentColor = Color.Transparent,
@@ -154,16 +152,16 @@ fun MyOrdersScreen(state: MyOrdersState, events: (MyOrdersEvent) -> Unit, popup:
 
                         when (index) {
 
-                            SHIPPING_ACTIVE -> {
-                                MyOrdersList(list = state.orders.filter { it.status == SHIPPING_ACTIVE })
+                            ORDER_ACTIVE -> {
+                                MyOrdersList(list = state.orders.filter { it.status == ORDER_ACTIVE })
                             }
 
-                            SHIPPING_SUCCESS -> {
-                                MyOrdersList(list = state.orders.filter { it.status == SHIPPING_SUCCESS })
+                            ORDER_SUCCESS -> {
+                                MyOrdersList(list = state.orders.filter { it.status == ORDER_SUCCESS })
                             }
 
-                            SHIPPING_FAILED -> {
-                                MyOrdersList(list = state.orders.filter { it.status == SHIPPING_FAILED })
+                            ORDER_CANCELED -> {
+                                MyOrdersList(list = state.orders.filter { it.status == ORDER_CANCELED })
                             }
                         }
                     }
@@ -263,7 +261,7 @@ private fun OrderBox(order: Order) {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(stringResource(Res.string.amount), style = MaterialTheme.typography.bodyLarge)
-                            Text(order.getAmount(), style = MaterialTheme.typography.bodyMedium)
+//                            Text(order.getAmount(), style = MaterialTheme.typography.bodyMedium)
                         }
                         Spacer_8dp()
 

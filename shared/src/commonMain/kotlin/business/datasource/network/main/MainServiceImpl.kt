@@ -21,7 +21,6 @@ import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
-import business.domain.main.Order
 import business.domain.main.OrderResponse
 import business.domain.main.Quote
 import business.domain.main.SalesMan
@@ -398,7 +397,7 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun sendSpecProducts(
+    override suspend fun sendQuote(
         token: String,
         quote: Quote
     ): MainGenericResponse<OrderResponse> {

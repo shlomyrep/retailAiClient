@@ -25,6 +25,7 @@ import business.interactors.main.HomeInteractor
 import business.interactors.main.LikeInteractor
 import business.interactors.main.LogoutInteractor
 import business.interactors.main.ProductInteractor
+import business.interactors.main.QuoteInteractor
 import business.interactors.main.SearchInteractor
 import business.interactors.main.UpdateProfileInteractor
 import business.interactors.main.WishListInteractor
@@ -75,7 +76,7 @@ fun appModule(context: Context) = module {
     factory { PaymentMethodViewModel() }
     factory { NotificationsViewModel() }
     factory { MyCouponsViewModel() }
-    factory { MyOrdersViewModel(get()) }
+    factory { MyOrdersViewModel(get(),get()) }
     factory { CheckoutViewModel(get(), get(),get(), get()) }
     factory { WishlistViewModel(get(), get()) }
     factory { CartViewModel(get(), get(), get()) }
@@ -106,5 +107,6 @@ fun appModule(context: Context) = module {
     single { CheckUserInteractor(get()) }
     single { HomeInteractor(get(), get()) }
     single { BarcodeInteractor(get(), get()) }
+    single { QuoteInteractor(get(), get()) }
     single { ProductInteractor(get(), get()) }
 }
