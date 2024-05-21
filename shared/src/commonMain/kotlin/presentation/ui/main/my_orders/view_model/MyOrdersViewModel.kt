@@ -40,9 +40,7 @@ class MyOrdersViewModel(
     private val appDataStoreManager: AppDataStore
 ) : ViewModel() {
 
-
     val state: MutableState<MyOrdersState> = mutableStateOf(MyOrdersState())
-
 
     fun onTriggerEvent(event: MyOrdersEvent) {
         when (event) {
@@ -70,6 +68,10 @@ class MyOrdersViewModel(
                 )
             }
         }
+    }
+
+    private fun onUpdatePdfUrl(pdfUrl: String) {
+        state.value = state.value.copy(orderPdf = pdfUrl)
     }
 
     private fun onSendQuote(orderType: Int, order: Order) {
@@ -126,7 +128,7 @@ class MyOrdersViewModel(
 
                 is DataState.Data -> {
                     if (dataState.data?.orderPdf?.isNotEmpty() == true) {
-                        state.value = state.value.copy(orderPdf = dataState.data.orderPdf)
+                        onUpdatePdfUrl(dataState.data.orderPdf)
                     }
                 }
 
@@ -410,6 +412,7 @@ class MyOrdersViewModel(
         emailData.products = products
         return emailData
     }
+
     private fun getCustomerIdRegex() {
         viewModelScope.launch {
             val jsonSettings = appDataStoreManager.readValue(DataStoreKeys.CUSTOMER_CONFIG)
@@ -424,5 +427,9 @@ class MyOrdersViewModel(
             val customerIdRegex = customerConfig?.customerIdRegex ?: "^(|[45]\\d{7})$"
             state.value = state.value.copy(customerIdRegex = customerIdRegex)
         }
+    }
+
+    fun openPdf(url: String) {
+        appDataStoreManager.openPdfUrl(url)
     }
 }

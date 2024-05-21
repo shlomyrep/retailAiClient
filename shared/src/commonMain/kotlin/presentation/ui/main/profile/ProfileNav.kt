@@ -88,6 +88,7 @@ fun ProfileNav(logout: () -> Unit) {
             MyOrdersScreen(
                 state = viewModel.state.value,
                 events = viewModel::onTriggerEvent,
+                viewModel = viewModel
             ) {
                 navigator.popBackStack()
             }
