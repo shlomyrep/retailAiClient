@@ -8,7 +8,7 @@ import business.core.DataState
 import business.core.NetworkState
 import business.core.ProgressBarState
 import business.datasource.network.main.MainService
-import business.datasource.network.main.responses.AddImageResult
+import business.datasource.network.main.responses.Image
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.toHeldInventoryBatch
 import business.domain.main.HeldInventoryBatch
@@ -53,7 +53,7 @@ class ProductInteractor(
             emit(DataState.Loading(progressBarState = ProgressBarState.LoadingWithLogo))
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
             val apiResponse = service.productInventory(token = token, supplierId = supplierId, sku = sku)
-            val result = apiResponse?.toHeldInventoryBatch()
+            val result = apiResponse.result?.toHeldInventoryBatch()
             emit(DataState.NetworkStatus(NetworkState.Good))
             emit(DataState.Data(result))
         } catch (e: Exception) {
@@ -64,7 +64,7 @@ class ProductInteractor(
         }
     }
 
-    fun uploadImage(bitmap: ImageBitmap, sku: String, productId: String): Flow<DataState<AddImageResult>> = flow {
+    fun uploadImage(bitmap: ImageBitmap, sku: String, productId: String): Flow<DataState<Image>> = flow {
         try {
             emit(DataState.Loading(progressBarState = ProgressBarState.LoadingWithLogo))
 
@@ -72,7 +72,7 @@ class ProductInteractor(
 
             val apiResponse = service.uploadImage(token = token, bitmap, sku, productId)
             emit(DataState.NetworkStatus(NetworkState.Good))
-            emit(DataState.Data(apiResponse))
+            emit(DataState.Data(apiResponse.result))
         } catch (e: Exception) {
             e.printStackTrace()
             emit(handleUseCaseException(e))

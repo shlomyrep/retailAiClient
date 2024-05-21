@@ -294,11 +294,9 @@ class DetailViewModel(
                     }
 
                     is DataState.Data -> {
-                        dataState.data?.let { addImageResult ->
+                        dataState.data?.let { image ->
                             val currentImages = state.value.galleryImages.toMutableList()
-                            addImageResult.product.images.forEach { image ->
-                                currentImages.add(image.url)
-                            }
+                            currentImages.add(image.url)
                             state.value = state.value.copy(galleryImages = currentImages)
                         }
                     }
