@@ -18,6 +18,8 @@ data class OrderDTO(
     @SerialName("status") val status: Int?,
     @SerialName("address") val address: AddressDTO?,
     @SerialName("products") val products: List<ProductSelectable>?,
+    @SerialName("order_pdf") val orderPdf: String?,
+
 )
 
 fun OrderDTO.toOrder() = Order(
@@ -29,6 +31,7 @@ fun OrderDTO.toOrder() = Order(
     firstName = firstName ?: "",
     lastName = lastName ?: "",
     address = address?.toAddress() ?: Address(),
-    products = products ?: listOf()
+    products = products ?: listOf(),
+    orderPdf = orderPdf ?: ""
 )
 

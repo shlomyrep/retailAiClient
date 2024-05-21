@@ -388,11 +388,11 @@ private fun OrderBox(
                     .fillMaxWidth()
                     .padding(5.dp)
             ) {
-                if (state.orderPdf.isNotEmpty()) {
+                if (order.orderPdf.isNotEmpty()) {
                     ClickableTextWithCopy(
-                        text = state.orderPdf,
+                        text = order.orderPdf,
                         onClick = {
-                            viewModel.openPdf(state.orderPdf)
+                            viewModel.openPdf(order.orderPdf)
                         },
                         snackbarHostState = snackbarHostState
                     )
