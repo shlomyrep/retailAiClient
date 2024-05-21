@@ -1,6 +1,7 @@
 package business.datasource.network.main.responses
 
 import business.domain.main.Address
+import business.domain.main.CustomerConfig
 import business.domain.main.FlashSale
 import business.domain.main.Home
 import kotlinx.serialization.SerialName
@@ -15,7 +16,7 @@ data class HomeDTO(
     @SerialName("flash_sale") val flashSale: FlashSaleDTO?,
     @SerialName("most_sale") val mostSale: List<ProductSelectable>?,
     @SerialName("newest_product") val newestProduct: List<ProductSelectable>?,
-//    @SerialName("settings") val settings: Settings
+    @SerialName("config") val config: CustomerConfig
 )
 
 fun HomeDTO.toHome() = Home(
