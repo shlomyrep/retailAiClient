@@ -1,9 +1,6 @@
 package presentation.ui.main.my_orders
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,13 +9,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -27,8 +22,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
@@ -69,7 +62,7 @@ import org.jetbrains.compose.resources.stringResource
 import presentation.component.DEFAULT__BUTTON_SIZE
 import presentation.component.DefaultButton
 import presentation.component.DefaultScreenUI
-import presentation.component.Spacer_4dp
+import presentation.component.Spacer_12dp
 import presentation.component.Spacer_8dp
 import presentation.theme.BorderColor
 import presentation.theme.ProgressBarColor
@@ -78,23 +71,15 @@ import presentation.theme.Transparent
 import presentation.ui.main.my_orders.view_model.MyOrdersEvent
 import presentation.ui.main.my_orders.view_model.MyOrdersState
 import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.address
-import shoping_by_kmp.shared.generated.resources.amount
-import shoping_by_kmp.shared.generated.resources.cancel
 import shoping_by_kmp.shared.generated.resources.created_bid
 import shoping_by_kmp.shared.generated.resources.created_pdf
 import shoping_by_kmp.shared.generated.resources.customer_id
 import shoping_by_kmp.shared.generated.resources.customer_name
 import shoping_by_kmp.shared.generated.resources.date
 import shoping_by_kmp.shared.generated.resources.default_image_loader
-import shoping_by_kmp.shared.generated.resources.delivery_cost
-import shoping_by_kmp.shared.generated.resources.delivery_type
-import shoping_by_kmp.shared.generated.resources.enter_customer_id
 import shoping_by_kmp.shared.generated.resources.invalid_customer_id
 import shoping_by_kmp.shared.generated.resources.no_orders
-import shoping_by_kmp.shared.generated.resources.ok
 import shoping_by_kmp.shared.generated.resources.orders
-import shoping_by_kmp.shared.generated.resources.please_enter_customer_id
 import kotlin.random.Random
 
 
@@ -214,86 +199,9 @@ private fun MyOrdersList(events: (MyOrdersEvent) -> Unit, list: List<Order>, sta
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order, state: MyOrdersState) {
-    var isExpanded by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
+
     var customerId by remember { mutableStateOf("") }
     var customerIdError by remember { mutableStateOf<String?>(null) }
-
-    val rotationState by animateFloatAsState(
-        targetValue = if (isExpanded) 180f else 0f,
-        animationSpec = tween(350, easing = LinearEasing)
-    )
-
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text(text = stringResource(Res.string.enter_customer_id)) },
-            text = {
-                Column {
-                    Text(text = stringResource(Res.string.please_enter_customer_id))
-                    val errorMessages = stringResource(Res.string.invalid_customer_id)
-
-                    OutlinedTextField(
-                        value = customerId,
-                        onValueChange = { customerIdInput ->
-                            customerId = customerIdInput
-                            customerIdError = if (customerIdInput.isEmpty() || isValidCustomerId(state.customerIdRegex, customerIdInput)) {
-                                null
-                            } else {
-                                errorMessages
-                            }
-                        },
-                        label = { Text(text = stringResource(Res.string.customer_id)) },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(
-                            focusedContainerColor = Transparent,
-                            unfocusedContainerColor = Transparent,
-                            cursorColor = MaterialTheme.colorScheme.onBackground,
-                            focusedIndicatorColor = ProgressBarColor,
-                            unfocusedIndicatorColor = ProgressBarColor,
-                            disabledContainerColor = TextFieldColor,
-                            disabledTextColor = MaterialTheme.colorScheme.onBackground,
-                            disabledIndicatorColor = ProgressBarColor,
-                        ),
-                        shape = MaterialTheme.shapes.small,
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next,
-                            keyboardType = KeyboardType.Number,
-                        )
-                    )
-                    if (customerIdError != null) {
-                        Text(
-                            text = customerIdError ?: "",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(onClick = { showDialog = false }) {
-                        Text(text = stringResource(Res.string.cancel))
-                    }
-                    Spacer(modifier = Modifier.width(8.dp)) // Add spacing between buttons
-                    Button(onClick = {
-                        if (customerId.isNotEmpty() && isValidCustomerId(state.customerIdRegex, customerId)) {
-                            order.customerId = customerId
-                            events(MyOrdersEvent.OnSendQuote(1, order))
-                            showDialog = false
-                        }
-                    }) {
-                        Text(text = stringResource(Res.string.ok))
-                    }
-                }
-            }
-        )
-    }
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -307,7 +215,7 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order, state: MyOrd
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
+                    .padding(horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -315,17 +223,11 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order, state: MyOrd
                     "${stringResource(Res.string.date)}:  ${formatIsoStringToHebrew(order.createdAt)}",
                     style = MaterialTheme.typography.bodyLarge
                 )
-//                Icon(
-//                    painter = painterResource(Res.drawable.arrow_down),
-//                    null,
-//                    modifier = Modifier.size(35.dp).padding(4.dp).rotate(rotationState)
-//                        .noRippleClickable { isExpanded = !isExpanded })
             }
-            Spacer_4dp()
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -334,7 +236,56 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order, state: MyOrd
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
-            Spacer_8dp()
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .animateContentSize()
+                    .padding(horizontal = 10.dp),
+            ) {
+                val errorMessages = stringResource(Res.string.invalid_customer_id)
+                customerId = order.customerId
+                OutlinedTextField(
+                    value = customerId,
+                    onValueChange = { customerIdInput ->
+                        customerId = customerIdInput
+                        customerIdError =
+                            if (customerIdInput.isEmpty() || isValidCustomerId(state.customerIdRegex, customerIdInput)) {
+                                null
+                            } else {
+                                errorMessages
+                            }
+                    },
+                    label = { Text(text = stringResource(Res.string.customer_id)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(
+                        focusedContainerColor = Transparent,
+                        unfocusedContainerColor = Transparent,
+                        cursorColor = MaterialTheme.colorScheme.onBackground,
+                        focusedIndicatorColor = ProgressBarColor,
+                        unfocusedIndicatorColor = ProgressBarColor,
+                        disabledContainerColor = TextFieldColor,
+                        disabledTextColor = MaterialTheme.colorScheme.onBackground,
+                        disabledIndicatorColor = ProgressBarColor,
+                    ),
+                    shape = MaterialTheme.shapes.small,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Number,
+                    )
+                )
+                if (customerIdError != null) {
+                    Text(
+                        text = customerIdError ?: "",
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+            Spacer_12dp()
+
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 8.dp)
@@ -380,86 +331,7 @@ private fun OrderBox(events: (MyOrdersEvent) -> Unit, order: Order, state: MyOrd
                     if (order.customerId.isNotEmpty()) {
                         events(MyOrdersEvent.OnSendQuote(1, order))
                     } else {
-                        showDialog = true
-                    }
-                }
-            }
 
-            if (isExpanded) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp)
-                ) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                stringResource(Res.string.amount),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-//                            Text(order.getAmount(), style = MaterialTheme.typography.bodyMedium)
-                        }
-                        Spacer_8dp()
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                stringResource(Res.string.delivery_cost),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Text(
-                                order.shippingType.getPrice(),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                        Spacer_8dp()
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                stringResource(Res.string.delivery_type),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Text(
-                                order.shippingType.title,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                        Spacer_8dp()
-
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp),
-                            horizontalAlignment = Alignment.Start,
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Text(
-                                stringResource(Res.string.address),
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Text(
-                                order.address.getShippingAddress(),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
                     }
                 }
             }
