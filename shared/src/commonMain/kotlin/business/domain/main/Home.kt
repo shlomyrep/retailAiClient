@@ -7,5 +7,5 @@ data class Home(
     val flashSale: FlashSale = FlashSale(),
     val mostSale: List<Product> = listOf(),
     val newestProduct: List<Product> = listOf(),
-//    val settings: Settings = Settings()
+    val config: CustomerConfig = CustomerConfig()
 )

@@ -8,17 +8,18 @@ import business.core.NetworkState
 import business.core.ProgressBarState
 import business.datasource.network.main.MainService
 import business.datasource.network.main.responses.toHome
+import business.domain.main.CustomerConfig
 import business.domain.main.Home
 import business.util.createException
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
 
 class HomeInteractor(
     private val service: MainService,
     private val appDataStoreManager: AppDataStore,
 ) {
-
 
     fun execute(): Flow<DataState<Home>> = flow {
 
@@ -35,12 +36,12 @@ class HomeInteractor(
                     apiResponse.alert?.createException()
                 )
             }
-//            val settingsResult = apiResponse.result?.settings
-//
-//            if (settingsResult != null) {
-//                val jsonSettings = Json.encodeToString(Settings.serializer(), settingsResult)
-//                appDataStoreManager.setValue(DataStoreKeys.SETTINGS, jsonSettings)
-//            }
+            val configResult = apiResponse.result?.config
+
+            if (configResult != null) {
+                val jsonConfig = Json.encodeToString(CustomerConfig.serializer(), configResult)
+                appDataStoreManager.setValue(DataStoreKeys.CUSTOMER_CONFIG, jsonConfig)
+            }
 
             val result = apiResponse.result?.toHome()
 
@@ -56,9 +57,5 @@ class HomeInteractor(
         } finally {
             emit(DataState.Loading(progressBarState = ProgressBarState.Idle))
         }
-
-
     }
-
-
 }

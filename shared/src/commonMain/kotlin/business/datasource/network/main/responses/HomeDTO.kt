@@ -21,9 +21,10 @@ data class HomeDTO(
 
 fun HomeDTO.toHome() = Home(
     address = address?.toAddress() ?: Address(),
-    banners = banners?.map { it.toBanner() }?: listOf(),
-    categories = categories?.map { it.toCategory() }?: listOf(),
-    flashSale = flashSale?.toFlashSale()?:FlashSale(),
-    mostSale = mostSale?.map { it.toProduct() }?: listOf(),
-    newestProduct = newestProduct?.map { it.toProduct() }?: listOf()
+    banners = banners?.map { it.toBanner() } ?: listOf(),
+    categories = categories?.map { it.toCategory() } ?: listOf(),
+    flashSale = flashSale?.toFlashSale() ?: FlashSale(),
+    mostSale = mostSale?.map { it.toProduct() } ?: listOf(),
+    newestProduct = newestProduct?.map { it.toProduct() } ?: listOf(),
+    config = config
 )

@@ -229,10 +229,9 @@ fun CheckoutButtonBox(
     }
 }
 
-// TODO(Replace with regex from customer config file)
+
 fun isValidCustomerId(customerIdRegex: String, customerId: String): Boolean {
-    val regex = Regex("^(|[45]\\d{7})$")
-//    val regex = Regex(customerIdRegex)
+    val regex = Regex(customerIdRegex)
     return regex.matches(customerId)
 }
 
