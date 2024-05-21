@@ -76,8 +76,8 @@ fun appModule(context: Context) = module {
     factory { PaymentMethodViewModel() }
     factory { NotificationsViewModel() }
     factory { MyCouponsViewModel() }
-    factory { MyOrdersViewModel(get(),get()) }
-    factory { CheckoutViewModel(get(), get(),get(), get()) }
+    factory { MyOrdersViewModel(get(), get(), get()) }
+    factory { CheckoutViewModel(get(), get(), get(), get()) }
     factory { WishlistViewModel(get(), get()) }
     factory { CartViewModel(get(), get(), get()) }
     factory { DetailViewModel(get(), get(), get(), get(), get()) }

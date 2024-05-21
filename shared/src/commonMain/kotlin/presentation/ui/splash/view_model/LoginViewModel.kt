@@ -214,8 +214,7 @@ class LoginViewModel(
 
     private fun onRetryNetwork() {
     }
-
-
+    
     private fun onUpdateNetworkState(networkState: NetworkState) {
         state.value = state.value.copy(networkState = networkState)
     }

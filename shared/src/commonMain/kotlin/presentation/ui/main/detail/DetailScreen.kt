@@ -383,7 +383,7 @@ fun DetailScreen(
                     BuyButtonBox(
                         state.product
                     ) {
-                        events(DetailEvent.AddBasket(state.product))
+                        events(DetailEvent.AddBasket(state.product,""))
                     }
                 }
             }

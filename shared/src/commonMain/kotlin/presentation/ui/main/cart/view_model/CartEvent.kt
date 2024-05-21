@@ -8,7 +8,7 @@ sealed class CartEvent {
 
     data class DeleteFromBasket(val id: String) : CartEvent()
 
-    data class AddProduct(val id: ProductSelectable) : CartEvent()
+    data class AddProduct(val id: ProductSelectable,val cartItemId:String) : CartEvent()
 
    data object OnRemoveHeadFromQueue : CartEvent()
 

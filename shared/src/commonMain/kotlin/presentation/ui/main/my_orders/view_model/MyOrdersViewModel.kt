@@ -3,6 +3,8 @@ package presentation.ui.main.my_orders.view_model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import business.constants.CUSTOM_TAG
+import business.constants.DataStoreKeys
+import business.core.AppDataStore
 import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
@@ -12,15 +14,19 @@ import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.SizeSelectable
 import business.datasource.network.main.responses.getCustomizationSteps
 import business.domain.main.Content
+import business.domain.main.CustomerConfig
 import business.domain.main.EmailData
 import business.domain.main.Line
 import business.domain.main.Order
 import business.domain.main.OrderProduct
 import business.domain.main.Quote
+import business.domain.main.SalesMan
 import business.interactors.main.GetOrdersInteractor
 import business.interactors.main.QuoteInteractor
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -30,16 +36,14 @@ import shoping_by_kmp.shared.generated.resources.sku
 
 class MyOrdersViewModel(
     private val getOrdersInteractor: GetOrdersInteractor,
-    private val quoteInteractor: QuoteInteractor
+    private val quoteInteractor: QuoteInteractor,
+    private val appDataStoreManager: AppDataStore
 ) : ViewModel() {
-
 
     val state: MutableState<MyOrdersState> = mutableStateOf(MyOrdersState())
 
-
     fun onTriggerEvent(event: MyOrdersEvent) {
         when (event) {
-
 
             is MyOrdersEvent.OnRemoveHeadFromQueue -> {
                 removeHeadMessage()
@@ -58,23 +62,37 @@ class MyOrdersViewModel(
             }
 
             is MyOrdersEvent.OnSendQuote -> {
-                onSendQuote(event.orderType, event.customerId, event.erpCodeID, event.firstName, event.lastName, event.order)
+                onSendQuote(
+                    event.orderType,
+                    event.order
+                )
             }
         }
     }
 
-    private fun onSendQuote(orderType: Int, customerId: String, erpCodeID: String, firstName: String, lastName: String, order: Order) {
+    private fun onUpdatePdfUrl(pdfUrl: String) {
+        state.value = state.value.copy(orderPdf = pdfUrl)
+    }
+
+    private fun onSendQuote(orderType: Int, order: Order) {
+        var erpCodeID = ""
+        viewModelScope.launch {
+            val jsonSalesMan = appDataStoreManager.readValue(DataStoreKeys.SALES_MAN)
+            val user = jsonSalesMan?.let { Json.decodeFromString(SalesMan.serializer(), it) }
+            erpCodeID = user?.erpID ?: ""
+        }
         val quote = Quote(
             orderType,
-            customerId,
+            order.customerId,
             erpCodeID,
-            setEmailDataObject(firstName, lastName, order)
+            setEmailDataObject(order.firstName, order.lastName, order)
         )
         sendQuote(quote)
     }
 
     init {
         getOrders()
+        getCustomerIdRegex()
     }
 
     private fun getOrders() {
@@ -110,7 +128,7 @@ class MyOrdersViewModel(
 
                 is DataState.Data -> {
                     if (dataState.data?.orderPdf?.isNotEmpty() == true) {
-                        state.value = state.value.copy(orderPdf = dataState.data.orderPdf)
+                        onUpdatePdfUrl(dataState.data.orderPdf)
                     }
                 }
 
@@ -164,7 +182,7 @@ class MyOrdersViewModel(
         val emailData = EmailData()
         val products = mutableListOf<OrderProduct>()
         val orderProduct = OrderProduct()
-        emailData.title ="$firstName $lastName"
+        emailData.title = "$firstName $lastName"
         emailData.date = order.createdAt
 
         // טובול לוגו
@@ -395,5 +413,23 @@ class MyOrdersViewModel(
         return emailData
     }
 
+    private fun getCustomerIdRegex() {
+        viewModelScope.launch {
+            val jsonSettings = appDataStoreManager.readValue(DataStoreKeys.CUSTOMER_CONFIG)
+            val customerConfig = jsonSettings?.takeIf { it.isNotEmpty() }?.let {
+                try {
+                    Json.decodeFromString(CustomerConfig.serializer(), it)
+                } catch (e: Exception) {
+                    // Log the error and return null if deserialization fails
+                    null
+                }
+            }
+            val customerIdRegex = customerConfig?.customerIdRegex ?: "^(|[45]\\d{7})$"
+            state.value = state.value.copy(customerIdRegex = customerIdRegex)
+        }
+    }
 
+    fun openPdf(url: String) {
+        appDataStoreManager.openPdfUrl(url)
+    }
 }

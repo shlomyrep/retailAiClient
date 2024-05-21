@@ -326,9 +326,9 @@ fun DismissCartContent(
                                 .focusRequester(focusRequester)
                                 .onFocusChanged { focusState ->
                                     if (isFocused && !focusState.isFocused) {
-                                        if (selectedRoomName.isNotEmpty()){
+                                        if (selectedRoomName.isNotEmpty()) {
                                             basket.product.roomName = selectedRoomName
-                                            events(CartEvent.AddProduct(basket.product))
+                                            events(CartEvent.AddProduct(basket.product, basket.id))
                                             isFocused = false
                                         }
                                     } else if (focusState.isFocused) {
@@ -369,7 +369,7 @@ fun DismissCartContent(
                                     onClick = {
                                         selectedRoomName = roomName
                                         basket.product.roomName = roomName
-                                        events(CartEvent.AddProduct(basket.product))
+                                        events(CartEvent.AddProduct(basket.product, basket.id))
                                         expanded = false
                                         focusManager.clearFocus()
                                     },
@@ -413,8 +413,6 @@ fun DismissCartContent(
         HorizontalDivider(modifier = Modifier.fillMaxWidth())
     }
 }
-
-
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)

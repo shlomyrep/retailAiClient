@@ -30,7 +30,7 @@ class CartViewModel(
         when (event) {
 
             is CartEvent.AddProduct -> {
-                addProduct(productSelectable = event.id)
+                addProduct(productSelectable = event.id, cartItemId = event.cartItemId )
             }
 
             is CartEvent.DeleteFromBasket -> {
@@ -110,8 +110,8 @@ class CartViewModel(
     }
 
 
-    private fun addProduct(productSelectable: ProductSelectable) {
-        addBasketInteractor.execute(productSelectable = productSelectable).onEach { dataState ->
+    private fun addProduct(productSelectable: ProductSelectable, cartItemId:String) {
+        addBasketInteractor.execute(productSelectable = productSelectable, cartItemId).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {}
                 is DataState.Response -> {

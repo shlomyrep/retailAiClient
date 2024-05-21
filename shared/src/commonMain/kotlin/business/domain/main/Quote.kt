@@ -1,7 +1,9 @@
 package business.domain.main
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Quote(
     var type: Int = Type.NONE.ordinal,
     var customerId: String = "",
@@ -10,11 +12,11 @@ data class Quote(
     var emailData: EmailData = EmailData(),
     var orderStatus: String = "",
 )
-
+@Serializable
 data class OrderResponse(
     var orderPdf: String = ""
 )
-
+@Serializable
 data class EmailData(
     var header_image: String = "",
     var products: List<OrderProduct> = listOf(),
@@ -22,7 +24,7 @@ data class EmailData(
     var date: String = "",
     var address: String = "",
 )
-
+@Serializable
 data class OrderProduct(
     var content: List<Content> = listOf(),
     var main_images: List<String> = listOf(),
@@ -33,19 +35,19 @@ data class OrderProduct(
     var roomName: String = "",
     var notes: String = ""
 )
-
+@Serializable
 data class Content(
     var lines: List<Line> = listOf(),
     var sku: String = ""
 )
-
+@Serializable
 data class Line(
     var assets: List<String> = listOf(),
     var text: String = "",
     var longDescription: String = ""
 )
 
-
+@Serializable
 enum class Type(val type: Int) {
     NONE(0),
     OPEN_BID_IN_ERP(1),

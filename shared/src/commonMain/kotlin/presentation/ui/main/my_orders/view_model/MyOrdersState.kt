@@ -13,5 +13,6 @@ data class MyOrdersState(
     val networkState: NetworkState = NetworkState.Good,
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf()),
     val quote: Quote = Quote(),
-    val orderPdf: String = ""
+    val orderPdf: String = "",
+    val customerIdRegex: String = "",
 )

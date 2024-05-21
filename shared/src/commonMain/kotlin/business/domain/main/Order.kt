@@ -6,7 +6,7 @@ data class Order(
     val products: List<ProductSelectable>,
     val status: Int,
     val code: String,
-    val customerId: String,
+    var customerId: String,
     val firstName: String,
     val lastName: String,
     val createdAt: String,

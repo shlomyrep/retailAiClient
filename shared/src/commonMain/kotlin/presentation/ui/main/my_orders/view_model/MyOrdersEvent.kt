@@ -15,10 +15,6 @@ sealed class MyOrdersEvent {
     data object OnRetryNetwork : MyOrdersEvent()
     data class OnSendQuote(
         val orderType: Int,
-        val customerId: String,
-        val erpCodeID: String,
-        val firstName: String,
-        val lastName: String,
         val order: Order
     ) : MyOrdersEvent()
 

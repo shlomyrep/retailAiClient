@@ -196,9 +196,10 @@ class ScannerActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun createBarcodeButtons(barcodes: List<Barcode>) {
         isProcessingEnabled = false
-
+        val skuPattern = Regex(skuRegex)
         barcodes.forEach { barcode ->
-            if (barcode.rawValue?.length!! > 7) {
+            val barcodeValue = barcode.rawValue ?: ""
+            if (barcodeValue.length > 7 && skuPattern.matches(barcodeValue)) {
                 val buttonLayout = createButtonLayout()
 
                 val barcodeButton = TextView(this).apply {
@@ -209,7 +210,7 @@ class ScannerActivity : AppCompatActivity() {
                         gravity = Gravity.CENTER
                     }
                     elevation = 1.5f
-                    text = " פתח מוצר ${barcode.displayValue}"
+                    text = " פתח מוצר $barcodeValue"
                     textSize = 18f
                     setTextColor(Color.BLACK)
                     typeface = ResourcesCompat.getFont(this@ScannerActivity, R.font.lato_regular)
@@ -219,7 +220,7 @@ class ScannerActivity : AppCompatActivity() {
                 barcodeButton.setOnClickListener {
                     barcodeButton.visibility = View.INVISIBLE
                     barcodeButton.isEnabled = false
-                    handleBarcodeClick(barcode.rawValue ?: "")
+                    handleBarcodeClick(barcodeValue)
                 }
                 buttonLayout.addView(barcodeButton)
                 barcodeButtonContainer.addView(buttonLayout)
@@ -249,15 +250,6 @@ class ScannerActivity : AppCompatActivity() {
     private fun dpToPx(dp: Int): Int {
         val density = this.resources?.displayMetrics?.density ?: 1f
         return (dp * density).toInt()
-    }
-
-    private fun showProgressBar() {
-        progressBar.visibility = View.VISIBLE
-        resetButtonGeneration()
-    }
-
-    private fun hideProgressBar() {
-        progressBar.visibility = View.GONE
     }
 
     private fun allPermissionsGranted() = arrayOf(Manifest.permission.CAMERA).all {

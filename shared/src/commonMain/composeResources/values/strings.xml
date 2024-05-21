@@ -106,8 +106,17 @@
     <string name="first_name">שם פרטי</string>
     <string name="last_name">שם משפחה</string>
     <string name="customer_id">מספר לקוח</string>
+    <string name="customer_name">שם לקוח</string>
     <string name="room_name_header_text"> שם חדר:</string>
     <string name="model_text"> דגם </string>
+    <string name="date">תאריך </string>
+    <string name="created_pdf">יצירת pdf </string>
+    <string name="created_bid">הצעת מחיר</string>
+    <string name="enter_customer_id">מספר לקוח</string>
+    <string name="please_enter_customer_id">הזן מספר לקוח</string>
+    <string name="invalid_customer_id">יש להזין מספר לקוח תקין</string>
+    <string name="copy_pdf_hint_text">לחץ על השם המפרט לפתיחה\nלחץ לחיצה ארוכה בכדי להעתיק את קישור ה - Pdf</string>
+
 
     <!--    room names list-->
     <string name="general_bath">אמבטיה כללית</string>
