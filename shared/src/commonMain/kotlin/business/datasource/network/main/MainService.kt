@@ -10,6 +10,7 @@ import business.datasource.network.main.responses.BasketDTO
 import business.datasource.network.main.responses.CommentDTO
 import business.datasource.network.main.responses.HeldInventoryBatchDTO
 import business.datasource.network.main.responses.HomeDTO
+import business.datasource.network.main.responses.Image
 import business.datasource.network.main.responses.OrderDTO
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.ProfileDTO
@@ -37,7 +38,7 @@ interface MainService {
         const val COMMENT = "comment"
         const val WISHLIST = "wishlist"
         const val ADDRESS = "address"
-        const val PRODUCT_INVENTORY = "inventory"
+        const val PRODUCT_INVENTORY = "inventory/mp"
     }
 
     suspend fun getOrders(
@@ -122,8 +123,7 @@ interface MainService {
         token: String,
         supplierId: String,
         sku: String
-    ): HeldInventoryBatchDTO
-
+    ): MainGenericResponse<HeldInventoryBatchDTO>
 
 
     suspend fun uploadImage(
@@ -131,7 +131,7 @@ interface MainService {
         bitmap: ImageBitmap,
         sku: String,
         productId: String
-    ): AddImageResult
+    ): MainGenericResponse<Image>
 
     suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?>
     suspend fun wishlist(

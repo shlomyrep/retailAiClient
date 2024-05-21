@@ -15,6 +15,7 @@ import business.datasource.network.main.responses.CommentDTO
 import business.datasource.network.main.responses.CommentRequestDTO
 import business.datasource.network.main.responses.HeldInventoryBatchDTO
 import business.datasource.network.main.responses.HomeDTO
+import business.datasource.network.main.responses.Image
 import business.datasource.network.main.responses.OrderDTO
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.ProfileDTO
@@ -383,7 +384,7 @@ class MainServiceImpl(
         token: String,
         supplierId: String,
         sku: String
-    ): HeldInventoryBatchDTO {
+    ): MainGenericResponse<HeldInventoryBatchDTO> {
         return httpClient.get {
             headers {
                 append(HttpHeaders.Authorization, token)
@@ -406,7 +407,7 @@ class MainServiceImpl(
                 headers {
                     append(HttpHeaders.Authorization, token)
                 }
-                takeFrom(BASE_URL + "api/product/mail")
+                takeFrom(BASE_URL + "api/product/order")
             }
             contentType(ContentType.Application.Json)
             setBody(quote)
@@ -420,8 +421,8 @@ class MainServiceImpl(
         bitmap: ImageBitmap,
         sku: String,
         productId: String
-    ): AddImageResult {
-        val imageUrl = "$BASE_URL/product/picture/$productId?sku=$sku"
+    ): MainGenericResponse<Image> {
+        val imageUrl = "$BASE_URL/product/image/$productId?sku=$sku"
         return httpClient.post {
             url(imageUrl)
             headers {
@@ -442,7 +443,7 @@ class MainServiceImpl(
                     )
                 }
             )
-        }.body<AddImageResult>()
+        }.body()
     }
 
     override suspend fun like(token: String, id: String): MainGenericResponse<JRNothing?> {
