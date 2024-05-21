@@ -20,12 +20,16 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -91,6 +95,7 @@ import shoping_by_kmp.shared.generated.resources.customer_id
 import shoping_by_kmp.shared.generated.resources.customer_name
 import shoping_by_kmp.shared.generated.resources.date
 import shoping_by_kmp.shared.generated.resources.default_image_loader
+import shoping_by_kmp.shared.generated.resources.edit_order
 import shoping_by_kmp.shared.generated.resources.invalid_customer_id
 import shoping_by_kmp.shared.generated.resources.no_orders
 import shoping_by_kmp.shared.generated.resources.orders
@@ -272,6 +277,27 @@ private fun OrderBox(
                     "${stringResource(Res.string.date)}:  ${formatIsoStringToHebrew(order.createdAt)}",
                     style = MaterialTheme.typography.bodyLarge
                 )
+                IconButton(
+                    onClick = {
+                        
+                    }
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(Res.string.edit_order),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
             Row(
                 modifier = Modifier

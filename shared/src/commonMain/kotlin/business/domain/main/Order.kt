@@ -12,7 +12,6 @@ data class Order(
     val createdAt: String,
     val address: Address,
     val shippingType: ShippingType,
-    val orderPdf: String
-) {
-//    fun getAmount() = "$ ${products.sumOf { it.price } + shippingType.price}"
-}
+    val orderPdf: String,
+    val orderId: String
+)
