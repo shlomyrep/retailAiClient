@@ -70,8 +70,9 @@ actual fun Context.deviceDataFetcher(scope: CoroutineScope, onDeviceDataFetched:
             uuid = uuid,
             username = "username",
             name = name,
-            version = version,
+            version = getAppVersion(this@deviceDataFetcher),
             deviceType = deviceType,
+            modelName = Build.MODEL,
             lastInteractionTime = lastInteractionTime,
             versionCode = versionCode
         )
@@ -79,6 +80,16 @@ actual fun Context.deviceDataFetcher(scope: CoroutineScope, onDeviceDataFetched:
         onDeviceDataFetched(deviceData)
     }
 }
+
+fun getAppVersion(context: Context): String {
+    return try {
+        val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        packageInfo.versionName
+    } catch (e: Exception) {
+        "Unknown"
+    }
+}
+
 
 
 

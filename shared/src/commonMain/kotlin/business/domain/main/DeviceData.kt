@@ -10,6 +10,7 @@ data class DeviceData (
     var version: String = "",
     var fcm: String = "",
     var deviceType: String = "",
+    var modelName: String = "",
     var lastInteractionTime: Long = 0,
     var versionCode: Int = 0
 )

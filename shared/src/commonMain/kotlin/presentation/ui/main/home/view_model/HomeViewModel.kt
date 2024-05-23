@@ -10,6 +10,8 @@ import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
 import business.domain.main.CustomerConfig
+import business.domain.main.SalesMan
+import business.interactors.main.DeviceDataInteractor
 import business.interactors.main.HomeInteractor
 import business.interactors.main.LikeInteractor
 import kotlinx.coroutines.flow.launchIn
@@ -23,6 +25,7 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class HomeViewModel(
+    private val deviceDataInteractor: DeviceDataInteractor,
     private val homeInteractor: HomeInteractor,
     private val likeInteractor: LikeInteractor,
     private val appDataStoreManager: AppDataStore,
@@ -58,6 +61,7 @@ class HomeViewModel(
 
     init {
         getHome()
+        getDeviceData()
     }
 
 
@@ -245,4 +249,35 @@ class HomeViewModel(
         }
     }
 
+    private fun getDeviceData() {
+        viewModelScope.launch {
+            val username = appDataStoreManager.readValue(DataStoreKeys.EMAIL) ?: ""
+            val jsonSalesMan = appDataStoreManager.readValue(DataStoreKeys.SALES_MAN)
+            val user = jsonSalesMan?.let { Json.decodeFromString(SalesMan.serializer(), it) }
+            val name = user?.username ?: ""
+
+            appDataStoreManager.fetchDeviceData(this) { result ->
+                println("result, username: $username")
+                println("result, name: ${result.name}")
+                println("result, version: ${result.version}")
+                println("result, deviceType: ${result.deviceType}")
+                println("result, modelName: ${result.modelName}")
+                println("result, lastInteractionTime: ${result.lastInteractionTime}")
+                println("result, versionCode: ${result.versionCode}")
+                val uuid = "${user?.username}${user?.erpID}${result.modelName}".hashCode()
+                println("result, uuid: $uuid")
+
+                deviceDataInteractor.execute(
+                    uuid.toString(),
+                    username,
+                    name,
+                    result.version,
+                    result.deviceType,
+                    result.modelName,
+                    result.lastInteractionTime,
+                    result.versionCode
+                )
+            }
+        }
+    }
 }

@@ -15,6 +15,7 @@ import business.interactors.main.BarcodeInteractor
 import business.interactors.main.BasketListInteractor
 import business.interactors.main.BuyProductInteractor
 import business.interactors.main.DeleteBasketInteractor
+import business.interactors.main.DeviceDataInteractor
 import business.interactors.main.GetAddressesInteractor
 import business.interactors.main.GetCommentsInteractor
 import business.interactors.main.GetEmailFromCacheInteractor
@@ -67,7 +68,7 @@ fun appModule(context: Context) = module {
     single<AppDataStore> { AppDataStoreManager(context) }
     factory { SharedViewModel(get()) }
     factory { LoginViewModel(get(), get(), get(), get(), get()) }
-    factory { HomeViewModel(get(), get(), get()) }
+    factory { HomeViewModel(get(),get(), get(), get()) }
     factory { AddressViewModel(get(), get()) }
     factory { CategoriesViewModel(get()) }
     factory { ProfileViewModel(get()) }
@@ -109,4 +110,5 @@ fun appModule(context: Context) = module {
     single { BarcodeInteractor(get(), get()) }
     single { QuoteInteractor(get(), get()) }
     single { ProductInteractor(get(), get()) }
+    single { DeviceDataInteractor(get(), get()) }
 }
