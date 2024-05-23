@@ -1,8 +1,11 @@
 package common
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.widget.Toast
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -10,7 +13,10 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import business.core.APP_DATASTORE
+import business.domain.main.DeviceData
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(APP_DATASTORE)
@@ -44,6 +50,33 @@ actual fun Context.pdfOpener(url: String) {
         this.startActivity(intent)
     } catch (e: ActivityNotFoundException) {
         Toast.makeText(this, "No application found to open PDF.", Toast.LENGTH_SHORT).show()
+    }
+}
+
+@SuppressLint("HardwareIds")
+actual fun Context.deviceDataFetcher(scope: CoroutineScope, onDeviceDataFetched: (DeviceData) -> Unit) {
+    DeviceDataBridge.getDeviceData?.invoke()
+
+    scope.launch {
+        val uuid = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+
+        val name = Build.MODEL
+        val version = Build.VERSION.RELEASE
+        val deviceType = "Android"
+        val lastInteractionTime = System.currentTimeMillis()
+        val versionCode = packageManager.getPackageInfo(packageName, 0).versionCode
+
+        val deviceData = DeviceData(
+            uuid = uuid,
+            username = "username",
+            name = name,
+            version = version,
+            deviceType = deviceType,
+            lastInteractionTime = lastInteractionTime,
+            versionCode = versionCode
+        )
+
+        onDeviceDataFetched(deviceData)
     }
 }
 

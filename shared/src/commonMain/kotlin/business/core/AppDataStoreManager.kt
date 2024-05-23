@@ -1,10 +1,13 @@
 package business.core
 
+import business.domain.main.DeviceData
 import common.Context
+import common.deviceDataFetcher
 import common.getData
 import common.openNativeScreen
 import common.pdfOpener
 import common.putData
+import kotlinx.coroutines.CoroutineScope
 
 const val APP_DATASTORE = "com.razzaghi.shoppingbykmp"
 
@@ -31,4 +34,7 @@ class AppDataStoreManager(val context: Context) : AppDataStore {
         context.pdfOpener(url)
     }
 
+    override fun fetchDeviceData(scope: CoroutineScope, onDeviceDataFetched: (DeviceData) -> Unit) {
+        context.deviceDataFetcher(scope, onDeviceDataFetched)
+    }
 }

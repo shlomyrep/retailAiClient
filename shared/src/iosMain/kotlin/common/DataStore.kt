@@ -1,5 +1,7 @@
 package common
 
+import business.domain.main.DeviceData
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import platform.Foundation.NSLog
 import platform.Foundation.NSUserDefaults
@@ -24,4 +26,10 @@ actual fun Context.openNativeScreen(skuRegex: String, onScanResult: (String) -> 
 
 actual fun Context.pdfOpener(url: String) {
     PdfOpenerBridge.openPdfFunc?.invoke(url)
+
+}
+
+actual fun Context.deviceDataFetcher(scope: CoroutineScope, onDeviceDataFetched: (DeviceData) -> Unit) {
+    DeviceDataBridge.getDeviceData?.invoke()
+    DeviceDataBridge.handleDeviceDataResult = onDeviceDataFetched
 }

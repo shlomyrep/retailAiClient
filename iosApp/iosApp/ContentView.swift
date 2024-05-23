@@ -20,9 +20,47 @@ struct ContentView: View {
                 PdfOpenerBridge.shared.openPdfFunc = { (url: String) in
                     openPdfFromSwift(url: url)
                 }
+                
+                DeviceDataBridge.shared.getDeviceData = {
+                    fetchDeviceData()
+                }
+                
             }
             .ignoresSafeArea(.all, edges: .bottom) // Compose has own keyboard handler
     }
+}
+
+func fetchDeviceData() {
+//     Collect device data
+    let uuid = UIDevice.current.identifierForVendor?.uuidString ?? ""
+    let username = "YourUsername" // Replace with actual username if available
+    let name = UIDevice.current.model
+    let fcm = ""
+    let version = UIDevice.current.systemVersion
+    let deviceType = "iOS"
+    let lastInteractionTime = Date().timeIntervalSince1970
+    let versionCode = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
+
+    let deviceData = DeviceData(
+        uuid: uuid,
+        username: username,
+        name: name,
+        version: version,
+        fcm:fcm,
+        deviceType: deviceType,
+        lastInteractionTime: Int64(lastInteractionTime),
+        versionCode: Int32(versionCode) ?? 0
+    )
+
+    DeviceDataBridge.shared.handleDeviceDataResult?(deviceData)
+    NSLog("TAMIR --> fetchDeviceData -->  : \(uuid)")
+    NSLog("TAMIR --> fetchDeviceData -->  : \(username)")
+    NSLog("TAMIR --> fetchDeviceData -->  : \(name)")
+    NSLog("TAMIR --> fetchDeviceData -->  : \(fcm)")
+    NSLog("TAMIR --> fetchDeviceData -->  : \(version)")
+    NSLog("TAMIR --> fetchDeviceData -->  : \(deviceType)")
+    NSLog("TAMIR --> fetchDeviceData -->  : \(lastInteractionTime)")
+    NSLog("TAMIR --> fetchDeviceData -->  : \(versionCode)")
 }
 
 func openScannerScreenFromSwift(skuRegex: String) {
