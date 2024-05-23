@@ -319,6 +319,7 @@ private fun OrderBox(
                     .padding(horizontal = 10.dp),
             ) {
                 val errorMessages = stringResource(Res.string.invalid_customer_id)
+                val isTextFieldEditable = order.customerId.isEmpty()
                 OutlinedTextField(
                     value = customerId,
                     onValueChange = { customerIdInput ->
@@ -330,6 +331,7 @@ private fun OrderBox(
                                 errorMessages
                             }
                     },
+                    enabled = isTextFieldEditable,
                     label = { Text(text = stringResource(Res.string.customer_id)) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ExposedDropdownMenuDefaults.textFieldColors(

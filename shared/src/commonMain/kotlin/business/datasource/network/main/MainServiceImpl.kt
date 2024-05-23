@@ -4,7 +4,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import business.constants.BASE_URL
 import business.datasource.network.common.JRNothing
 import business.datasource.network.common.MainGenericResponse
-import business.datasource.network.main.responses.AddImageResult
 import business.datasource.network.main.responses.AddressDTO
 import business.datasource.network.main.responses.AddressRequestDTO
 import business.datasource.network.main.responses.BasketAddRequestDTO
@@ -22,6 +21,7 @@ import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
+import business.domain.main.DeviceData
 import business.domain.main.OrderResponse
 import business.domain.main.Quote
 import business.domain.main.SalesMan
@@ -89,6 +89,24 @@ class MainServiceImpl(
                     lastName = customerLastName,
                     customerId = customerId
                 )
+            )
+        }.body()
+    }
+    override suspend fun sendClientData(
+        token: String,
+        deviceData: DeviceData,
+    ): MainGenericResponse<JRNothing> {
+        return httpClient.post {
+            url {
+                headers {
+                    append(HttpHeaders.Authorization, token)
+                }
+                takeFrom(BASE_URL)
+                encodedPath += "tablet"
+            }
+            contentType(ContentType.Application.Json)
+            setBody(
+                deviceData
             )
         }.body()
     }

@@ -4,7 +4,6 @@ package business.datasource.network.main
 import androidx.compose.ui.graphics.ImageBitmap
 import business.datasource.network.common.JRNothing
 import business.datasource.network.common.MainGenericResponse
-import business.datasource.network.main.responses.AddImageResult
 import business.datasource.network.main.responses.AddressDTO
 import business.datasource.network.main.responses.BasketDTO
 import business.datasource.network.main.responses.CommentDTO
@@ -17,6 +16,7 @@ import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
+import business.domain.main.DeviceData
 import business.domain.main.OrderResponse
 import business.domain.main.Quote
 import business.domain.main.SalesMan
@@ -52,6 +52,11 @@ interface MainService {
         customerFirstName: String,
         customerLastName: String,
         customerId: String
+    ): MainGenericResponse<JRNothing>
+
+    suspend fun sendClientData(
+        token: String,
+        deviceData: DeviceData,
     ): MainGenericResponse<JRNothing>
 
     suspend fun getAddresses(
@@ -105,7 +110,7 @@ interface MainService {
         token: String,
         salesMan: SalesMan,
         productSelectable: ProductSelectable,
-        cartItemId:String
+        cartItemId: String
     ): MainGenericResponse<JRNothing?>
 
     suspend fun basketDelete(
