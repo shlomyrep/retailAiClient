@@ -32,7 +32,7 @@ struct ContentView: View {
 
 func fetchDeviceData() {
 //     Collect device data
-    let uuid = UIDevice.current.identifierForVendor?.uuidString ?? ""
+    let uuid = UIDevice.current.identifierForVendor?.uuidString ?? "" 
     let username = "YourUsername" // Replace with actual username if available
     let name = UIDevice.current.model
     let fcm = ""

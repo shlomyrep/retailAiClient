@@ -257,6 +257,8 @@ class HomeViewModel(
             val name = user?.username ?: ""
 
             appDataStoreManager.fetchDeviceData(this) { result ->
+
+                println("DeviceData, uuid: ${result.uuid}")
                 println("DeviceData, username: $username")
                 println("DeviceData, name: $name")
                 println("DeviceData, version: ${result.version}")
@@ -264,11 +266,9 @@ class HomeViewModel(
                 println("DeviceData, modelName: ${result.modelName}")
                 println("DeviceData, lastInteractionTime: ${result.lastInteractionTime}")
                 println("DeviceData, versionCode: ${result.versionCode}")
-                val uuid = "${user?.username}${user?.erpID}${result.modelName}".hashCode()
-                println("DeviceData, uuid: $uuid")
-
+                
                 deviceDataInteractor.execute(
-                    uuid.toString(),
+                    result.uuid,
                     username,
                     name,
                     result.version,

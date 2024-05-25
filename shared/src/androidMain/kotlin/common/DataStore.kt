@@ -59,9 +59,7 @@ actual fun Context.deviceDataFetcher(scope: CoroutineScope, onDeviceDataFetched:
 
     scope.launch {
         val uuid = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-
         val name = Build.MODEL
-        val version = Build.VERSION.RELEASE
         val deviceType = "Android"
         val lastInteractionTime = System.currentTimeMillis()
         val versionCode = packageManager.getPackageInfo(packageName, 0).versionCode
