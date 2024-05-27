@@ -1,6 +1,9 @@
 package presentation.ui.main.profile
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.rememberNavigator
 import org.koin.compose.koinInject
@@ -58,14 +61,23 @@ fun ProfileNav(logout: () -> Unit) {
                 events = viewModel::onTriggerEvent
             ) { navigator.popBackStack() }
         }
-        scene(route = ProfileNavigation.MyWallet.route) {}
+        scene(route = ProfileNavigation.MyWallet.route) {
+            // Ensure the MyWalletScreen is defined correctly
+            // val viewModel: MyWalletViewModel = koinInject()
+            // MyWalletScreen(
+            //     state = viewModel.state.value,
+            //     events = viewModel::onTriggerEvent
+            // ) {
+            //     navigator.popBackStack()
+            // }
+        }
         scene(route = ProfileNavigation.MyOrders.route) {
             val viewModel: MyOrdersViewModel = koinInject()
             MyOrdersScreen(
                 state = viewModel.state.value,
                 events = viewModel::onTriggerEvent,
                 viewModel = viewModel,
-                navigateToEditOrder = {  navigator.navigate(ProfileNavigation.EditOrder.route) },
+                navigateToEditOrder = { navigator.navigate(ProfileNavigation.EditOrder.route) },
                 popup = { navigator.popBackStack() }
             )
         }
@@ -97,6 +109,14 @@ fun ProfileNav(logout: () -> Unit) {
                 state = viewModel.state.value,
                 events = viewModel::onTriggerEvent,
             )
+
+            val navigateBack by viewModel.navigateBack.collectAsState()
+            if (navigateBack) {
+                LaunchedEffect(Unit) {
+                    navigator.popBackStack()
+                    viewModel.resetNavigateBack()
+                }
+            }
         }
     }
 }

@@ -10,6 +10,8 @@ import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
 import business.interactors.main.GetEditOrderInteractor
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -22,6 +24,8 @@ class EditOrderViewModel(
 ) : ViewModel() {
 
     val state: MutableState<EditOrderState> = mutableStateOf(EditOrderState())
+    private val _navigateBack = MutableStateFlow(false)
+    val navigateBack: StateFlow<Boolean> get() = _navigateBack
 
     fun onTriggerEvent(event: EditOrderEvent) {
         when (event) {
@@ -50,7 +54,7 @@ class EditOrderViewModel(
             getOrder(orderId)
             resetOrderId()
         } else {
-            //TODO need to pop back in MyOrdersScreen
+            _navigateBack.value = true
         }
 
     }
@@ -126,5 +130,9 @@ class EditOrderViewModel(
                 ""
             )
         }
+    }
+
+    fun resetNavigateBack() {
+        _navigateBack.value = false
     }
 }
