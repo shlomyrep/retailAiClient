@@ -7,6 +7,8 @@ import org.koin.compose.koinInject
 import presentation.navigation.ProfileNavigation
 import presentation.ui.main.address.AddressScreen
 import presentation.ui.main.address.view_model.AddressViewModel
+import presentation.ui.main.edit_order.EditOrderScreen
+import presentation.ui.main.edit_order.view_model.EditOrderViewModel
 import presentation.ui.main.edit_profile.EditProfileScreen
 import presentation.ui.main.edit_profile.view_model.EditProfileViewModel
 import presentation.ui.main.my_coupons.MyCouponsScreen
@@ -31,27 +33,13 @@ fun ProfileNav(logout: () -> Unit) {
             ProfileScreen(
                 state = viewModel.state.value,
                 events = viewModel::onTriggerEvent,
-                navigateToAddress = {
-                    navigator.navigate(ProfileNavigation.Address.route)
-                },
-                navigateToEditProfile = {
-                    navigator.navigate(ProfileNavigation.EditProfile.route)
-                },
-                navigateToPaymentMethod = {
-                    navigator.navigate(ProfileNavigation.PaymentMethod.route)
-                },
-                navigateToMyOrders = {
-                    navigator.navigate(ProfileNavigation.MyOrders.route)
-                },
-                navigateToMyCoupons = {
-                    navigator.navigate(ProfileNavigation.MyCoupons.route)
-                },
-                navigateToMyWallet = {
-                    navigator.navigate(ProfileNavigation.MyWallet.route)
-                },
-                navigateToSettings = {
-                    navigator.navigate(ProfileNavigation.Settings.route)
-                },
+                navigateToAddress = { navigator.navigate(ProfileNavigation.Address.route) },
+                navigateToEditProfile = { navigator.navigate(ProfileNavigation.EditProfile.route) },
+                navigateToPaymentMethod = { navigator.navigate(ProfileNavigation.PaymentMethod.route) },
+                navigateToMyOrders = { navigator.navigate(ProfileNavigation.MyOrders.route) },
+                navigateToMyCoupons = { navigator.navigate(ProfileNavigation.MyCoupons.route) },
+                navigateToMyWallet = { navigator.navigate(ProfileNavigation.MyWallet.route) },
+                navigateToSettings = { navigator.navigate(ProfileNavigation.Settings.route) }
             )
         }
         scene(route = ProfileNavigation.Settings.route) {
@@ -60,65 +48,55 @@ fun ProfileNav(logout: () -> Unit) {
                 state = viewModel.state.value,
                 events = viewModel::onTriggerEvent,
                 logout = logout,
-                popup = {
-                    navigator.popBackStack()
-                },
+                popup = { navigator.popBackStack() }
             )
         }
         scene(route = ProfileNavigation.MyCoupons.route) {
             val viewModel: MyCouponsViewModel = koinInject()
             MyCouponsScreen(
                 state = viewModel.state.value,
-                events = viewModel::onTriggerEvent,
-            ) {
-                navigator.popBackStack()
-            }
+                events = viewModel::onTriggerEvent
+            ) { navigator.popBackStack() }
         }
-        scene(route = ProfileNavigation.MyWallet.route) {
-            /*val viewModel: MyWalletViewModel = koinInject()
-            MyWalletScreen(
-                state = viewModel.state.value,
-                events = viewModel::onTriggerEvent,
-            ) {
-                navigator.popBackStack()
-            }*/
-        }
+        scene(route = ProfileNavigation.MyWallet.route) {}
         scene(route = ProfileNavigation.MyOrders.route) {
             val viewModel: MyOrdersViewModel = koinInject()
             MyOrdersScreen(
                 state = viewModel.state.value,
                 events = viewModel::onTriggerEvent,
-                viewModel = viewModel
-            ) {
-                navigator.popBackStack()
-            }
+                viewModel = viewModel,
+                navigateToEditOrder = {  navigator.navigate(ProfileNavigation.EditOrder.route) },
+                popup = { navigator.popBackStack() }
+            )
         }
         scene(route = ProfileNavigation.PaymentMethod.route) {
             val viewModel: PaymentMethodViewModel = koinInject()
             PaymentMethodScreen(
                 state = viewModel.state.value,
-                events = viewModel::onTriggerEvent,
-            ) {
-                navigator.popBackStack()
-            }
+                events = viewModel::onTriggerEvent
+            ) { navigator.popBackStack() }
         }
         scene(route = ProfileNavigation.EditProfile.route) {
             val viewModel: EditProfileViewModel = koinInject()
             EditProfileScreen(
                 state = viewModel.state.value,
-                events = viewModel::onTriggerEvent,
-            ) {
-                navigator.popBackStack()
-            }
+                events = viewModel::onTriggerEvent
+            ) { navigator.popBackStack() }
         }
         scene(route = ProfileNavigation.Address.route) {
             val viewModel: AddressViewModel = koinInject()
             AddressScreen(
                 state = viewModel.state.value,
+                events = viewModel::onTriggerEvent
+            ) { navigator.popBackStack() }
+        }
+
+        scene(route = ProfileNavigation.EditOrder.route) { backStackEntry ->
+            val viewModel: EditOrderViewModel = koinInject()
+            EditOrderScreen(
+                state = viewModel.state.value,
                 events = viewModel::onTriggerEvent,
-            ) {
-                navigator.popBackStack()
-            }
+            )
         }
     }
 }

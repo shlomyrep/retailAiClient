@@ -3,6 +3,8 @@ package presentation.ui.main.edit_order.view_model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import business.constants.CUSTOM_TAG
+import business.constants.DataStoreKeys
+import business.core.AppDataStore
 import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
@@ -10,11 +12,13 @@ import business.core.UIComponent
 import business.interactors.main.GetEditOrderInteractor
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class EditOrderViewModel(
     private val getEditOrderInteractor: GetEditOrderInteractor,
+    private val appDataStoreManager: AppDataStore
 ) : ViewModel() {
 
     val state: MutableState<EditOrderState> = mutableStateOf(EditOrderState())
@@ -38,6 +42,17 @@ class EditOrderViewModel(
                 onUpdateNetworkState(event.networkState)
             }
         }
+    }
+
+    init {
+        val orderId = fetchOrderId()
+        if (orderId.isNotEmpty()) {
+            getOrder(orderId)
+            resetOrderId()
+        } else {
+            //TODO need to pop back in MyOrdersScreen
+        }
+
     }
 
 
@@ -94,5 +109,22 @@ class EditOrderViewModel(
 
     private fun onUpdateNetworkState(networkState: NetworkState) {
         state.value = state.value.copy(networkState = networkState)
+    }
+
+    private fun fetchOrderId(): String {
+        var orderId = ""
+        viewModelScope.launch {
+            orderId = appDataStoreManager.readValue(DataStoreKeys.EDIT_ODER_ID).toString()
+        }
+        return orderId
+    }
+
+    private fun resetOrderId() {
+        viewModelScope.launch {
+            appDataStoreManager.setValue(
+                DataStoreKeys.EDIT_ODER_ID,
+                ""
+            )
+        }
     }
 }

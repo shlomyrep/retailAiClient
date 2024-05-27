@@ -74,7 +74,7 @@ fun appModule(context: Context) = module {
     factory { AddressViewModel(get(), get()) }
     factory { CategoriesViewModel(get()) }
     factory { ProfileViewModel(get()) }
-    factory { EditOrderViewModel(get()) }
+    factory { EditOrderViewModel(get(),get()) }
     factory { SettingsViewModel(get()) }
     factory { EditProfileViewModel(get(), get(), get()) }
     factory { PaymentMethodViewModel() }
