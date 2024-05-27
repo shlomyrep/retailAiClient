@@ -23,6 +23,8 @@ import business.domain.main.Quote
 import business.domain.main.SalesMan
 import business.interactors.main.GetOrdersInteractor
 import business.interactors.main.QuoteInteractor
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -41,6 +43,9 @@ class MyOrdersViewModel(
 ) : ViewModel() {
 
     val state: MutableState<MyOrdersState> = mutableStateOf(MyOrdersState())
+    private val _orderIdSaved = MutableStateFlow(false)
+    val orderIdSaved: StateFlow<Boolean> = _orderIdSaved
+
 
     fun onTriggerEvent(event: MyOrdersEvent) {
         when (event) {
@@ -67,11 +72,29 @@ class MyOrdersViewModel(
                     event.order
                 )
             }
+
+            is MyOrdersEvent.OnEditOrder -> {
+                onEditOrder(event.orderId)
+            }
         }
     }
 
     private fun onUpdatePdfUrl(pdfUrl: String) {
         state.value = state.value.copy(orderPdf = pdfUrl)
+    }
+
+    private fun onEditOrder(orderId: String) {
+        viewModelScope.launch {
+            appDataStoreManager.setValue(
+                DataStoreKeys.EDIT_ODER_ID,
+                orderId
+            )
+            _orderIdSaved.value = true
+        }
+    }
+
+    fun resetOrderIdSaved() {
+        _orderIdSaved.value = false
     }
 
     private fun onSendQuote(orderType: Int, order: Order) {

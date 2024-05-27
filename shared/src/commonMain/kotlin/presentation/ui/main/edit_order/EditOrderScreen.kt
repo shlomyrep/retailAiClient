@@ -1,4 +1,4 @@
-package presentation.ui.main.cart
+package presentation.ui.main.edit_order
 
 import ExpandingText
 import androidx.compose.animation.AnimatedVisibility
@@ -70,7 +70,6 @@ import business.datasource.network.main.responses.ColorSelectable
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.SizeSelectable
 import business.datasource.network.main.responses.getCustomizationSteps
-import business.domain.main.Basket
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import presentation.component.DEFAULT__BUTTON_SIZE
@@ -84,8 +83,8 @@ import presentation.theme.ProgressBarColor
 import presentation.theme.Red
 import presentation.theme.TextFieldColor
 import presentation.theme.Transparent
-import presentation.ui.main.cart.view_model.CartEvent
-import presentation.ui.main.cart.view_model.CartState
+import presentation.ui.main.edit_order.view_model.EditOrderEvent
+import presentation.ui.main.edit_order.view_model.EditOrderState
 import shoping_by_kmp.shared.generated.resources.Res
 import shoping_by_kmp.shared.generated.resources.basket_is_empty
 import shoping_by_kmp.shared.generated.resources.cm
@@ -115,46 +114,45 @@ import shoping_by_kmp.shared.generated.resources.supplier
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun CartScreen(
-    state: CartState,
-    events: (CartEvent) -> Unit,
-    navigateToDetail: (String, Boolean) -> Unit = { _, _ -> },
-    navigateToCheckout: () -> Unit,
+fun EditOrderScreen(
+    state: EditOrderState,
+    events: (EditOrderEvent) -> Unit,
+    navigateToDetail: (String, Boolean) -> Unit = { _, _ -> }
 ) {
 
     DefaultScreenUI(
         queue = state.errorQueue,
-        onRemoveHeadFromQueue = { events(CartEvent.OnRemoveHeadFromQueue) },
+//        onRemoveHeadFromQueue = { events(EditOrderEvent.OnRemoveHeadFromQueue) },
         progressBarState = state.progressBarState,
         networkState = state.networkState,
         titleToolbar = stringResource(Res.string.spec),
-        onTryAgain = { events(CartEvent.OnRetryNetwork) }
+//        onTryAgain = { events(EditOrderEvent.OnRetryNetwork) }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize().align(Alignment.Center).padding(bottom = 100.dp)
             ) {
-                items(state.baskets) {
-                    CartBox(
+                items(state.products) {
+                    OrderBox(
                         events,
                         it,
-                        navigateToDetail = navigateToDetail
+                        navigateToDetail
                     ) {
-                        events(CartEvent.DeleteFromBasket(it.product.id))
+//                        events(EditOrderEvent.DeleteFromBasket(it.product.id))
                     }
                 }
             }
 
-            if (state.baskets.isNotEmpty()) {
+            if (state.products.isNotEmpty()) {
                 Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
                     ProceedButtonBox() {
-                        navigateToCheckout()
+
                     }
                 }
             }
 
 
-            if (state.baskets.isEmpty()) {
+            if (state.products.isEmpty()) {
                 Box(
                     modifier = Modifier.align(Alignment.Center).fillMaxWidth(),
                     contentAlignment = Alignment.Center
@@ -201,9 +199,9 @@ fun ProceedButtonBox(onClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CartBox(
-    events: (CartEvent) -> Unit,
-    basket: Basket,
+fun OrderBox(
+    events: (EditOrderEvent) -> Unit,
+    product: ProductSelectable,
     navigateToDetail: (String, Boolean) -> Unit = { _, _ -> },
     deleteFromBasket: () -> Unit
 ) {
@@ -229,10 +227,9 @@ fun CartBox(
                 DismissBackground(dismissState)
             },
             content = {
-                DismissCartContent(
+                DismissOrderContent(
                     events,
-                    basket,
-                    navigateToDetail = navigateToDetail
+                    product
                 )
             })
     }
@@ -240,12 +237,12 @@ fun CartBox(
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun DismissCartContent(
-    events: (CartEvent) -> Unit,
-    basket: Basket,
-    navigateToDetail: (String, Boolean) -> Unit = { _, _ -> },
+fun DismissOrderContent(
+    events: (EditOrderEvent) -> Unit,
+    product: ProductSelectable,
+    navigateToDetail: (String, Boolean) -> Unit = { _, _ -> }
 
-    ) {
+) {
     val roomNames = listOf(
         stringResource(Res.string.general_room_text),
         stringResource(Res.string.general_bath),
@@ -291,14 +288,14 @@ fun DismissCartContent(
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.primary)
                     .noRippleClickable {
-                        navigateToDetail(basket.product.getCalculatedSku(), true)
+                        navigateToDetail(product.getCalculatedSku(), true)
                     }
             ) {
                 Image(
-                    painter = rememberCustomImagePainter(basket.image),
+                    painter = rememberCustomImagePainter(product.image),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
             }
 
@@ -328,8 +325,8 @@ fun DismissCartContent(
                                 .onFocusChanged { focusState ->
                                     if (isFocused && !focusState.isFocused) {
                                         if (selectedRoomName.isNotEmpty()) {
-                                            basket.product.roomName = selectedRoomName
-                                            events(CartEvent.AddProduct(basket.product, basket.id))
+                                            product.roomName = selectedRoomName
+//                                            events(EditOrderEvent.AddProduct(basket.product, basket.id))
                                             isFocused = false
                                         }
                                     } else if (focusState.isFocused) {
@@ -369,8 +366,8 @@ fun DismissCartContent(
                                 DropdownMenuItem(
                                     onClick = {
                                         selectedRoomName = roomName
-                                        basket.product.roomName = roomName
-                                        events(CartEvent.AddProduct(basket.product, basket.id))
+                                        product.roomName = roomName
+//                                        events(EditOrderEvent.AddProduct(product, product.id))
                                         expanded = false
                                         focusManager.clearFocus()
                                     },
@@ -381,7 +378,7 @@ fun DismissCartContent(
                     }
                 }
                 Text(
-                    text = basket.title,
+                    text = product.title,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp),
@@ -389,7 +386,7 @@ fun DismissCartContent(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = basket.category.name,
+                    text = product.category.name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodySmall.copy(fontSize = 18.sp),
@@ -401,7 +398,7 @@ fun DismissCartContent(
         Spacer(modifier = Modifier.height(8.dp))
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                val productDescription = getProductDescription(basket.product)
+                val productDescription = getProductDescription(product)
                 ExpandingText(
                     modifier = Modifier.fillMaxWidth(),
                     text = productDescription,

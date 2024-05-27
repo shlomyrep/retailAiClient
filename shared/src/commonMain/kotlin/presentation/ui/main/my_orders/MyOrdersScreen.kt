@@ -41,6 +41,8 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -108,6 +110,7 @@ fun MyOrdersScreen(
     state: MyOrdersState,
     events: (MyOrdersEvent) -> Unit,
     viewModel: MyOrdersViewModel,
+    navigateToEditOrder: () -> Unit,
     popup: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -187,7 +190,8 @@ fun MyOrdersScreen(
                                         list = state.orders.filter { it.status == ORDER_ACTIVE },
                                         state,
                                         viewModel,
-                                        snackbarHostState
+                                        snackbarHostState,
+                                        navigateToEditOrder
                                     )
                                 }
 
@@ -197,7 +201,8 @@ fun MyOrdersScreen(
                                         list = state.orders.filter { it.status == ORDER_SUCCESS },
                                         state,
                                         viewModel,
-                                        snackbarHostState
+                                        snackbarHostState,
+                                        navigateToEditOrder
                                     )
                                 }
 
@@ -207,7 +212,8 @@ fun MyOrdersScreen(
                                         list = state.orders.filter { it.status == ORDER_CANCELED },
                                         state,
                                         viewModel,
-                                        snackbarHostState
+                                        snackbarHostState,
+                                        navigateToEditOrder
                                     )
                                 }
                             }
@@ -226,7 +232,8 @@ private fun MyOrdersList(
     list: List<Order>,
     state: MyOrdersState,
     viewModel: MyOrdersViewModel,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    navigateToEditOrder: () -> Unit,
 ) {
     if (list.isEmpty()) {
         Text(
@@ -240,7 +247,7 @@ private fun MyOrdersList(
 
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
         items(list, key = { Random.nextInt().toString() }) {
-            OrderBox(events, it, state, viewModel, snackbarHostState)
+            OrderBox(events, it, state, viewModel, snackbarHostState, navigateToEditOrder)
         }
     }
 }
@@ -252,10 +259,13 @@ private fun OrderBox(
     order: Order,
     state: MyOrdersState,
     viewModel: MyOrdersViewModel,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    navigateToEditOrder: () -> Unit
 ) {
     var customerId by remember { mutableStateOf(order.customerId) }
     var customerIdError by remember { mutableStateOf<String?>(null) }
+    val orderIdSaved by viewModel.orderIdSaved.collectAsState()
+
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -279,7 +289,7 @@ private fun OrderBox(
                 )
                 IconButton(
                     onClick = {
-                        
+                        events(MyOrdersEvent.OnEditOrder(order.orderId))
                     }
                 ) {
                     Box(
@@ -426,6 +436,12 @@ private fun OrderBox(
                     )
                 }
             }
+        }
+    }
+    LaunchedEffect(orderIdSaved) {
+        if (orderIdSaved) {
+            navigateToEditOrder()
+            viewModel.resetOrderIdSaved()
         }
     }
 }

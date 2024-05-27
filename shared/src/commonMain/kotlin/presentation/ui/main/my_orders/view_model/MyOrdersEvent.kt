@@ -21,4 +21,8 @@ sealed class MyOrdersEvent {
     data class OnUpdateNetworkState(
         val networkState: NetworkState
     ) : MyOrdersEvent()
+
+    data class OnEditOrder(
+        val orderId: String
+    ) : MyOrdersEvent()
 }

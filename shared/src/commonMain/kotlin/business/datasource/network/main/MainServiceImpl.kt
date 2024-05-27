@@ -92,6 +92,7 @@ class MainServiceImpl(
             )
         }.body()
     }
+
     override suspend fun sendClientData(
         token: String,
         deviceData: DeviceData,
@@ -314,7 +315,7 @@ class MainServiceImpl(
         token: String,
         salesMan: SalesMan,
         productSelectable: ProductSelectable,
-        cartItemId:String
+        cartItemId: String
     ): MainGenericResponse<JRNothing?> {
         return httpClient.post {
             url {
@@ -495,6 +496,23 @@ class MainServiceImpl(
                 encodedPath += MainService.WISHLIST
                 parameter("category_id", categoryId)
                 parameter("page", page)
+            }
+            contentType(ContentType.Application.Json)
+        }.body()
+    }
+
+    override suspend fun editOrder(
+        token: String,
+        user: String?,
+        orderId: String
+    ): MainGenericResponse<List<ProductSelectable>> {
+        return httpClient.get {
+            url {
+                headers {
+                    append(HttpHeaders.Authorization, token)
+                }
+                takeFrom(BASE_URL)
+                encodedPath += ""
             }
             contentType(ContentType.Application.Json)
         }.body()
