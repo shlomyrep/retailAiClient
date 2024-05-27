@@ -13,7 +13,5 @@ sealed class ProfileNavigation(
    data object MyCoupons : ProfileNavigation(route = "MyCoupons")
    data object MyWallet : ProfileNavigation(route = "MyWallet")
    data object Settings : ProfileNavigation(route = "Settings")
-
-
 }
 

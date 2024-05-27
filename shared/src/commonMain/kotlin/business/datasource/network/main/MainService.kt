@@ -145,4 +145,6 @@ interface MainService {
         categoryId: Int?,
         page: Int
     ): MainGenericResponse<WishlistDTO>
+
+    suspend fun editOrder(token: String, user: String?, orderId: String): MainGenericResponse<List<ProductSelectable>>
 }

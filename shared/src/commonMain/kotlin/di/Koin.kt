@@ -18,6 +18,7 @@ import business.interactors.main.DeleteBasketInteractor
 import business.interactors.main.DeviceDataInteractor
 import business.interactors.main.GetAddressesInteractor
 import business.interactors.main.GetCommentsInteractor
+import business.interactors.main.GetEditOrderInteractor
 import business.interactors.main.GetEmailFromCacheInteractor
 import business.interactors.main.GetOrdersInteractor
 import business.interactors.main.GetProfileInteractor
@@ -45,6 +46,7 @@ import presentation.ui.main.categories.view_model.CategoriesViewModel
 import presentation.ui.main.checkout.view_model.CheckoutViewModel
 import presentation.ui.main.comment.view_model.CommentViewModel
 import presentation.ui.main.detail.view_model.DetailViewModel
+import presentation.ui.main.edit_order.view_model.EditOrderViewModel
 import presentation.ui.main.edit_profile.view_model.EditProfileViewModel
 import presentation.ui.main.home.view_model.HomeViewModel
 import presentation.ui.main.my_coupons.view_model.MyCouponsViewModel
@@ -72,6 +74,7 @@ fun appModule(context: Context) = module {
     factory { AddressViewModel(get(), get()) }
     factory { CategoriesViewModel(get()) }
     factory { ProfileViewModel(get()) }
+    factory { EditOrderViewModel(get()) }
     factory { SettingsViewModel(get()) }
     factory { EditProfileViewModel(get(), get(), get()) }
     factory { PaymentMethodViewModel() }
@@ -86,6 +89,7 @@ fun appModule(context: Context) = module {
     single { WishListInteractor(get(), get()) }
     single { BasketListInteractor(get(), get()) }
     single { GetProfileInteractor(get(), get()) }
+    single { GetEditOrderInteractor(get(), get()) }
     single { UpdateProfileInteractor(get(), get()) }
     single { TokenManager(get(), get()) }
     single { LogoutInteractor(get()) }
