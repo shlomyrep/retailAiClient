@@ -118,7 +118,7 @@ import shoping_by_kmp.shared.generated.resources.supplier
 fun CartScreen(
     state: CartState,
     events: (CartEvent) -> Unit,
-    navigateToDetail: (String) -> Unit,
+    navigateToDetail: (String, Boolean) -> Unit = { _, _ -> },
     navigateToCheckout: () -> Unit,
 ) {
 
@@ -204,7 +204,7 @@ fun ProceedButtonBox(onClick: () -> Unit) {
 fun CartBox(
     events: (CartEvent) -> Unit,
     basket: Basket,
-    navigateToDetail: (String) -> Unit,
+    navigateToDetail: (String, Boolean) -> Unit = { _, _ -> },
     deleteFromBasket: () -> Unit
 ) {
     var show by remember { mutableStateOf(true) }
@@ -243,8 +243,9 @@ fun CartBox(
 fun DismissCartContent(
     events: (CartEvent) -> Unit,
     basket: Basket,
-    navigateToDetail: (String) -> Unit,
-) {
+    navigateToDetail: (String, Boolean) -> Unit = { _, _ -> },
+
+    ) {
     val roomNames = listOf(
         stringResource(Res.string.general_room_text),
         stringResource(Res.string.general_bath),
@@ -290,7 +291,7 @@ fun DismissCartContent(
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.primary)
                     .noRippleClickable {
-                        navigateToDetail(basket.product.id)
+                        navigateToDetail(basket.product.getCalculatedSku(), true)
                     }
             ) {
                 Image(

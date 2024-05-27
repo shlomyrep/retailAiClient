@@ -5,11 +5,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import moe.tlaster.precompose.navigation.NavHost
+import moe.tlaster.precompose.navigation.path
 import moe.tlaster.precompose.navigation.rememberNavigator
 import org.koin.compose.koinInject
 import presentation.navigation.ProfileNavigation
 import presentation.ui.main.address.AddressScreen
 import presentation.ui.main.address.view_model.AddressViewModel
+import presentation.ui.main.detail.DetailNav
 import presentation.ui.main.edit_order.EditOrderScreen
 import presentation.ui.main.edit_order.view_model.EditOrderViewModel
 import presentation.ui.main.edit_profile.EditProfileScreen
@@ -108,6 +110,10 @@ fun ProfileNav(logout: () -> Unit) {
             EditOrderScreen(
                 state = viewModel.state.value,
                 events = viewModel::onTriggerEvent,
+                navigateToDetail = { id: String, isSKU: Boolean ->
+                    navigator.popBackStack()
+                    navigator.navigate(ProfileNavigation.Detail.route.plus("/$id").plus("/$isSKU"))
+                }
             )
 
             val navigateBack by viewModel.navigateBack.collectAsState()
@@ -115,6 +121,16 @@ fun ProfileNav(logout: () -> Unit) {
                 LaunchedEffect(Unit) {
                     navigator.popBackStack()
                     viewModel.resetNavigateBack()
+                }
+            }
+        }
+
+        scene(route = ProfileNavigation.Detail.route.plus("/{id}/{isSKU}")) { backStackEntry ->
+            val id: String? = backStackEntry.path<String>("id")
+            val isSKU: Boolean = backStackEntry.path<Boolean>("isSKU") ?: false
+            id?.let {
+                DetailNav(it, isSKU) {
+                    navigator.popBackStack()
                 }
             }
         }

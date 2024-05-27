@@ -6,6 +6,7 @@ import moe.tlaster.precompose.navigation.path
 import moe.tlaster.precompose.navigation.rememberNavigator
 import org.koin.compose.koinInject
 import presentation.navigation.CartNavigation
+import presentation.navigation.HomeNavigation
 import presentation.ui.main.address.AddressScreen
 import presentation.ui.main.address.view_model.AddressViewModel
 import presentation.ui.main.cart.view_model.CartViewModel
@@ -25,9 +26,9 @@ fun CartNav() {
             CartScreen(
                 state = viewModel.state.value,
                 events = viewModel::onTriggerEvent,
-                navigateToDetail = {
+                navigateToDetail = { id: String, isSKU: Boolean ->
                     navigator.popBackStack()
-                    navigator.navigate(CartNavigation.Detail.route.plus("/$it"))
+                    navigator.navigate(HomeNavigation.Detail.route.plus("/$id").plus("/$isSKU"))
                 }, navigateToCheckout = {
                     navigator.navigate(CartNavigation.Checkout.route)
                 })
@@ -51,10 +52,12 @@ fun CartNav() {
                 popup = { navigator.popBackStack() },
             )
         }
-        scene(route = CartNavigation.Detail.route.plus(CartNavigation.Detail.objectPath)) { backStackEntry ->
-            val id: String? = backStackEntry.path<String>(CartNavigation.Detail.objectName)
+
+        scene(route = CartNavigation.Detail.route.plus("/{id}/{isSKU}")) { backStackEntry ->
+            val id: String? = backStackEntry.path<String>("id")
+            val isSKU: Boolean = backStackEntry.path<Boolean>("isSKU") ?: false
             id?.let {
-                DetailNav(it,false) {
+                DetailNav(it, isSKU) {
                     navigator.popBackStack()
                 }
             }

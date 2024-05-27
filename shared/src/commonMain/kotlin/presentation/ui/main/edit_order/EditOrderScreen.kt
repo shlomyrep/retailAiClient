@@ -117,9 +117,8 @@ import shoping_by_kmp.shared.generated.resources.supplier
 fun EditOrderScreen(
     state: EditOrderState,
     events: (EditOrderEvent) -> Unit,
+    navigateToDetail: (String, Boolean) -> Unit = { _, _ -> }
 ) {
-
-
 
     DefaultScreenUI(
         queue = state.errorQueue,
@@ -136,7 +135,8 @@ fun EditOrderScreen(
                 items(state.products) {
                     OrderBox(
                         events,
-                        it
+                        it,
+                        navigateToDetail
                     ) {
 //                        events(EditOrderEvent.DeleteFromBasket(it.product.id))
                     }
@@ -202,6 +202,7 @@ fun ProceedButtonBox(onClick: () -> Unit) {
 fun OrderBox(
     events: (EditOrderEvent) -> Unit,
     product: ProductSelectable,
+    navigateToDetail: (String, Boolean) -> Unit = { _, _ -> },
     deleteFromBasket: () -> Unit
 ) {
     var show by remember { mutableStateOf(true) }
@@ -239,6 +240,7 @@ fun OrderBox(
 fun DismissOrderContent(
     events: (EditOrderEvent) -> Unit,
     product: ProductSelectable,
+    navigateToDetail: (String, Boolean) -> Unit = { _, _ -> }
 
 ) {
     val roomNames = listOf(
@@ -286,14 +288,14 @@ fun DismissOrderContent(
                     .clip(RoundedCornerShape(16.dp))
                     .background(MaterialTheme.colorScheme.primary)
                     .noRippleClickable {
-
+                        navigateToDetail(product.getCalculatedSku(), true)
                     }
             ) {
                 Image(
                     painter = rememberCustomImagePainter(product.image),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
             }
 

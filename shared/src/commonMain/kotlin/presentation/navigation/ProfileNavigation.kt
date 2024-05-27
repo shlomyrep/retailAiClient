@@ -14,5 +14,7 @@ sealed class ProfileNavigation(
     data object MyWallet : ProfileNavigation(route = "MyWallet")
     data object Settings : ProfileNavigation(route = "Settings")
     data object EditOrder : ProfileNavigation(route = "EditOrder")
+    data object Detail : ProfileNavigation(route = "Detail/{id}/{isSKU}")
+
 }
 
