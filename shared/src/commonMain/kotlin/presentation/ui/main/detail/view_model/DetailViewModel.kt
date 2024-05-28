@@ -70,7 +70,7 @@ class DetailViewModel(
             }
 
             is DetailEvent.AddBasket -> {
-                addBasket(id = event.product, cartItemId = event.cartItemId)
+                addBasket(productSelectable = event.product, cartItemId = event.cartItemId)
             }
 
             is DetailEvent.OnUpdateSelectedImage -> {
@@ -186,16 +186,14 @@ class DetailViewModel(
             }.launchIn(viewModelScope)
     }
 
-    private fun addBasket(id: ProductSelectable, cartItemId: String) {
-        addBasketInteractor.execute(productSelectable = id, cartItemId).onEach { dataState ->
+    private fun addBasket(productSelectable: ProductSelectable, cartItemId: String) {
+        addBasketInteractor.execute(productSelectable = productSelectable, cartItemId).onEach { dataState ->
             when (dataState) {
                 is DataState.NetworkStatus -> {}
                 is DataState.Response -> {
                     onTriggerEvent(DetailEvent.Error(dataState.uiComponent))
                 }
-
                 is DataState.Data -> {}
-
                 is DataState.Loading -> {
                     state.value =
                         state.value.copy(progressBarState = dataState.progressBarState)

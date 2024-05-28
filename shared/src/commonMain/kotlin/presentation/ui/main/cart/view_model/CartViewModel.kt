@@ -30,7 +30,7 @@ class CartViewModel(
         when (event) {
 
             is CartEvent.AddProduct -> {
-                addProduct(productSelectable = event.id, cartItemId = event.cartItemId )
+                addProduct(productSelectable = event.productSelectable, cartItemId = event.cartItemId )
             }
 
             is CartEvent.DeleteFromBasket -> {
@@ -117,11 +117,7 @@ class CartViewModel(
                 is DataState.Response -> {
                     onTriggerEvent(CartEvent.Error(dataState.uiComponent))
                 }
-
-                is DataState.Data -> {
-                    if (dataState.data == true) onTriggerEvent(CartEvent.OnRetryNetwork)
-                }
-
+                is DataState.Data -> {}
                 is DataState.Loading -> {
                     state.value =
                         state.value.copy(progressBarState = dataState.progressBarState)
