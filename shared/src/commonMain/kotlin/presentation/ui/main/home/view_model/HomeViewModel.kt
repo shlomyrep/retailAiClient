@@ -1,7 +1,7 @@
-package presentation.ui.main.home.view_model
-
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import business.constants.DataStoreKeys
+import business.core.AppDataStore
 import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
@@ -10,16 +10,25 @@ import business.domain.main.ChatMessage
 import business.interactors.main.HomeInteractor
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
+import presentation.ui.main.home.view_model.HomeEvent
+import presentation.ui.main.home.view_model.HomeState
 import kotlin.random.Random
 
-
 class HomeViewModel(
-    private val homeInteractor: HomeInteractor
+    private val homeInteractor: HomeInteractor,
+    private val appDataStoreManager: AppDataStore
 ) : ViewModel() {
     val state: MutableState<HomeState> = mutableStateOf(HomeState())
+
+    init {
+        getChatMessages()
+    }
 
     fun onTriggerEvent(event: HomeEvent) {
         when (event) {
@@ -31,7 +40,6 @@ class HomeViewModel(
         }
     }
 
-
     private fun sendMessageToServer(message: String) {
         val newMessage = ChatMessage(
             id = generateRandomId(),
@@ -40,9 +48,18 @@ class HomeViewModel(
             timestamp = getCurrentTimestamp()
         )
         addMessage(newMessage)
+        saveChatMessages(state.value.chatMessages)
 
         homeInteractor.sendMessage(message).onEach { dataState ->
             when (dataState) {
+                is DataState.NetworkStatus -> {
+                    onTriggerEvent(HomeEvent.OnUpdateNetworkState(dataState.networkState))
+                }
+
+                is DataState.Response -> {
+                    onTriggerEvent(HomeEvent.Error(dataState.uiComponent))
+                }
+
                 is DataState.Data -> {
                     dataState.data?.let {
                         val gptMessage = ChatMessage(
@@ -51,22 +68,23 @@ class HomeViewModel(
                             content = it.message,
                             timestamp = getCurrentTimestamp()
                         )
-                        addMessage(gptMessage) // Add the GPT response to the chat
+                        addMessage(gptMessage)
+                        saveChatMessages(state.value.chatMessages)
                     }
                 }
-                is DataState.Response -> onTriggerEvent(HomeEvent.Error(dataState.uiComponent))
-                is DataState.Loading -> state.value = state.value.copy(progressBarState = dataState.progressBarState)
-                is DataState.NetworkStatus -> onTriggerEvent(HomeEvent.OnUpdateNetworkState(dataState.networkState))
+
+                is DataState.Loading -> {
+                    state.value =
+                        state.value.copy(progressBarState = dataState.progressBarState)
+                }
             }
         }.launchIn(viewModelScope)
     }
-
 
     private fun addMessage(message: ChatMessage) {
         val updatedMessages = state.value.chatMessages.toMutableList().apply { add(message) }
         state.value = state.value.copy(chatMessages = updatedMessages)
     }
-
 
     private fun appendToMessageQueue(uiComponent: UIComponent) {
         val queue = state.value.errorQueue
@@ -99,5 +117,38 @@ class HomeViewModel(
 
     private fun getCurrentTimestamp(): Long {
         return Clock.System.now().toEpochMilliseconds()
+    }
+
+    fun getChatMessages() {
+        viewModelScope.launch {
+            val conversation = appDataStoreManager.readValue(DataStoreKeys.CHAT_CONVERSATION)
+            conversation?.let {
+                val messages = parseConversation(it)
+                state.value = state.value.copy(chatMessages = messages)
+            }
+        }
+    }
+
+   private fun saveChatMessages(messages: List<ChatMessage>) {
+        viewModelScope.launch {
+            val conversation = formatConversation(messages)
+            appDataStoreManager.setValue(DataStoreKeys.CHAT_CONVERSATION, conversation)
+        }
+    }
+
+    private fun parseConversation(conversation: String): List<ChatMessage> {
+        return try {
+            Json.decodeFromString(conversation)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    private fun formatConversation(messages: List<ChatMessage>): String {
+        return try {
+            Json.encodeToString(messages)
+        } catch (e: Exception) {
+            "" // Return an empty string in case of any formatting errors
+        }
     }
 }

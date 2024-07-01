@@ -1,6 +1,7 @@
 package di
 
 
+import HomeViewModel
 import business.core.AppDataStore
 import business.core.AppDataStoreManager
 import business.core.KtorHttpClient
@@ -48,7 +49,6 @@ import presentation.ui.main.comment.view_model.CommentViewModel
 import presentation.ui.main.detail.view_model.DetailViewModel
 import presentation.ui.main.edit_order.view_model.EditOrderViewModel
 import presentation.ui.main.edit_profile.view_model.EditProfileViewModel
-import presentation.ui.main.home.view_model.HomeViewModel
 import presentation.ui.main.my_coupons.view_model.MyCouponsViewModel
 import presentation.ui.main.my_orders.view_model.MyOrdersViewModel
 import presentation.ui.main.notifications.view_model.NotificationsViewModel
@@ -70,11 +70,11 @@ fun appModule(context: Context) = module {
     single<AppDataStore> { AppDataStoreManager(context) }
     factory { SharedViewModel(get()) }
     factory { LoginViewModel(get(), get(), get(), get(), get()) }
-    factory { HomeViewModel(get()) }
+    factory { HomeViewModel(get(), get()) }
     factory { AddressViewModel(get(), get()) }
     factory { CategoriesViewModel(get()) }
     factory { ProfileViewModel(get()) }
-    factory { EditOrderViewModel(get(),get()) }
+    factory { EditOrderViewModel(get(), get()) }
     factory { SettingsViewModel(get()) }
     factory { EditProfileViewModel(get(), get(), get()) }
     factory { PaymentMethodViewModel() }

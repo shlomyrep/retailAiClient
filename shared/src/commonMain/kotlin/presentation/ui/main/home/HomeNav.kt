@@ -1,6 +1,7 @@
 package presentation.ui.main.home
 
 import HomeScreen
+import HomeViewModel
 import androidx.compose.runtime.Composable
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.path
@@ -9,7 +10,6 @@ import org.koin.compose.koinInject
 import presentation.navigation.HomeNavigation
 import presentation.ui.main.categories.CategoriesNav
 import presentation.ui.main.detail.DetailNav
-import presentation.ui.main.home.view_model.HomeViewModel
 import presentation.ui.main.notifications.NotificationsScreen
 import presentation.ui.main.notifications.view_model.NotificationsViewModel
 import presentation.ui.main.search.SearchNav
