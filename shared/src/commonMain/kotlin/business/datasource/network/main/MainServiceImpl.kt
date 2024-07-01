@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import business.constants.BASE_URL
 import business.datasource.network.common.JRNothing
 import business.datasource.network.common.MainGenericResponse
+import business.datasource.network.main.MainService.Companion.HOME
 import business.datasource.network.main.responses.AddressDTO
 import business.datasource.network.main.responses.AddressRequestDTO
 import business.datasource.network.main.responses.BasketAddRequestDTO
@@ -13,7 +14,6 @@ import business.datasource.network.main.responses.BuyRequestDTO
 import business.datasource.network.main.responses.CommentDTO
 import business.datasource.network.main.responses.CommentRequestDTO
 import business.datasource.network.main.responses.HeldInventoryBatchDTO
-import business.datasource.network.main.responses.HomeDTO
 import business.datasource.network.main.responses.Image
 import business.datasource.network.main.responses.OrderDTO
 import business.datasource.network.main.responses.ProductSelectable
@@ -21,6 +21,8 @@ import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
+import business.domain.main.ChatGptRequest
+import business.domain.main.ChatGptResponse
 import business.domain.main.DeviceData
 import business.domain.main.OrderResponse
 import business.domain.main.Quote
@@ -354,17 +356,17 @@ class MainServiceImpl(
         }.body()
     }
 
-    override suspend fun home(token: String): MainGenericResponse<HomeDTO> {
-        return httpClient.get {
-            url {
-                headers {
-                    append(HttpHeaders.Authorization, token)
-                }
-                takeFrom(BASE_URL)
-                encodedPath += MainService.HOME
+
+    override suspend fun home(token: String, chatGptRequest: ChatGptRequest): ChatGptResponse {
+        return httpClient.post {
+            url("$BASE_URL$HOME")
+            headers {
+                append(HttpHeaders.Authorization, token)
+                append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             }
             contentType(ContentType.Application.Json)
-        }.body()
+            setBody(chatGptRequest)
+        }.body<ChatGptResponse>()
     }
 
     override suspend fun product(

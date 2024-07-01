@@ -17,6 +17,5 @@ sealed class HomeEvent {
         val networkState: NetworkState
     ) : HomeEvent()
 
-    data class Like(val id: String) : HomeEvent()
-
+    data class OnClickSendMessage(val message: String) : HomeEvent()
 }

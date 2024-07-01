@@ -3,15 +3,11 @@ package presentation.ui.main.categories.view_model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import business.constants.CUSTOM_TAG
-import business.core.DataState
 import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
 import business.interactors.main.HomeInteractor
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import moe.tlaster.precompose.viewmodel.ViewModel
-import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class CategoriesViewModel(
     private val homeInteractor: HomeInteractor,
@@ -50,27 +46,27 @@ class CategoriesViewModel(
 
 
     private fun getCategories() {
-        homeInteractor.execute().onEach { dataState ->
-            when (dataState) {
-                is DataState.NetworkStatus -> {
-                    onTriggerEvent(CategoriesEvent.OnUpdateNetworkState(dataState.networkState))
-                }
-                is DataState.Response -> {
-                    onTriggerEvent(CategoriesEvent.Error(dataState.uiComponent))
-                }
-
-                is DataState.Data -> {
-                    dataState.data?.let {
-                        state.value = state.value.copy(categories = it.categories.sortedBy{ it.name })
-                    }
-                }
-
-                is DataState.Loading -> {
-                    state.value =
-                        state.value.copy(progressBarState = dataState.progressBarState)
-                }
-            }
-        }.launchIn(viewModelScope)
+//        homeInteractor.execute().onEach { dataState ->
+//            when (dataState) {
+//                is DataState.NetworkStatus -> {
+//                    onTriggerEvent(CategoriesEvent.OnUpdateNetworkState(dataState.networkState))
+//                }
+//                is DataState.Response -> {
+//                    onTriggerEvent(CategoriesEvent.Error(dataState.uiComponent))
+//                }
+//
+//                is DataState.Data -> {
+//                    dataState.data?.let {
+//                        state.value = state.value.copy(categories = it.categories.sortedBy{ it.name })
+//                    }
+//                }
+//
+//                is DataState.Loading -> {
+//                    state.value =
+//                        state.value.copy(progressBarState = dataState.progressBarState)
+//                }
+//            }
+//        }.launchIn(viewModelScope)
     }
 
 

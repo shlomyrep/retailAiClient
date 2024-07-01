@@ -1,5 +1,6 @@
 package presentation.ui.main.home
 
+import HomeScreen
 import androidx.compose.runtime.Composable
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.path
@@ -25,31 +26,8 @@ fun HomeNav(logout: () -> Unit) {
         scene(route = HomeNavigation.Home.route) {
             val viewModel: HomeViewModel = koinInject()
             HomeScreen(
-                state = viewModel.state.value,
-                getBarcode = {
-                    viewModel.openBarcodeScanner { productSku, isSKU: Boolean ->
-                        navigator.navigate(HomeNavigation.Detail.route.plus("/$productSku").plus("/$isSKU"))
-                    }
-                },
-                events = viewModel::onTriggerEvent,
-                navigateToNotifications = {
-                    navigator.navigate(HomeNavigation.Notification.route)
-                },
-                navigateToCategories = {
-                    navigator.navigate(HomeNavigation.Categories.route)
-                },
-                navigateToSetting = {
-                    navigator.navigate(HomeNavigation.Settings.route)
-                },
-                navigateToDetail = { id: String, isSKU: Boolean ->
-                    navigator.popBackStack()
-                    navigator.navigate(HomeNavigation.Detail.route.plus("/$id").plus("/$isSKU"))
-                })
-            { categoryId, sort ->
-                navigator.navigate(
-                    HomeNavigation.Search.route.plus("/${categoryId}").plus("/${sort}")
-                )
-            }
+                viewModel
+            )
         }
 
         scene(route = HomeNavigation.Settings.route) {

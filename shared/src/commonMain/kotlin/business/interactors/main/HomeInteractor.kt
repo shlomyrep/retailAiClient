@@ -7,14 +7,12 @@ import business.core.DataState
 import business.core.NetworkState
 import business.core.ProgressBarState
 import business.datasource.network.main.MainService
-import business.datasource.network.main.responses.toHome
-import business.domain.main.CustomerConfig
+import business.domain.main.ChatGptRequest
+import business.domain.main.ChatGptResponse
 import business.domain.main.Home
-import business.util.createException
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.json.Json
 
 class HomeInteractor(
     private val service: MainService,
@@ -23,31 +21,15 @@ class HomeInteractor(
 
     fun execute(): Flow<DataState<Home>> = flow {
 
+    }
+
+    fun sendMessage(message: String): Flow<DataState<ChatGptResponse>> = flow {
+
         try {
-
-            emit(DataState.Loading(progressBarState = ProgressBarState.LoadingWithLogo))
-
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
-
-            val apiResponse = service.home(token = token)
-
-            if (apiResponse.status == false || apiResponse.result == null) {
-                throw Exception(
-                    apiResponse.alert?.createException()
-                )
-            }
-            val configResult = apiResponse.result?.config
-
-            if (configResult != null) {
-                val jsonConfig = Json.encodeToString(CustomerConfig.serializer(), configResult)
-                appDataStoreManager.setValue(DataStoreKeys.CUSTOMER_CONFIG, jsonConfig)
-            }
-
-            val result = apiResponse.result?.toHome()
-
-
-            emit(DataState.NetworkStatus(NetworkState.Good))
-            emit(DataState.Data(result))
+            val chatGptRequest = ChatGptRequest(message)
+            val apiResponse = service.home(token = token, chatGptRequest = chatGptRequest)
+            emit(DataState.Data(apiResponse))
 
         } catch (e: Exception) {
             e.printStackTrace()

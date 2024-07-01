@@ -8,7 +8,6 @@ import business.datasource.network.main.responses.AddressDTO
 import business.datasource.network.main.responses.BasketDTO
 import business.datasource.network.main.responses.CommentDTO
 import business.datasource.network.main.responses.HeldInventoryBatchDTO
-import business.datasource.network.main.responses.HomeDTO
 import business.datasource.network.main.responses.Image
 import business.datasource.network.main.responses.OrderDTO
 import business.datasource.network.main.responses.ProductSelectable
@@ -16,6 +15,8 @@ import business.datasource.network.main.responses.ProfileDTO
 import business.datasource.network.main.responses.SearchDTO
 import business.datasource.network.main.responses.SearchFilterDTO
 import business.datasource.network.main.responses.WishlistDTO
+import business.domain.main.ChatGptRequest
+import business.domain.main.ChatGptResponse
 import business.domain.main.DeviceData
 import business.domain.main.OrderResponse
 import business.domain.main.Quote
@@ -29,7 +30,7 @@ interface MainService {
         const val BUY = "cart/buy"
         const val BASKET_ADD = "cart/add"
         const val BASKET_DELETE = "cart/delete"
-        const val HOME = "home"
+        const val HOME = "message/send"
         const val ORDERS = "cart/all"
         const val PRODUCT = "search/product"
         const val PRODUCT_SKU = "search/sku"
@@ -119,7 +120,7 @@ interface MainService {
         sales: SalesMan
     ): MainGenericResponse<JRNothing?>
 
-    suspend fun home(token: String): MainGenericResponse<HomeDTO>
+    suspend fun home(token: String, chatGptRequest: ChatGptRequest): ChatGptResponse
     suspend fun productBySku(token: String, sku: String): MainGenericResponse<ProductSelectable>
     suspend fun product(token: String, id: String): MainGenericResponse<ProductSelectable>
 
