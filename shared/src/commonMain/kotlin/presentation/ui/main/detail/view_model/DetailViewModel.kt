@@ -31,9 +31,9 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.vat_included
-import shoping_by_kmp.shared.generated.resources.vat_not_included
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.vat_included
+import retailai.shared.generated.resources.vat_not_included
 
 class DetailViewModel(
     private val barcodeInteractor: BarcodeInteractor,

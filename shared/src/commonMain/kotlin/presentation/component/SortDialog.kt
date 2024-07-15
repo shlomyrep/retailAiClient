@@ -29,13 +29,13 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import presentation.ui.main.search.view_model.SearchEvent
 import presentation.ui.main.search.view_model.SearchState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.highest_price
-import shoping_by_kmp.shared.generated.resources.lowest_price
-import shoping_by_kmp.shared.generated.resources.most_sale
-import shoping_by_kmp.shared.generated.resources.newest
-import shoping_by_kmp.shared.generated.resources.oldest
-import shoping_by_kmp.shared.generated.resources.sort
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.highest_price
+import retailai.shared.generated.resources.lowest_price
+import retailai.shared.generated.resources.most_sale
+import retailai.shared.generated.resources.newest
+import retailai.shared.generated.resources.oldest
+import retailai.shared.generated.resources.sort
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable

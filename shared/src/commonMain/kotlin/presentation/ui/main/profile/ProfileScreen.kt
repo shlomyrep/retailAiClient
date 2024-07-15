@@ -36,16 +36,16 @@ import presentation.component.noRippleClickable
 import presentation.component.rememberCustomImagePainter
 import presentation.ui.main.profile.view_model.ProfileEvent
 import presentation.ui.main.profile.view_model.ProfileState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.arrow_left
-import shoping_by_kmp.shared.generated.resources.edit_profile
-import shoping_by_kmp.shared.generated.resources.help_center
-import shoping_by_kmp.shared.generated.resources.order
-import shoping_by_kmp.shared.generated.resources.orders
-import shoping_by_kmp.shared.generated.resources.profile2
-import shoping_by_kmp.shared.generated.resources.setting2
-import shoping_by_kmp.shared.generated.resources.settings
-import shoping_by_kmp.shared.generated.resources.warning
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.arrow_left
+import retailai.shared.generated.resources.edit_profile
+import retailai.shared.generated.resources.help_center
+import retailai.shared.generated.resources.order
+import retailai.shared.generated.resources.orders
+import retailai.shared.generated.resources.profile2
+import retailai.shared.generated.resources.setting2
+import retailai.shared.generated.resources.settings
+import retailai.shared.generated.resources.warning
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable

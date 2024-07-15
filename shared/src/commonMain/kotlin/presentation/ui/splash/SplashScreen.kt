@@ -22,9 +22,9 @@ import presentation.theme.ProgressBarColor
 import presentation.theme.White
 import presentation.ui.splash.view_model.LoginEvent
 import presentation.ui.splash.view_model.LoginState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.retail_ai_logo
-import shoping_by_kmp.shared.generated.resources.splash_slogan
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.retail_ai_logo
+import retailai.shared.generated.resources.splash_slogan
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable

@@ -39,13 +39,13 @@ import presentation.component.TextWithIcon
 import presentation.theme.BorderColor
 import presentation.ui.main.address.view_model.AddressEvent
 import presentation.ui.main.address.view_model.AddressState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.address
-import shoping_by_kmp.shared.generated.resources.delete
-import shoping_by_kmp.shared.generated.resources.earth
-import shoping_by_kmp.shared.generated.resources.location2
-import shoping_by_kmp.shared.generated.resources.mail
-import shoping_by_kmp.shared.generated.resources.no_address
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.address
+import retailai.shared.generated.resources.delete
+import retailai.shared.generated.resources.earth
+import retailai.shared.generated.resources.location2
+import retailai.shared.generated.resources.mail
+import retailai.shared.generated.resources.no_address
 
 
 @OptIn(ExperimentalResourceApi::class)

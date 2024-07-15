@@ -56,11 +56,11 @@ import presentation.component.rememberCustomImagePainter
 import presentation.theme.TextFieldWithTransparentTheme
 import presentation.ui.main.search.view_model.SearchEvent
 import presentation.ui.main.search.view_model.SearchState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.close
-import shoping_by_kmp.shared.generated.resources.filter
-import shoping_by_kmp.shared.generated.resources.search
-import shoping_by_kmp.shared.generated.resources.sort
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.close
+import retailai.shared.generated.resources.filter
+import retailai.shared.generated.resources.search
+import retailai.shared.generated.resources.sort
 
 
 @OptIn(ExperimentalResourceApi::class)

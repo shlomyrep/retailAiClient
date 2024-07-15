@@ -33,8 +33,8 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import presentation.theme.BackgroundContent
 import presentation.theme.orange_400
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.default_image_loader
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.default_image_loader
 
 
 @OptIn(ExperimentalResourceApi::class)

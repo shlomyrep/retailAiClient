@@ -53,15 +53,15 @@ import presentation.theme.Blue
 import presentation.theme.DefaultTextFieldTheme
 import presentation.ui.splash.view_model.LoginEvent
 import presentation.ui.splash.view_model.LoginState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.choose_salesman
-import shoping_by_kmp.shared.generated.resources.email
-import shoping_by_kmp.shared.generated.resources.enter_valid_email
-import shoping_by_kmp.shared.generated.resources.enter_valid_password
-import shoping_by_kmp.shared.generated.resources.password
-import shoping_by_kmp.shared.generated.resources.retail_ai_logo
-import shoping_by_kmp.shared.generated.resources.select
-import shoping_by_kmp.shared.generated.resources.sign_in
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.choose_salesman
+import retailai.shared.generated.resources.email
+import retailai.shared.generated.resources.enter_valid_email
+import retailai.shared.generated.resources.enter_valid_password
+import retailai.shared.generated.resources.password
+import retailai.shared.generated.resources.retail_ai_logo
+import retailai.shared.generated.resources.select
+import retailai.shared.generated.resources.sign_in
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable

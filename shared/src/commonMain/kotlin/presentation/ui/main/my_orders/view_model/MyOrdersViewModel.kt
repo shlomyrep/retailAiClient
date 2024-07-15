@@ -32,9 +32,9 @@ import kotlinx.serialization.json.Json
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.model_text
-import shoping_by_kmp.shared.generated.resources.sku
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.model_text
+import retailai.shared.generated.resources.sku
 
 class MyOrdersViewModel(
     private val getOrdersInteractor: GetOrdersInteractor,

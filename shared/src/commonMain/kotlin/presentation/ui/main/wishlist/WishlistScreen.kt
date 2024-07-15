@@ -30,8 +30,8 @@ import presentation.component.ProductBox
 import presentation.theme.BorderColor
 import presentation.ui.main.wishlist.view_model.WishlistEvent
 import presentation.ui.main.wishlist.view_model.WishlistState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.wishlist_is_empty
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.wishlist_is_empty
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable

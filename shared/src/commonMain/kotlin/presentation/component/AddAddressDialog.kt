@@ -28,12 +28,12 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import presentation.theme.BorderColor
 import presentation.theme.DefaultTextFieldTheme
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.address
-import shoping_by_kmp.shared.generated.resources.city
-import shoping_by_kmp.shared.generated.resources.country
-import shoping_by_kmp.shared.generated.resources.submit
-import shoping_by_kmp.shared.generated.resources.zip_code
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.address
+import retailai.shared.generated.resources.city
+import retailai.shared.generated.resources.country
+import retailai.shared.generated.resources.submit
+import retailai.shared.generated.resources.zip_code
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)

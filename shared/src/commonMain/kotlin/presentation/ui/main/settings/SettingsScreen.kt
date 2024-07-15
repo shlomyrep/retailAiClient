@@ -30,11 +30,11 @@ import presentation.component.noRippleClickable
 import presentation.theme.BorderColor
 import presentation.ui.main.settings.view_model.SettingsEvent
 import presentation.ui.main.settings.view_model.SettingsState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.arrow_left
-import shoping_by_kmp.shared.generated.resources.exit
-import shoping_by_kmp.shared.generated.resources.logout
-import shoping_by_kmp.shared.generated.resources.settings
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.arrow_left
+import retailai.shared.generated.resources.exit
+import retailai.shared.generated.resources.logout
+import retailai.shared.generated.resources.settings
 
 
 @OptIn(ExperimentalResourceApi::class)

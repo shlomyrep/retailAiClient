@@ -29,8 +29,8 @@ import business.core.Queue
 import business.core.UIComponent
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.no_wifi
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.no_wifi
 
 /**
  * @param queue: Dialogs

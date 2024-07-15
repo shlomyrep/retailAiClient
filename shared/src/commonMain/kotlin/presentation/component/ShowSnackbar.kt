@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.ok
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.ok
 
 
 @OptIn(ExperimentalResourceApi::class)

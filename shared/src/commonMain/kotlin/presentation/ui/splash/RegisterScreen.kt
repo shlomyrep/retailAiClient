@@ -51,16 +51,16 @@ import presentation.theme.DefaultCheckBoxTheme
 import presentation.theme.DefaultTextFieldTheme
 import presentation.ui.splash.view_model.LoginEvent
 import presentation.ui.splash.view_model.LoginState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.apple
-import shoping_by_kmp.shared.generated.resources.email
-import shoping_by_kmp.shared.generated.resources.enter_valid_email
-import shoping_by_kmp.shared.generated.resources.enter_valid_password
-import shoping_by_kmp.shared.generated.resources.facebook
-import shoping_by_kmp.shared.generated.resources.google
-import shoping_by_kmp.shared.generated.resources.name
-import shoping_by_kmp.shared.generated.resources.password
-import shoping_by_kmp.shared.generated.resources.sign_in
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.apple
+import retailai.shared.generated.resources.email
+import retailai.shared.generated.resources.enter_valid_email
+import retailai.shared.generated.resources.enter_valid_password
+import retailai.shared.generated.resources.facebook
+import retailai.shared.generated.resources.google
+import retailai.shared.generated.resources.name
+import retailai.shared.generated.resources.password
+import retailai.shared.generated.resources.sign_in
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable

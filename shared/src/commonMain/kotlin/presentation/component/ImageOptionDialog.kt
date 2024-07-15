@@ -15,9 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.camera
-import shoping_by_kmp.shared.generated.resources.gallery
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.camera
+import retailai.shared.generated.resources.gallery
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)

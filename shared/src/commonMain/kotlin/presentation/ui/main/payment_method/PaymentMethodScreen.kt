@@ -35,14 +35,14 @@ import presentation.component.noRippleClickable
 import presentation.theme.BorderColor
 import presentation.ui.main.payment_method.view_model.PaymentMethodEvent
 import presentation.ui.main.payment_method.view_model.PaymentMethodState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.apple
-import shoping_by_kmp.shared.generated.resources.cash
-import shoping_by_kmp.shared.generated.resources.google
-import shoping_by_kmp.shared.generated.resources.more_payment_methods
-import shoping_by_kmp.shared.generated.resources.payment_methods
-import shoping_by_kmp.shared.generated.resources.paypal
-import shoping_by_kmp.shared.generated.resources.wallet
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.apple
+import retailai.shared.generated.resources.cash
+import retailai.shared.generated.resources.google
+import retailai.shared.generated.resources.more_payment_methods
+import retailai.shared.generated.resources.payment_methods
+import retailai.shared.generated.resources.paypal
+import retailai.shared.generated.resources.wallet
 
 
 @OptIn(ExperimentalResourceApi::class)

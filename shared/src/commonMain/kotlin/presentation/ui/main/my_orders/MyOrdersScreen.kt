@@ -90,17 +90,17 @@ import presentation.theme.Transparent
 import presentation.ui.main.my_orders.view_model.MyOrdersEvent
 import presentation.ui.main.my_orders.view_model.MyOrdersState
 import presentation.ui.main.my_orders.view_model.MyOrdersViewModel
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.created_bid
-import shoping_by_kmp.shared.generated.resources.created_pdf
-import shoping_by_kmp.shared.generated.resources.customer_id
-import shoping_by_kmp.shared.generated.resources.customer_name
-import shoping_by_kmp.shared.generated.resources.date
-import shoping_by_kmp.shared.generated.resources.default_image_loader
-import shoping_by_kmp.shared.generated.resources.edit_order
-import shoping_by_kmp.shared.generated.resources.invalid_customer_id
-import shoping_by_kmp.shared.generated.resources.no_orders
-import shoping_by_kmp.shared.generated.resources.orders
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.created_bid
+import retailai.shared.generated.resources.created_pdf
+import retailai.shared.generated.resources.customer_id
+import retailai.shared.generated.resources.customer_name
+import retailai.shared.generated.resources.date
+import retailai.shared.generated.resources.default_image_loader
+import retailai.shared.generated.resources.edit_order
+import retailai.shared.generated.resources.invalid_customer_id
+import retailai.shared.generated.resources.no_orders
+import retailai.shared.generated.resources.orders
 import kotlin.random.Random
 
 

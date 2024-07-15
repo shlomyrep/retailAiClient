@@ -32,11 +32,11 @@ import presentation.component.rememberCustomImagePainter
 import presentation.theme.DefaultTextFieldTheme
 import presentation.ui.main.edit_profile.view_model.EditProfileEvent
 import presentation.ui.main.edit_profile.view_model.EditProfileState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.edit_profile
-import shoping_by_kmp.shared.generated.resources.email
-import shoping_by_kmp.shared.generated.resources.name
-import shoping_by_kmp.shared.generated.resources.roll
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.edit_profile
+import retailai.shared.generated.resources.email
+import retailai.shared.generated.resources.name
+import retailai.shared.generated.resources.roll
 
 
 @OptIn(ExperimentalResourceApi::class)

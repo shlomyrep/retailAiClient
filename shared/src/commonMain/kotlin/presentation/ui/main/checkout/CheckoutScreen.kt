@@ -39,13 +39,13 @@ import presentation.component.Spacer_32dp
 import presentation.theme.DefaultTextFieldTheme
 import presentation.ui.main.checkout.view_model.CheckoutEvent
 import presentation.ui.main.checkout.view_model.CheckoutState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.customer_id
-import shoping_by_kmp.shared.generated.resources.first_name
-import shoping_by_kmp.shared.generated.resources.invalid_customer_id
-import shoping_by_kmp.shared.generated.resources.last_name
-import shoping_by_kmp.shared.generated.resources.save_spec
-import shoping_by_kmp.shared.generated.resources.spec_info
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.customer_id
+import retailai.shared.generated.resources.first_name
+import retailai.shared.generated.resources.invalid_customer_id
+import retailai.shared.generated.resources.last_name
+import retailai.shared.generated.resources.save_spec
+import retailai.shared.generated.resources.spec_info
 
 
 @OptIn(ExperimentalResourceApi::class)

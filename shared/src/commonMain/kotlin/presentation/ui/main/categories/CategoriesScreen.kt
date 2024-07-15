@@ -35,8 +35,8 @@ import presentation.component.Spacer_8dp
 import presentation.component.noRippleClickable
 import presentation.ui.main.categories.view_model.CategoriesEvent
 import presentation.ui.main.categories.view_model.CategoriesState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.categories
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.categories
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable

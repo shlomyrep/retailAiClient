@@ -32,9 +32,9 @@ import presentation.theme.BorderColor
 import presentation.ui.main.checkout.view_model.CheckoutEvent
 import presentation.ui.main.checkout.view_model.CheckoutState
 import presentation.ui.main.checkout.view_model.shippingType_global
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.choose_shipping
-import shoping_by_kmp.shared.generated.resources.shipping
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.choose_shipping
+import retailai.shared.generated.resources.shipping
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)

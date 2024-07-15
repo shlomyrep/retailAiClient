@@ -31,10 +31,10 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import presentation.ui.main.search.view_model.SearchEvent
 import presentation.ui.main.search.view_model.SearchState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.category
-import shoping_by_kmp.shared.generated.resources.filter
-import shoping_by_kmp.shared.generated.resources.reset
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.category
+import retailai.shared.generated.resources.filter
+import retailai.shared.generated.resources.reset
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable

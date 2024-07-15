@@ -2,15 +2,15 @@ package presentation.navigation
 
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.cart
-import shoping_by_kmp.shared.generated.resources.cart_border
-import shoping_by_kmp.shared.generated.resources.heart2
-import shoping_by_kmp.shared.generated.resources.heart_border2
-import shoping_by_kmp.shared.generated.resources.home
-import shoping_by_kmp.shared.generated.resources.home_border
-import shoping_by_kmp.shared.generated.resources.profile
-import shoping_by_kmp.shared.generated.resources.profile_border
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.cart
+import retailai.shared.generated.resources.cart_border
+import retailai.shared.generated.resources.heart2
+import retailai.shared.generated.resources.heart_border2
+import retailai.shared.generated.resources.home
+import retailai.shared.generated.resources.home_border
+import retailai.shared.generated.resources.profile
+import retailai.shared.generated.resources.profile_border
 
 @OptIn(ExperimentalResourceApi::class)
 sealed class MainNavigation (

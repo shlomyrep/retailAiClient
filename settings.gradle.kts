@@ -37,6 +37,6 @@ dependencyResolutionManagement {
 }
 
 
-rootProject.name = "Shoping_By_KMP"
+rootProject.name = "RetailAi"
 include(":androidApp")
 include(":shared")

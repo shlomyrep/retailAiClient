@@ -25,9 +25,9 @@ import presentation.theme.BorderColor
 import presentation.ui.main.comment.view_model.CommentEvent
 import presentation.ui.main.comment.view_model.CommentState
 import presentation.ui.main.detail.CommentBox
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.comments
-import shoping_by_kmp.shared.generated.resources.no_comments
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.comments
+import retailai.shared.generated.resources.no_comments
 
 
 @OptIn(ExperimentalResourceApi::class)

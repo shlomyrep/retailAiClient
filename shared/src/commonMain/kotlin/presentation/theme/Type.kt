@@ -9,16 +9,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Font
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.lato_black_italic
-import shoping_by_kmp.shared.generated.resources.lato_bold
-import shoping_by_kmp.shared.generated.resources.lato_bold_italic
-import shoping_by_kmp.shared.generated.resources.lato_italic
-import shoping_by_kmp.shared.generated.resources.lato_light
-import shoping_by_kmp.shared.generated.resources.lato_light_italic
-import shoping_by_kmp.shared.generated.resources.lato_regular
-import shoping_by_kmp.shared.generated.resources.lato_thin
-import shoping_by_kmp.shared.generated.resources.lato_thin_italic
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.lato_black_italic
+import retailai.shared.generated.resources.lato_bold
+import retailai.shared.generated.resources.lato_bold_italic
+import retailai.shared.generated.resources.lato_italic
+import retailai.shared.generated.resources.lato_light
+import retailai.shared.generated.resources.lato_light_italic
+import retailai.shared.generated.resources.lato_regular
+import retailai.shared.generated.resources.lato_thin
+import retailai.shared.generated.resources.lato_thin_italic
 
 
 @OptIn(ExperimentalResourceApi::class)

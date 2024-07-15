@@ -36,10 +36,10 @@ import presentation.theme.BorderColor
 import presentation.theme.grey_050
 import presentation.ui.main.notifications.view_model.NotificationsEvent
 import presentation.ui.main.notifications.view_model.NotificationsState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.bell
-import shoping_by_kmp.shared.generated.resources.mark_all_as_read
-import shoping_by_kmp.shared.generated.resources.notifications
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.bell
+import retailai.shared.generated.resources.mark_all_as_read
+import retailai.shared.generated.resources.notifications
 
 
 @OptIn(ExperimentalResourceApi::class)

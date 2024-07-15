@@ -38,8 +38,8 @@ import presentation.theme.BorderColor
 import presentation.theme.grey_050
 import presentation.ui.main.my_coupons.view_model.MyCouponsEvent
 import presentation.ui.main.my_coupons.view_model.MyCouponsState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.offer
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.offer
 
 
 @Composable

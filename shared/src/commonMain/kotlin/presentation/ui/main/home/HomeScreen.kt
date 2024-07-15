@@ -67,16 +67,16 @@ import presentation.theme.BorderColor
 import presentation.theme.PagerDotColor
 import presentation.ui.main.home.view_model.HomeEvent
 import presentation.ui.main.home.view_model.HomeState
-import shoping_by_kmp.shared.generated.resources.Res
-import shoping_by_kmp.shared.generated.resources.barcode_scanner
-import shoping_by_kmp.shared.generated.resources.category
-import shoping_by_kmp.shared.generated.resources.default_image_loader
-import shoping_by_kmp.shared.generated.resources.flash_sale
-import shoping_by_kmp.shared.generated.resources.location
-import shoping_by_kmp.shared.generated.resources.most_sale
-import shoping_by_kmp.shared.generated.resources.newest_products
-import shoping_by_kmp.shared.generated.resources.search
-import shoping_by_kmp.shared.generated.resources.see_all
+import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.barcode_scanner
+import retailai.shared.generated.resources.category
+import retailai.shared.generated.resources.default_image_loader
+import retailai.shared.generated.resources.flash_sale
+import retailai.shared.generated.resources.location
+import retailai.shared.generated.resources.most_sale
+import retailai.shared.generated.resources.newest_products
+import retailai.shared.generated.resources.search
+import retailai.shared.generated.resources.see_all
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalResourceApi::class)
