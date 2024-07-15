@@ -31,7 +31,7 @@ kotlin {
 }
 android {
     compileSdk = (findProperty("android.compileSdk") as String).toInt()
-    namespace = "com.razzaghi.shopingbykmp.android"
+    namespace = "com.digitup.retailai.android"
     defaultConfig {
         applicationId = "com.digitup.retailai.android"
         minSdk = (findProperty("android.minSdk") as String).toInt()

@@ -1,4 +1,4 @@
-package com.razzaghi.shopingbykmp.android
+package com.digitup.retailai.android
 
 import MainView
 import android.os.Bundle
