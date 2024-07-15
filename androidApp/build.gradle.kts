@@ -33,7 +33,7 @@ android {
     compileSdk = (findProperty("android.compileSdk") as String).toInt()
     namespace = "com.razzaghi.shopingbykmp.android"
     defaultConfig {
-        applicationId = "com.razzaghi.shopingbykmp.android"
+        applicationId = "com.digitup.retailai.android"
         minSdk = (findProperty("android.minSdk") as String).toInt()
         targetSdk = (findProperty("android.targetSdk") as String).toInt()
         versionCode = 1

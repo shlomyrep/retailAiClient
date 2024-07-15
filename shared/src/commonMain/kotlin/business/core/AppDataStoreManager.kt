@@ -9,7 +9,7 @@ import common.pdfOpener
 import common.putData
 import kotlinx.coroutines.CoroutineScope
 
-const val APP_DATASTORE = "com.razzaghi.shoppingbykmp"
+const val APP_DATASTORE = "com.digitup.retailai"
 
 class AppDataStoreManager(val context: Context) : AppDataStore {
 

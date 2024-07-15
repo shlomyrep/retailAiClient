@@ -1,10 +1,10 @@
 package business.constants
 
 object DataStoreKeys {
-    const val TOKEN = "com.razzaghi.shoppingbykmp.TOKEN"
-    const val EMAIL = "com.razzaghi.shoppingbykmp.EMAIL"
+    const val TOKEN = "com.digitup.retailai.TOKEN"
+    const val EMAIL = "com.digitup.retailai.EMAIL"
 
-    const val SALES_MAN = "com.razzaghi.shoppingbykmp.SALES_MAN"
-    const val CUSTOMER_CONFIG = "com.razzaghi.shoppingbykmp.CUSTOMER_CONFIG"
-    const val EDIT_ODER_ID ="com.razzaghi.shoppingbykmp.EDIT_ODER_ID"
+    const val SALES_MAN = "com.digitup.retailai.SALES_MAN"
+    const val CUSTOMER_CONFIG = "com.digitup.retailai.CUSTOMER_CONFIG"
+    const val EDIT_ODER_ID ="com.digitup.retailai.EDIT_ODER_ID"
 }
