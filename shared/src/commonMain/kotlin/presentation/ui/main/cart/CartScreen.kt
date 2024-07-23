@@ -140,7 +140,7 @@ fun CartScreen(
                         it,
                         navigateToDetail = navigateToDetail
                     ) {
-                        events(CartEvent.DeleteFromBasket(it.product.id))
+                        events(CartEvent.DeleteFromBasket(it.id))
                     }
                 }
             }
