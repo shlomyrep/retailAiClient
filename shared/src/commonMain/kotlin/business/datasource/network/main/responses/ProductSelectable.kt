@@ -76,46 +76,37 @@ data class ProductSelectable(
             else -> ""
         }
     }
-    fun getAllSkus(): List<String> {
-        val skus = mutableListOf<String>()
 
-        when (this.priceType) {
-            PriceType.SINGLE_PRICE.toString() -> {
-                skus.add(this.sku)
+    fun getAllSkus(): Set<String> {
+        val skus = mutableSetOf<String>()
+        skus.add(this.sku)
+        this.selections
+            .filter { it.selector?.selectionType == SizeSelectable.type }
+            .mapNotNull { it.selector?.selected as? SizeSelectable }
+            .forEach { sizeSelectable ->
+                skus.add(sizeSelectable.sku)
+                sizeSelectable.colors.values.forEach { colorInfo ->
+                    colorInfo.sku?.let { skus.add(it) }
+                }
             }
-            PriceType.SIZES_PRICE.toString() -> {
+        this.selections
+            .filter { it.selector?.selectionType == ColorSelectable.type }
+            .mapNotNull { it.selector?.selected as? ColorSelectable }
+            .forEach { colorSelectable ->
+                skus.add(colorSelectable._id ?: "")
+
+                // If size selectable also exists, add their combined SKU
                 this.selections
                     .filter { it.selector?.selectionType == SizeSelectable.type }
                     .mapNotNull { it.selector?.selected as? SizeSelectable }
                     .forEach { sizeSelectable ->
-                        skus.add(sizeSelectable.sku)
-                        sizeSelectable.colors.values.forEach { colorInfo ->
-                            colorInfo.sku?.let { skus.add(it) }
+                        val idSelectedColor = colorSelectable._id
+                        sizeSelectable.colors[idSelectedColor]?.sku?.let { combinedSku ->
+                            skus.add(combinedSku)
                         }
                     }
-            }
-            PriceType.COLOR_PRICE.toString(),
-            PriceType.COLOR_SIZES_PRICE.toString() -> {
-                this.selections
-                    .filter { it.selector?.selectionType == ColorSelectable.type }
-                    .mapNotNull { it.selector?.selected as? ColorSelectable }
-                    .forEach { colorSelectable ->
-                        skus.add(colorSelectable._id ?: "")
 
-                        // If size selectable also exists, add their combined SKU
-                        this.selections
-                            .filter { it.selector?.selectionType == SizeSelectable.type }
-                            .mapNotNull { it.selector?.selected as? SizeSelectable }
-                            .forEach { sizeSelectable ->
-                                val idSelectedColor = colorSelectable._id
-                                sizeSelectable.colors[idSelectedColor]?.sku?.let { combinedSku ->
-                                    skus.add(combinedSku)
-                                }
-                            }
-                    }
             }
-        }
-
         return skus
     }
 }
@@ -231,6 +222,7 @@ enum class FinalSale(val type: Int) {
         fun fromInt(value: Int) = values().first { it.type == value }
     }
 }
+
 @Serializable
 data class AddImageResult(
     @SerialName("product")
@@ -238,6 +230,7 @@ data class AddImageResult(
     @SerialName("message")
     val message: String
 )
+
 @Serializable
 data class ProductImageResult(
     @SerialName("images")

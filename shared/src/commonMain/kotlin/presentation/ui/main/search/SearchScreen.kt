@@ -154,13 +154,12 @@ fun SearchScreen(
                     ) {
                         items(
                             state.search.products.filter { product ->
-//                                println("TAMAMAMA" + product.getCalculatedSku() + " "+ product.sku + " " + product.getAllSkus())
                                 println("TAMAMAMA" + product.getCalculatedSku() + " "+ product.sku + " " + product.getAllSkus())
                                 product.title.contains(state.searchText, ignoreCase = true) ||
                                         product.sku.contains(state.searchText, ignoreCase = true) ||
                                         product.description.contains(state.searchText, ignoreCase = true) ||
-                                        product.getCalculatedSku().contains(state.searchText, ignoreCase = true) ||
-                                        product.getAllSkus().any { it.contains(state.searchText, ignoreCase = true) }
+                                        product.getAllSkus().any { it.contains(state.searchText, ignoreCase = true)
+                                        }
                             },
                             key = { it.id }
                         ) {
@@ -208,12 +207,12 @@ private fun ProductSearchBox(product: ProductSelectable, isLastItem: Boolean, na
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer_4dp()
-                    Text(
-                        product.getPrice(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+//                    Text(
+//                        product.getPrice(),
+//                        style = MaterialTheme.typography.bodyMedium,
+//                        maxLines = 1,
+//                        overflow = TextOverflow.Ellipsis
+//                    )
                 }
             }
 
