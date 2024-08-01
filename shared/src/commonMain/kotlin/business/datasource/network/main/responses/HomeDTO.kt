@@ -24,7 +24,7 @@ fun HomeDTO.toHome() = Home(
     banners = banners?.map { it.toBanner() } ?: listOf(),
     categories = categories?.map { it.toCategory() } ?: listOf(),
     flashSale = flashSale?.toFlashSale() ?: FlashSale(),
-    mostSale = mostSale?.map { it.toProduct() } ?: listOf(),
-    newestProduct = newestProduct?.map { it.toProduct() } ?: listOf(),
+    mostSale = mostSale?.map { it } ?: listOf(),
+    newestProduct = newestProduct?.map { it } ?: listOf(),
     config = config
 )

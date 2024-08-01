@@ -40,7 +40,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.core.UIComponentState
-import business.domain.main.Product
+import business.datasource.network.main.responses.ProductSelectable
+//import business.domain.main.Product
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -152,11 +153,17 @@ fun SearchScreen(
                         contentPadding = PaddingValues(16.dp)
                     ) {
                         items(
-                            // TODO Implement a better regex find mechanizm
-                            state.search.products.filter { it.title.contains(state.searchText) },
-                            key = {
-                                it.id
-                            }) {
+                            state.search.products.filter { product ->
+//                                println("TAMAMAMA" + product.getCalculatedSku() + " "+ product.sku + " " + product.getAllSkus())
+                                println("TAMAMAMA" + product.getCalculatedSku() + " "+ product.sku + " " + product.getAllSkus())
+                                product.title.contains(state.searchText, ignoreCase = true) ||
+                                        product.sku.contains(state.searchText, ignoreCase = true) ||
+                                        product.description.contains(state.searchText, ignoreCase = true) ||
+                                        product.getCalculatedSku().contains(state.searchText, ignoreCase = true) ||
+                                        product.getAllSkus().any { it.contains(state.searchText, ignoreCase = true) }
+                            },
+                            key = { it.id }
+                        ) {
                             ProductSearchBox(
                                 it,
                                 isLastItem = state.search.products.last() == it,
@@ -171,7 +178,7 @@ fun SearchScreen(
 }
 
 @Composable
-private fun ProductSearchBox(product: Product, isLastItem: Boolean, navigateToDetail: () -> Unit) {
+private fun ProductSearchBox(product: ProductSelectable, isLastItem: Boolean, navigateToDetail: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxWidth()
             .noRippleClickable { navigateToDetail() }) {

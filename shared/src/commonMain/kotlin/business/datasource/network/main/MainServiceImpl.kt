@@ -259,15 +259,6 @@ class MainServiceImpl(
                 takeFrom(BASE_URL)
                 encodedPath += MainService.PROFILE
             }
-            // contentType(ContentType.MultiPart.FormData)
-            /*body = formData {
-                append("name", name)
-                if (image != null) {
-                    append("image", image)
-                }
-                append("age", age)
-            }*/
-
             body = MultiPartFormDataContent(
                 formData {
                     append("name", name)

@@ -81,6 +81,7 @@ class MyOrdersViewModel(
 
     private fun onUpdatePdfUrl(pdfUrl: String) {
         state.value = state.value.copy(orderPdf = pdfUrl)
+
     }
 
     private fun onEditOrder(orderId: String) {
@@ -105,6 +106,7 @@ class MyOrdersViewModel(
             erpCodeID = user?.erpID ?: ""
         }
         val quote = Quote(
+            order.code,
             orderType,
             order.customerId,
             erpCodeID,

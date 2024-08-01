@@ -1,8 +1,6 @@
 package business.datasource.network.main.responses
 
-import business.domain.main.Category
-import business.domain.main.Product
-import business.domain.main.Supplier
+//import business.domain.main.Product
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -49,6 +47,8 @@ data class ProductSelectable(
         const val type = "product"
     }
 
+    fun getPrice() = "$ $price"
+
     fun getCalculatedSku(): String {
         return when (this.priceType) {
             PriceType.SINGLE_PRICE.toString() -> {
@@ -76,7 +76,50 @@ data class ProductSelectable(
             else -> ""
         }
     }
+    fun getAllSkus(): List<String> {
+        val skus = mutableListOf<String>()
+
+        when (this.priceType) {
+            PriceType.SINGLE_PRICE.toString() -> {
+                skus.add(this.sku)
+            }
+            PriceType.SIZES_PRICE.toString() -> {
+                this.selections
+                    .filter { it.selector?.selectionType == SizeSelectable.type }
+                    .mapNotNull { it.selector?.selected as? SizeSelectable }
+                    .forEach { sizeSelectable ->
+                        skus.add(sizeSelectable.sku)
+                        sizeSelectable.colors.values.forEach { colorInfo ->
+                            colorInfo.sku?.let { skus.add(it) }
+                        }
+                    }
+            }
+            PriceType.COLOR_PRICE.toString(),
+            PriceType.COLOR_SIZES_PRICE.toString() -> {
+                this.selections
+                    .filter { it.selector?.selectionType == ColorSelectable.type }
+                    .mapNotNull { it.selector?.selected as? ColorSelectable }
+                    .forEach { colorSelectable ->
+                        skus.add(colorSelectable._id ?: "")
+
+                        // If size selectable also exists, add their combined SKU
+                        this.selections
+                            .filter { it.selector?.selectionType == SizeSelectable.type }
+                            .mapNotNull { it.selector?.selected as? SizeSelectable }
+                            .forEach { sizeSelectable ->
+                                val idSelectedColor = colorSelectable._id
+                                sizeSelectable.colors[idSelectedColor]?.sku?.let { combinedSku ->
+                                    skus.add(combinedSku)
+                                }
+                            }
+                    }
+            }
+        }
+
+        return skus
+    }
 }
+
 
 fun ProductSelectable.deepCopy(): ProductSelectable {
     return this.copy(
@@ -252,23 +295,24 @@ enum class PriceType {
     }
 }
 
-fun ProductSelectable.toProduct() = Product(
-    description = description ?: "",
-    id = id ?: "0",
-    sku = sku ?: "",
-    priceType = PriceType.fromString(priceType),
-    image = image ?: "",
-    isLike = isLike ?: false,
-    likes = likes ?: 0,
-    price = price ?: 0,
-    selections = selections,
-    rate = rate ?: 0.0,
-    title = title ?: "",
-    category = category?.toCategory() ?: Category(),
-    comments = comments?.map { it.toComment() } ?: listOf(),
-    gallery = gallery ?: listOf(),
-    supplier = supplier?.toSupplier() ?: Supplier(),
-)
+//fun ProductSelectable.toProduct() = Product(
+//    description = description ?: "",
+//    id = id ?: "0",
+//    sku = sku ?: "",
+//    priceType = PriceType.fromString(priceType),
+//    image = image ?: "",
+//    isLike = isLike ?: false,
+//    likes = likes ?: 0,
+//    price = price ?: 0,
+//    selections = selections,
+//    rate = rate ?: 0.0,
+//    title = title ?: "",
+//    category = category?.toCategory() ?: Category(),
+//    comments = comments?.map { it.toComment() } ?: listOf(),
+//    gallery = gallery ?: listOf(),
+//    supplier = supplier?.toSupplier() ?: Supplier(),
+//)
+
 
 fun getCustomizationSteps(
     product: ProductSelectable,

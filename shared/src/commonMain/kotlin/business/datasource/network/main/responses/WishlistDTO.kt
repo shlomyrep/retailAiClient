@@ -13,6 +13,6 @@ data class WishlistDTO(
 
 fun WishlistDTO.toWishlist() = Wishlist(
     categories = categories?.map { it.toCategory() } ?: listOf(),
-    products = products?.map { it.toProduct() } ?: listOf(),
+    products = products?.map { it } ?: listOf(),
 )
 

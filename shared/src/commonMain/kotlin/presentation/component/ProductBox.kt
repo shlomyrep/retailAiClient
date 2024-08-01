@@ -27,7 +27,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import business.domain.main.Product
+import business.datasource.network.main.responses.ProductSelectable
+//import business.domain.main.Product
 import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -41,7 +42,7 @@ import retailai.shared.generated.resources.default_image_loader
 @Composable
 fun ProductBox(
     modifier: Modifier = Modifier.width(180.dp),
-    product: Product,
+    product: ProductSelectable,
     onLikeClick: () -> Unit,
     onClick: () -> Unit
 ) {

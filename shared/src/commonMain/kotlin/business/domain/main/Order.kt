@@ -12,6 +12,6 @@ data class Order(
     val createdAt: String,
     val address: Address,
     val shippingType: ShippingType,
-    val orderPdf: String,
+    val pdf: String,
     val orderId: String
 )

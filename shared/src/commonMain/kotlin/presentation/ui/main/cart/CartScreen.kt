@@ -312,6 +312,7 @@ fun DismissCartContent(
                 horizontalAlignment = Alignment.End
             ) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    selectedRoomName = basket.product.roomName
                     Box {
                         OutlinedTextField(
                             value = selectedRoomName,

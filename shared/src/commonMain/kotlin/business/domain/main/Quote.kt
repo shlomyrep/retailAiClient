@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Quote(
+    var id: String = "",
     var type: Int = Type.NONE.ordinal,
     var customerId: String = "",
     var erpCodeID: String = "",

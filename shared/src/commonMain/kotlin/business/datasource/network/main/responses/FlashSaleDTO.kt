@@ -11,7 +11,10 @@ data class FlashSaleDTO(
     @SerialName("products") val products: List<ProductSelectable>? = listOf()
 )
 
-fun FlashSaleDTO.toFlashSale() = FlashSale(
-    expiredAt = expiredAt ?: "",
-    products = products?.map { it.toProduct() } ?: listOf(),
-)
+fun FlashSaleDTO.toFlashSale() = products?.let {
+    FlashSale(
+        expiredAt = expiredAt ?: "",
+//    products = products?.map { it.toProduct() } ?: listOf(),
+        products = it
+    )
+}

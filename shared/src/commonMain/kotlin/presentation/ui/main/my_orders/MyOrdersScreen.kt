@@ -20,15 +20,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -97,10 +94,10 @@ import retailai.shared.generated.resources.customer_id
 import retailai.shared.generated.resources.customer_name
 import retailai.shared.generated.resources.date
 import retailai.shared.generated.resources.default_image_loader
-import retailai.shared.generated.resources.edit_order
 import retailai.shared.generated.resources.invalid_customer_id
 import retailai.shared.generated.resources.no_orders
 import retailai.shared.generated.resources.orders
+import retailai.shared.generated.resources.show_pdf
 import kotlin.random.Random
 
 
@@ -114,7 +111,7 @@ fun MyOrdersScreen(
     popup: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val tabList by remember { mutableStateOf(listOf("פעיל", "הושלם", "בוטל")) }
+    val tabList by remember { mutableStateOf(listOf("")) }
     val pagerState = rememberPagerState { tabList.size }
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -138,7 +135,7 @@ fun MyOrdersScreen(
                         .padding(innerPadding)
                 ) {
                     TabRow(
-                        modifier = Modifier.height(50.dp).fillMaxWidth(),
+                        modifier = Modifier.height(10.dp).fillMaxWidth(),
                         selectedTabIndex = pagerState.currentPage,
                         contentColor = Color.Transparent,
                         containerColor = Color.Transparent,
@@ -147,7 +144,7 @@ fun MyOrdersScreen(
                             Box(
                                 modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
                                     .height(4.dp).padding(horizontal = 28.dp).background(
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = Color.Transparent,
                                         shape = MaterialTheme.shapes.medium
                                     )
                             )
@@ -185,9 +182,10 @@ fun MyOrdersScreen(
                         ) {
                             when (index) {
                                 ORDER_ACTIVE -> {
+
                                     MyOrdersList(
                                         events,
-                                        list = state.orders.filter { it.status == ORDER_ACTIVE },
+                                        list = state.orders.filter { it.status == ORDER_ACTIVE }.sortedByDescending { it.createdAt },
                                         state,
                                         viewModel,
                                         snackbarHostState,
@@ -266,7 +264,6 @@ private fun OrderBox(
     var customerIdError by remember { mutableStateOf<String?>(null) }
     val orderIdSaved by viewModel.orderIdSaved.collectAsState()
 
-
     Box(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
@@ -292,21 +289,22 @@ private fun OrderBox(
                         events(MyOrdersEvent.OnEditOrder(order.orderId))
                     }
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = stringResource(Res.string.edit_order),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                    //TODO remove remark when edit order is working
+//                    Box(
+//                        modifier = Modifier
+//                            .size(40.dp)
+//                            .background(
+//                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+//                                shape = CircleShape
+//                            ),
+//                        contentAlignment = Alignment.Center
+//                    ) {
+////                        Icon(
+////                            imageVector = Icons.Default.Edit,
+////                            contentDescription = stringResource(Res.string.edit_order),
+////                            tint = MaterialTheme.colorScheme.primary
+////                        )
+//                    }
                 }
             }
             Row(
@@ -421,16 +419,18 @@ private fun OrderBox(
             }
             Spacer_8dp()
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
-            ) {
-                if (order.orderPdf.isNotEmpty()) {
+            val pdf = order.pdf.ifEmpty { state.orderPdf }
+            if (pdf.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                ) {
                     ClickableTextWithCopy(
-                        text = order.orderPdf,
+                        displayText = "${stringResource(Res.string.show_pdf)}  ${order.firstName} ${order.lastName}",
+                        url = pdf,
                         onClick = {
-                            viewModel.openPdf(order.orderPdf)
+                            viewModel.openPdf(pdf)
                         },
                         snackbarHostState = snackbarHostState
                     )
@@ -446,15 +446,18 @@ private fun OrderBox(
     }
 }
 
+
+
 @Composable
 fun ClickableTextWithCopy(
-    text: String,
+    displayText: String,
+    url: String,
     onClick: () -> Unit,
     snackbarHostState: SnackbarHostState
 ) {
     val annotatedString = buildAnnotatedString {
         withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
-            append(text)
+            append(displayText)
         }
     }
 
@@ -468,7 +471,7 @@ fun ClickableTextWithCopy(
                     onTap = { onClick() },
                     onLongPress = {
                         coroutineScope.launch {
-                            clipboardManager.setText(AnnotatedString(text))
+                            clipboardManager.setText(AnnotatedString(url))
                             snackbarHostState.showSnackbar("Text copied to clipboard")
                         }
                     }
@@ -482,15 +485,23 @@ fun ClickableTextWithCopy(
     }
 }
 
+
 fun formatIsoStringToHebrew(isoString: String): String {
     val instant = Instant.parse(isoString)
-    val localDateTime = instant.toLocalDateTime(TimeZone.UTC)
+    val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
 
     val hebrewMonths =
         listOf("ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר")
     val month = hebrewMonths[localDateTime.monthNumber - 1]
-    return "$month ${localDateTime.dayOfMonth},  ${localDateTime.hour}:${localDateTime.minute}:${localDateTime.second}"
+
+    val hour = localDateTime.hour.toString().padStart(2, '0')
+    val minute = localDateTime.minute.toString().padStart(2, '0')
+    val second = localDateTime.second.toString().padStart(2, '0')
+
+    return "$month ${localDateTime.dayOfMonth}, $hour:$minute:$second"
 }
+
+
 
 fun isValidCustomerId(customerIdRegex: String, customerId: String): Boolean {
     val regex = Regex(customerIdRegex)

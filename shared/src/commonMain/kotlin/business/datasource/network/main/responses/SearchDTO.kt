@@ -11,6 +11,6 @@ data class SearchDTO(
 )
 
 fun SearchDTO.toSearch() = Search(
-    products = products?.map { it.toProduct() } ?: listOf(),
+    products = products?.map { it } ?: listOf(),
 )
 

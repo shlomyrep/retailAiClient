@@ -116,6 +116,7 @@
     <string name="please_enter_customer_id">הזן מספר לקוח</string>
     <string name="invalid_customer_id">יש להזין מספר לקוח תקין</string>
     <string name="edit_order">ערוך הזמנה</string>
+    <string name="show_pdf">הצג הצעת מחיר עבור: </string>
 
 
 
