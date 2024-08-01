@@ -1,5 +1,6 @@
 package presentation.ui.main.search
 
+//import business.domain.main.Product
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,7 +42,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.core.UIComponentState
 import business.datasource.network.main.responses.ProductSelectable
-//import business.domain.main.Product
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -61,7 +61,6 @@ import retailai.shared.generated.resources.Res
 import retailai.shared.generated.resources.close
 import retailai.shared.generated.resources.filter
 import retailai.shared.generated.resources.search
-import retailai.shared.generated.resources.sort
 
 
 @OptIn(ExperimentalResourceApi::class)
@@ -105,26 +104,6 @@ fun SearchScreen(
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
                     TextButton(onClick = {
                         events(
-                            SearchEvent.OnUpdateSortDialogState(
-                                UIComponentState.Show
-                            )
-                        )
-                    }, modifier = Modifier.weight(5f)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                painterResource(Res.drawable.sort),
-                                null,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            stringResource(Res.string.sort)
-                        }
-                    }
-                    TextButton(onClick = {
-                        events(
                             SearchEvent.OnUpdateFilterDialogState(
                                 UIComponentState.Show
                             )
@@ -142,6 +121,26 @@ fun SearchScreen(
                             )
                             stringResource(Res.string.filter)
                         }
+                    }
+                    TextButton(onClick = {
+                        events(
+                            SearchEvent.OnUpdateSortDialogState(
+                                UIComponentState.Show
+                            )
+                        )
+                    }, modifier = Modifier.weight(5f)) {
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            verticalAlignment = Alignment.CenterVertically,
+//                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+//                        ) {
+//                            Icon(
+//                                painterResource(Res.drawable.sort),
+//                                null,
+//                                modifier = Modifier.size(24.dp)
+//                            )
+//                            stringResource(Res.string.sort)
+//                        }
                     }
                 }
 
@@ -207,12 +206,6 @@ private fun ProductSearchBox(product: ProductSelectable, isLastItem: Boolean, na
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer_4dp()
-//                    Text(
-//                        product.getPrice(),
-//                        style = MaterialTheme.typography.bodyMedium,
-//                        maxLines = 1,
-//                        overflow = TextOverflow.Ellipsis
-//                    )
                 }
             }
 

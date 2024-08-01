@@ -1,17 +1,16 @@
 package presentation.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -20,8 +19,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
@@ -56,7 +55,10 @@ fun FilterDialog(
                 events(SearchEvent.OnUpdateFilterDialogState(UIComponentState.Hide))
             },
             modifier = Modifier
-                .fillMaxWidth(0.9f).background(MaterialTheme.colorScheme.background)
+                .fillMaxWidth(0.9f)
+                .clip(RoundedCornerShape(16.dp)) 
+                .background(MaterialTheme.colorScheme.background)
+                .padding(16.dp)
         ) {
 
             Column(
@@ -74,38 +76,37 @@ fun FilterDialog(
 
                 Spacer_32dp()
 
+//                Text(
+//                    stringResource(Res.string.category) + ":",
+//                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+//                    style = MaterialTheme.typography.titleMedium
+//                )
+//
+//                RangeSlider(
+//                    value = selectedRange,
+//                    onValueChange = { selectedRange = it },
+//                    valueRange = state.searchFilter.minPrice
+//                        .toFloat()..state.searchFilter.maxPrice.toFloat(),
+//                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+//                )
+//                Row(
+//                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.SpaceBetween
+//                ) {
+//                    Text(
+//                        "$${selectedRange.start.toInt()}",
+//                        style = MaterialTheme.typography.bodyMedium
+//                    )
+//                    Text(
+//                        "$${selectedRange.endInclusive.toInt()}",
+//                        style = MaterialTheme.typography.bodyMedium
+//                    )
+//                }
+//
+//                Spacer_16dp()
+
                 Text(
-                    stringResource(Res.string.category) + ":",
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                RangeSlider(
-                    value = selectedRange,
-                    onValueChange = { selectedRange = it },
-                    valueRange = state.searchFilter.minPrice
-                        .toFloat()..state.searchFilter.maxPrice.toFloat(),
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        "$${selectedRange.start.toInt()}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        "$${selectedRange.endInclusive.toInt()}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-
-                Spacer_16dp()
-
-                Text(
-
                     stringResource(Res.string.category) + ":",
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     style = MaterialTheme.typography.titleMedium
