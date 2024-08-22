@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "465398724282",
+    "project_id": "retailai-f6372",
+    "storage_bucket": "retailai-f6372.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465398724282:android:54b3bbdc0fcc3697ecb483",
+        "android_client_info": {
+          "package_name": "com.digitup.retailai.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSjLagIFx4ihZ6B5a8r8nsDirtVe0KGgk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465398724282:android:184ed2e821db2e09ecb483",
+        "android_client_info": {
+          "package_name": "com.razzaghi.shopingbykmp.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSjLagIFx4ihZ6B5a8r8nsDirtVe0KGgk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

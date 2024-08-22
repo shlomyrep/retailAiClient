@@ -6,6 +6,7 @@ plugins {
     kotlin("plugin.serialization")
     id("com.android.library")
     id("org.jetbrains.compose")
+    alias(libs.plugins.googleGmsGoogleServices)
 }
 
 kotlin {
@@ -125,10 +126,10 @@ android {
 dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.camera.view)
-    implementation (libs.androidx.camera.camera2)
-    implementation (libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
     implementation(libs.vision.common)
-    implementation("com.google.mlkit:barcode-scanning:17.2.0")
-    implementation("com.google.mlkit:text-recognition:16.0.0")
-
+    implementation(libs.barcode.scanning)
+    implementation(libs.text.recognition)
+    implementation(libs.firebase.analytics)
 }

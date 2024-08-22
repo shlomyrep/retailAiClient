@@ -5,6 +5,8 @@ plugins {
     kotlin("multiplatform")
     id("com.android.application")
     id("org.jetbrains.compose")
+    alias(libs.plugins.googleGmsGoogleServices)
+    alias(libs.plugins.googleFirebaseCrashlytics)
 }
 kotlin {
     androidTarget()
@@ -59,6 +61,10 @@ android {
     kotlin {
         jvmToolchain(17)
     }
+}
+dependencies {
+    implementation(libs.play.services.measurement.api)
+    implementation(libs.firebase.crashlytics)
 }
 
 
