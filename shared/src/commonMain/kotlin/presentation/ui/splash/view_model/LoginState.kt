@@ -9,8 +9,8 @@ import business.domain.main.SalesMans
 
 data class LoginState(
     val nameRegister: String = "",
-    val usernameLogin: String = "store@tuboul.co.il",
-    val passwordLogin: String = "123456",
+    val usernameLogin: String = "",
+    val passwordLogin: String = "",
 
     val isTokenValid: Boolean = false,
     val navigateToMain: Boolean = false,
