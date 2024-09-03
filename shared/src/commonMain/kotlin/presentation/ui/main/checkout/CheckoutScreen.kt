@@ -117,7 +117,7 @@ fun CheckoutScreen(
                         shape = MaterialTheme.shapes.small,
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next,
+                            imeAction = ImeAction.Done,
                             keyboardType = KeyboardType.Text,
                         ),
                     )
