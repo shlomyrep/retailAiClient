@@ -144,7 +144,7 @@ fun CheckoutScreen(
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             imeAction = ImeAction.Done,
-                            keyboardType = KeyboardType.Decimal
+                            keyboardType = KeyboardType.Text
                         ),
                     )
 
