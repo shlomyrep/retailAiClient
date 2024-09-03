@@ -143,8 +143,8 @@ fun CheckoutScreen(
                         },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Next,
-                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Decimal
                         ),
                     )
 

@@ -15,8 +15,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -104,76 +106,88 @@ fun LoginScreen(
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun showUserSelection(state: LoginState, events: (LoginEvent) -> Unit, navigateToMain: () -> Unit) {
+fun showUserSelection(
+    state: LoginState,
+    events: (LoginEvent) -> Unit,
+    navigateToMain: () -> Unit
+) {
     var selectedSalesman by remember { mutableStateOf<SalesMan?>(null) }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = stringResource(Res.string.choose_salesman),
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold
-            )
-        )
-        Spacer_32dp()
-
-        val sortedSalesmen = state.salesMans?.users?.sortedBy { it.username } ?: listOf()
-
-        LazyColumn(
+    // Wrap the main column with a scrollable box
+    Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Column(
             modifier = Modifier
-                .heightIn(max = 300.dp)
-                .fillMaxWidth()
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(sortedSalesmen.size) { index ->
-                val salesman = sortedSalesmen[index]
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp)
-                        .border(
-                            width = 1.dp,
-                            color = if (salesman == selectedSalesman) Blue else Color.Gray,
-                            shape = RoundedCornerShape(10.dp)
+            Text(
+                text = stringResource(Res.string.choose_salesman),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Spacer_32dp()
+
+            val sortedSalesmen = state.salesMans?.users?.sortedBy { it.username } ?: listOf()
+
+            LazyColumn(
+                modifier = Modifier
+                    .heightIn(max = 300.dp)
+                    .fillMaxWidth()
+            ) {
+                items(sortedSalesmen.size) { index ->
+                    val salesman = sortedSalesmen[index]
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .border(
+                                width = 1.dp,
+                                color = if (salesman == selectedSalesman) Blue else Color.Gray,
+                                shape = RoundedCornerShape(10.dp)
+                            )
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable {
+                                selectedSalesman = salesman
+                                events(LoginEvent.SelectSalesMan(salesman))
+                            }
+                            .padding(vertical = 12.dp)
+                    ) {
+                        Text(
+                            text = salesman.username,
+                            fontSize = 16.sp,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = if (salesman == selectedSalesman) Blue else Color.Black
                         )
-                        .clip(RoundedCornerShape(10.dp))
-                        .clickable {
-                            selectedSalesman = salesman
-                            events(LoginEvent.SelectSalesMan(salesman))
-                        }
-                        .padding(vertical = 12.dp)
-                ) {
-                    Text(
-                        text = salesman.username,
-                        fontSize = 16.sp,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (salesman == selectedSalesman) Blue else Color.Black
-                    )
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
-        DefaultButton(
-            progressBarState = state.progressBarState,
-            text = stringResource(Res.string.select),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(DEFAULT__BUTTON_SIZE_EXTRA),
-            onClick = {
-                if (selectedSalesman != null) {
-                    events(LoginEvent.SelectSalesMan(salesMan = selectedSalesman!!))
-                    navigateToMain() // Trigger the navigation after the selection is confirmed.
-                }
-            },
-            enabled = selectedSalesman != null
-        )
-        Spacer(Modifier.height(32.dp))
+            // Spacer with weight to push the button upwards but not out of view
+            Spacer(modifier = Modifier.weight(1f))
+
+            DefaultButton(
+                progressBarState = state.progressBarState,
+                text = stringResource(Res.string.select),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(DEFAULT__BUTTON_SIZE_EXTRA),
+                onClick = {
+                    if (selectedSalesman != null) {
+                        events(LoginEvent.SelectSalesMan(salesMan = selectedSalesman!!))
+                        navigateToMain() // Trigger the navigation after the selection is confirmed.
+                    }
+                },
+                enabled = selectedSalesman != null
+            )
+            Spacer(Modifier.height(32.dp))
+        }
     }
 }
+
 
 
 @OptIn(ExperimentalResourceApi::class)
@@ -224,7 +238,7 @@ fun showLoginForm(
             value = state.passwordLogin,
             onValueChange = {
                 events(LoginEvent.OnUpdatePasswordLogin(it))
-                isPasswordError = it.length < 8
+                isPasswordError = it.length < 6
             },
             modifier = Modifier.fillMaxWidth(),
         )
