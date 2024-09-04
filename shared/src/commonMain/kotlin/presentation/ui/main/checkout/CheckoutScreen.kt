@@ -44,6 +44,7 @@ import retailai.shared.generated.resources.customer_id
 import retailai.shared.generated.resources.first_name
 import retailai.shared.generated.resources.invalid_customer_id
 import retailai.shared.generated.resources.last_name
+import retailai.shared.generated.resources.optional
 import retailai.shared.generated.resources.save_spec
 import retailai.shared.generated.resources.spec_info
 
@@ -51,10 +52,7 @@ import retailai.shared.generated.resources.spec_info
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun CheckoutScreen(
-    state: CheckoutState,
-    events: (CheckoutEvent) -> Unit,
-    navigateToAddress: () -> Unit,
-    popup: () -> Unit
+    state: CheckoutState, events: (CheckoutEvent) -> Unit, navigateToAddress: () -> Unit, popup: () -> Unit
 ) {
     var customerIdError by remember { mutableStateOf<String?>(null) }
 
@@ -77,12 +75,36 @@ fun CheckoutScreen(
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                        .align(Alignment.TopCenter)
+                    modifier = Modifier.fillMaxSize().padding(16.dp).align(Alignment.TopCenter)
                 ) {
                     Spacer_32dp()
+                    val errorMessages = stringResource(Res.string.invalid_customer_id)
+                    TextField(
+                        value = state.customerID,
+                        onValueChange = {
+                            events(CheckoutEvent.OnUpdateCustomerID(it))
+                            customerIdError = if (it.isEmpty() || isValidCustomerId(state.customerIdRegex, it)) {
+                                null
+                            } else {
+                                errorMessages
+                            }
+                        },
+                        enabled = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = DefaultTextFieldTheme(),
+                        shape = MaterialTheme.shapes.small,
+                        label = {
+                            Text(stringResource(Res.string.customer_id))
+                        },
+                        placeholder = {
+                            Text(text = stringResource(Res.string.optional))
+                        },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Done, keyboardType = KeyboardType.Number
+                        ),
+                    )
+                    Spacer_16dp()
                     TextField(
                         value = state.firstName,
                         onValueChange = {
@@ -101,7 +123,6 @@ fun CheckoutScreen(
                             keyboardType = KeyboardType.Text,
                         ),
                     )
-
                     Spacer_16dp()
                     TextField(
                         value = state.lastName,
@@ -122,32 +143,6 @@ fun CheckoutScreen(
                         ),
                     )
 
-                    Spacer_16dp()
-                    val errorMessages = stringResource(Res.string.invalid_customer_id)
-                    TextField(
-                        value = state.customerID,
-                        onValueChange = {
-                            events(CheckoutEvent.OnUpdateCustomerID(it))
-                            customerIdError = if (it.isEmpty() || isValidCustomerId(state.customerIdRegex, it)) {
-                                null
-                            } else {
-                                errorMessages
-                            }
-                        },
-                        enabled = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = DefaultTextFieldTheme(),
-                        shape = MaterialTheme.shapes.small,
-                        label = {
-                            Text(stringResource(Res.string.customer_id))
-                        },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Done,
-                            keyboardType = KeyboardType.Text
-                        ),
-                    )
-
                     if (customerIdError != null) {
                         Text(
                             text = customerIdError ?: "",
@@ -161,10 +156,7 @@ fun CheckoutScreen(
 
                 Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
                     CheckoutButtonBox(
-                        state.firstName,
-                        state.lastName,
-                        state.customerID,
-                        state.customerIdRegex
+                        state.firstName, state.lastName, state.customerID, state.customerIdRegex
                     ) {
                         events(CheckoutEvent.BuyProduct)
                     }
@@ -178,19 +170,12 @@ fun CheckoutScreen(
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun CheckoutButtonBox(
-    firstName: String,
-    lastName: String,
-    customerID: String,
-    customerIdRegex: String,
-    onClick: () -> Unit
+    firstName: String, lastName: String, customerID: String, customerIdRegex: String, onClick: () -> Unit
 ) {
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(8.dp),
-        shape = RoundedCornerShape(
-            topStart = 8.dp,
-            topEnd = 8.dp
+        modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(8.dp), shape = RoundedCornerShape(
+            topStart = 8.dp, topEnd = 8.dp
         )
     ) {
         Column(
