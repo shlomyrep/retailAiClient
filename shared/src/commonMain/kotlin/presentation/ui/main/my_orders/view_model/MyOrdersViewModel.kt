@@ -32,9 +32,6 @@ import kotlinx.serialization.json.Json
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import retailai.shared.generated.resources.Res
-import retailai.shared.generated.resources.model_text
-import retailai.shared.generated.resources.sku
 
 class MyOrdersViewModel(
     private val getOrdersInteractor: GetOrdersInteractor,
@@ -271,16 +268,23 @@ class MyOrdersViewModel(
             )
 
             val lineList = mutableListOf<Line>()
+            val productTitle = product.title
+
+            val productTitleLine = Line(
+                text = productTitle,
+            )
+            lineList.add(productTitleLine)
+
             val productName = product.name
             val productNameLine = Line(
-                text = "${Res.string.model_text} $productName",
+                text = productName,
             )
             lineList.add(productNameLine)
 //            Log.i("TEST", "1: $sku")
 //            sku = getSupplierToStoreSku(sku)
 //            Log.i("TEST", "2: $sku")
             val skuLine = Line(
-                text = "${Res.string.sku} $sku",
+                text =  sku,
             )
             lineList.add(skuLine)
 //            Log.i("TEST", "3: $sku")

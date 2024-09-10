@@ -319,6 +319,8 @@ fun DismissCartContent(
                             value = selectedRoomName,
                             onValueChange = {
                                 selectedRoomName = it
+                                // Optional: you may want to reset the roomName here to avoid premature updates.
+                                basket.product.roomName = it
                             },
                             enabled = true,
                             label = {
@@ -329,6 +331,7 @@ fun DismissCartContent(
                                 .focusRequester(focusRequester)
                                 .onFocusChanged { focusState ->
                                     if (isFocused && !focusState.isFocused) {
+                                        // You can remove this focus check if it's causing issues with user input
                                         if (selectedRoomName.isNotEmpty()) {
                                             basket.product.roomName = selectedRoomName
                                             events(CartEvent.AddProduct(basket.product, basket.id))
@@ -371,18 +374,18 @@ fun DismissCartContent(
                             roomNames.forEach { roomName ->
                                 DropdownMenuItem(
                                     onClick = {
-                                        selectedRoomName = roomName
-                                        basket.product.roomName = roomName
-                                        events(CartEvent.AddProduct(basket.product, basket.id))
+                                        selectedRoomName = roomName // Set the room name when clicked
+                                        basket.product.roomName = roomName // Update product immediately
+                                        events(CartEvent.AddProduct(basket.product, basket.id)) // Trigger event if necessary
                                         expanded = false
-                                        focusManager.clearFocus()
+                                        // Removed focus clearing so the user can still edit the text field
                                     },
                                     text = { Text(roomName) }
                                 )
                             }
                         }
-
                     }
+
                 }
                 Text(
                     text = basket.title,

@@ -1,5 +1,6 @@
 package presentation.component
 
+//import business.domain.main.Product
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,24 +17,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import business.datasource.network.main.responses.ProductSelectable
-//import business.domain.main.Product
 import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import presentation.theme.BackgroundContent
-import presentation.theme.orange_400
 import retailai.shared.generated.resources.Res
 import retailai.shared.generated.resources.default_image_loader
 
@@ -87,27 +83,27 @@ fun ProductBox(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    product.title,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Filled.Star, null, tint = orange_400)
-                    Text(product.rate.toString(), style = MaterialTheme.typography.bodySmall)
-                }
+//                Text(
+//                    product.title,
+//                    style = MaterialTheme.typography.bodyMedium,
+//                    maxLines = 1,
+//                    overflow = TextOverflow.Ellipsis
+//                )
+//                Row(
+//                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Icon(Icons.Filled.Star, null, tint = orange_400)
+//                    Text(product.rate.toString(), style = MaterialTheme.typography.bodySmall)
+//                }
             }
             Spacer_4dp()
-            Text(
-                product.getPrice(),
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+//            Text(
+//                product.getPrice(),
+//                style = MaterialTheme.typography.bodyMedium,
+//                maxLines = 1,
+//                overflow = TextOverflow.Ellipsis
+//            )
         }
     }
 }

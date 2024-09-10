@@ -40,11 +40,8 @@ import presentation.theme.DefaultTextFieldTheme
 import presentation.ui.main.checkout.view_model.CheckoutEvent
 import presentation.ui.main.checkout.view_model.CheckoutState
 import retailai.shared.generated.resources.Res
-import retailai.shared.generated.resources.customer_id
 import retailai.shared.generated.resources.first_name
-import retailai.shared.generated.resources.invalid_customer_id
 import retailai.shared.generated.resources.last_name
-import retailai.shared.generated.resources.optional
 import retailai.shared.generated.resources.save_spec
 import retailai.shared.generated.resources.spec_info
 
@@ -78,33 +75,6 @@ fun CheckoutScreen(
                     modifier = Modifier.fillMaxSize().padding(16.dp).align(Alignment.TopCenter)
                 ) {
                     Spacer_32dp()
-                    val errorMessages = stringResource(Res.string.invalid_customer_id)
-                    TextField(
-                        value = state.customerID,
-                        onValueChange = {
-                            events(CheckoutEvent.OnUpdateCustomerID(it))
-                            customerIdError = if (it.isEmpty() || isValidCustomerId(state.customerIdRegex, it)) {
-                                null
-                            } else {
-                                errorMessages
-                            }
-                        },
-                        enabled = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = DefaultTextFieldTheme(),
-                        shape = MaterialTheme.shapes.small,
-                        label = {
-                            Text(stringResource(Res.string.customer_id))
-                        },
-                        placeholder = {
-                            Text(text = stringResource(Res.string.optional))
-                        },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Done, keyboardType = KeyboardType.Number
-                        ),
-                    )
-                    Spacer_16dp()
                     TextField(
                         value = state.firstName,
                         onValueChange = {
@@ -181,24 +151,6 @@ fun CheckoutButtonBox(
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
         ) {
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Text(stringResource(Res.string.delivery_cost), style = MaterialTheme.typography.titleMedium)
-//                Text(shippingCost, style = MaterialTheme.typography.titleLarge)
-//            }
-//            Spacer_8dp()
-//
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Text(stringResource(Res.string.total_cost), style = MaterialTheme.typography.titleMedium)
-//                Text(totalCost, style = MaterialTheme.typography.titleLarge)
-//            }
 
             Spacer_16dp()
             DefaultButton(
@@ -220,38 +172,3 @@ fun isValidCustomerId(customerIdRegex: String, customerId: String): Boolean {
     return regex.matches(customerId)
 }
 
-
-//@OptIn(ExperimentalResourceApi::class)
-//@Composable
-//fun ShippingBox(title: String, image: DrawableResource, detail: String, onClick: () -> Unit) {
-//    Row(modifier = Modifier.fillMaxWidth()) {
-//        Icon(
-//            painter = painterResource(image),
-//            null,
-//            modifier = Modifier.size(24.dp),
-//            tint = MaterialTheme.colorScheme.primary
-//        )
-//        Spacer_8dp()
-//        Column(modifier = Modifier.fillMaxWidth(.7f)) {
-//            Text(title, style = MaterialTheme.typography.titleMedium)
-//            Text(detail, style = MaterialTheme.typography.bodyMedium)
-//        }
-//        Spacer_8dp()
-//        Box(modifier = Modifier.wrapContentHeight(), contentAlignment = Alignment.CenterEnd) {
-//            Box(
-//                modifier = Modifier.border(
-//                    1.dp,
-//                    color = BorderColor,
-//                    MaterialTheme.shapes.medium
-//                ).noRippleClickable { onClick() }
-//            ) {
-//                Text(
-//                    stringResource(Res.string.change),
-//                    style = MaterialTheme.typography.labelSmall,
-//                    color = MaterialTheme.colorScheme.primary,
-//                    modifier = Modifier.padding(4.dp)
-//                )
-//            }
-//        }
-//    }
-//}

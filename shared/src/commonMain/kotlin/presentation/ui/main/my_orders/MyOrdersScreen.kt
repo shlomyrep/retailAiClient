@@ -1,8 +1,6 @@
 package presentation.ui.main.my_orders
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -18,8 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -32,9 +28,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -63,9 +56,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import business.constants.ORDER_ACTIVE
-import business.constants.ORDER_CANCELED
-import business.constants.ORDER_SUCCESS
 import business.domain.main.Order
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
@@ -101,7 +91,7 @@ import retailai.shared.generated.resources.show_pdf
 import kotlin.random.Random
 
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun MyOrdersScreen(
     state: MyOrdersState,
@@ -110,9 +100,6 @@ fun MyOrdersScreen(
     navigateToEditOrder: () -> Unit,
     popup: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-    val tabList by remember { mutableStateOf(listOf("")) }
-    val pagerState = rememberPagerState { tabList.size }
     val snackbarHostState = remember { SnackbarHostState() }
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -134,88 +121,18 @@ fun MyOrdersScreen(
                         .fillMaxSize()
                         .padding(innerPadding)
                 ) {
-                    TabRow(
-                        modifier = Modifier.height(10.dp).fillMaxWidth(),
-                        selectedTabIndex = pagerState.currentPage,
-                        contentColor = Color.Transparent,
-                        containerColor = Color.Transparent,
-                        divider = {},
-                        indicator = { tabPositions ->
-                            Box(
-                                modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                                    .height(4.dp).padding(horizontal = 28.dp).background(
-                                        color = Color.Transparent,
-                                        shape = MaterialTheme.shapes.medium
-                                    )
-                            )
-                        }
+                    Box(
+                        contentAlignment = Alignment.TopCenter,
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        tabList.forEachIndexed { index, _ ->
-                            Tab(
-                                unselectedContentColor = Color.Transparent,
-                                selectedContentColor = Color.Transparent,
-                                text = {
-                                    Text(
-                                        tabList[index],
-                                        style = MaterialTheme.typography.labelLarge,
-                                        color = if (pagerState.currentPage == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
-                                    )
-                                },
-                                selected = pagerState.currentPage == index,
-                                onClick = {
-                                    scope.launch {
-                                        pagerState.animateScrollToPage(index)
-                                    }
-                                }
-                            )
-                        }
-                    }
-
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.Top
-                    ) { index ->
-                        Box(
-                            contentAlignment = Alignment.TopCenter,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            when (index) {
-                                ORDER_ACTIVE -> {
-
-                                    MyOrdersList(
-                                        events,
-                                        list = state.orders.filter { it.status == ORDER_ACTIVE }.sortedByDescending { it.createdAt },
-                                        state,
-                                        viewModel,
-                                        snackbarHostState,
-                                        navigateToEditOrder
-                                    )
-                                }
-
-                                ORDER_SUCCESS -> {
-                                    MyOrdersList(
-                                        events,
-                                        list = state.orders.filter { it.status == ORDER_SUCCESS },
-                                        state,
-                                        viewModel,
-                                        snackbarHostState,
-                                        navigateToEditOrder
-                                    )
-                                }
-
-                                ORDER_CANCELED -> {
-                                    MyOrdersList(
-                                        events,
-                                        list = state.orders.filter { it.status == ORDER_CANCELED },
-                                        state,
-                                        viewModel,
-                                        snackbarHostState,
-                                        navigateToEditOrder
-                                    )
-                                }
-                            }
-                        }
+                        MyOrdersList(
+                            events,
+                            list = state.orders,
+                            state,
+                            viewModel,
+                            snackbarHostState,
+                            navigateToEditOrder
+                        )
                     }
                 }
             }
@@ -355,8 +272,8 @@ private fun OrderBox(
                     shape = MaterialTheme.shapes.small,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next,
-                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Text,
                     )
                 )
                 if (customerIdError != null) {
@@ -447,7 +364,6 @@ private fun OrderBox(
 }
 
 
-
 @Composable
 fun ClickableTextWithCopy(
     displayText: String,
@@ -500,7 +416,6 @@ fun formatIsoStringToHebrew(isoString: String): String {
 
     return "$month ${localDateTime.dayOfMonth}, $hour:$minute:$second"
 }
-
 
 
 fun isValidCustomerId(customerIdRegex: String, customerId: String): Boolean {
