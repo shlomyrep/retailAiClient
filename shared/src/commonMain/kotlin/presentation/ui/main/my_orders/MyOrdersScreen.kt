@@ -196,13 +196,20 @@ fun CollapsibleOrderBox(
     snackbarHostState: SnackbarHostState,
     navigateToEditOrder: () -> Unit
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    // Track if the dialog should be shown and which order is selected
+    var selectedOrderId by remember { mutableStateOf<String?>(null) }
+
+    // Toggle dialog visibility based on the current selection
+    val toggleDialog: () -> Unit = {
+        selectedOrderId = if (selectedOrderId == order.orderId) null else order.orderId
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
             .border(1.dp, BorderColor, MaterialTheme.shapes.medium)
-            .clickable { showDialog = true }
+            .clickable { toggleDialog() }
             .padding(16.dp)
     ) {
         // Display only the summary of the order
@@ -218,19 +225,20 @@ fun CollapsibleOrderBox(
         }
     }
 
-    // Show the dialog when showDialog is true
-    if (showDialog) {
+    // Show the dialog only if the current order is selected
+    if (selectedOrderId == order.orderId) {
         OrderDetailsDialog(
             order = order,
             events = events,
             state = state,
             viewModel = viewModel,
             snackbarHostState = snackbarHostState,
-            onDismissRequest = { showDialog = false },
+            onDismissRequest = { selectedOrderId = null },
             navigateToEditOrder = navigateToEditOrder
         )
     }
 }
+
 
 @Composable
 fun OrderDetailsDialog(
