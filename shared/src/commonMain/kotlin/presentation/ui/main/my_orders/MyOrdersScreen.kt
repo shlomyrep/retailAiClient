@@ -2,12 +2,14 @@ package presentation.ui.main.my_orders
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -88,7 +90,6 @@ import retailai.shared.generated.resources.invalid_customer_id
 import retailai.shared.generated.resources.no_orders
 import retailai.shared.generated.resources.orders
 import retailai.shared.generated.resources.show_pdf
-import kotlin.random.Random
 
 
 @OptIn(ExperimentalResourceApi::class)
@@ -140,6 +141,7 @@ fun MyOrdersScreen(
     }
 }
 
+
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun MyOrdersList(
@@ -161,11 +163,129 @@ private fun MyOrdersList(
     }
 
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
-        items(list, key = { Random.nextInt().toString() }) {
-            OrderBox(events, it, state, viewModel, snackbarHostState, navigateToEditOrder)
+        items(list, key = { order ->
+            // Use orderId if not null or empty; otherwise, use a fallback unique key
+            val uniqueKey = if (!order.orderId.isNullOrEmpty()) {
+                order.orderId
+            } else {
+                // Generate a fallback key using hash code or a combination of unique attributes
+                "${order.firstName}_${order.lastName}_${order.createdAt.hashCode()}"
+            }
+            uniqueKey
+        }) { order ->
+            CollapsibleOrderBox(
+                events = events,
+                order = order,
+                state = state,
+                viewModel = viewModel,
+                snackbarHostState = snackbarHostState,
+                navigateToEditOrder = navigateToEditOrder
+            )
         }
     }
 }
+
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+fun CollapsibleOrderBox(
+    events: (MyOrdersEvent) -> Unit,
+    order: Order,
+    state: MyOrdersState,
+    viewModel: MyOrdersViewModel,
+    snackbarHostState: SnackbarHostState,
+    navigateToEditOrder: () -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    // Click handler to show the dialog with full details
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .border(1.dp, BorderColor, MaterialTheme.shapes.medium)
+            .clickable { showDialog = true }
+            .padding(8.dp)
+    ) {
+        // Display only the summary of the order
+        Column {
+            Text(
+                "${stringResource(Res.string.date)}: ${formatIsoStringToHebrew(order.createdAt)}",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                "${stringResource(Res.string.customer_name)}: ${order.firstName} ${order.lastName}",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+    }
+
+    // Show the dialog when showDialog is true
+    if (showDialog) {
+        OrderDetailsDialog(
+            order = order,
+            events = events,
+            state = state,
+            viewModel = viewModel,
+            snackbarHostState = snackbarHostState,
+            onDismissRequest = { showDialog = false },
+            navigateToEditOrder = navigateToEditOrder
+        )
+    }
+}
+
+@Composable
+fun OrderDetailsDialog(
+    order: Order,
+    events: (MyOrdersEvent) -> Unit,
+    state: MyOrdersState,
+    viewModel: MyOrdersViewModel,
+    snackbarHostState: SnackbarHostState,
+    onDismissRequest: () -> Unit,
+    navigateToEditOrder: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize() // This makes the Box fill the full screen size
+            .padding(16.dp), // Optional padding around the dialog
+        contentAlignment = Alignment.Center // Centers the dialog content within the Box
+    ) {
+        androidx.compose.material3.Surface(
+            shape = MaterialTheme.shapes.medium,
+            tonalElevation = 8.dp,
+            modifier = Modifier
+                .fillMaxWidth() // This makes the dialog match the width of the screen
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp) // Add padding inside the dialog content
+            ) {
+                Text(
+                    text = "Order Details",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                // Include the full content of OrderBox here
+                OrderBox(
+                    events = events,
+                    order = order,
+                    state = state,
+                    viewModel = viewModel,
+                    snackbarHostState = snackbarHostState,
+                    navigateToEditOrder = navigateToEditOrder
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                androidx.compose.material3.TextButton(
+                    onClick = onDismissRequest,
+                    modifier = Modifier.align(Alignment.End) // Align the button to the right
+                ) {
+                    Text("סגור")
+                }
+            }
+        }
+    }
+}
+
+
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
