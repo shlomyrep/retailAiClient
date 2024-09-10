@@ -197,15 +197,13 @@ fun CollapsibleOrderBox(
     navigateToEditOrder: () -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
-
-    // Click handler to show the dialog with full details
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(16.dp)
             .border(1.dp, BorderColor, MaterialTheme.shapes.medium)
             .clickable { showDialog = true }
-            .padding(8.dp)
+            .padding(16.dp)
     ) {
         // Display only the summary of the order
         Column {
@@ -247,7 +245,7 @@ fun OrderDetailsDialog(
     Box(
         modifier = Modifier
             .fillMaxSize() // This makes the Box fill the full screen size
-            .padding(16.dp), // Optional padding around the dialog
+            .padding(4.dp), // Optional padding around the dialog
         contentAlignment = Alignment.Center // Centers the dialog content within the Box
     ) {
         androidx.compose.material3.Surface(
@@ -451,6 +449,8 @@ private fun OrderBox(
                 ) {
                     if (order.customerId.isNotEmpty()) {
                         events(MyOrdersEvent.OnSendQuote(1, order))
+                    }else{
+                        customerIdError = "יש להזין מספר לקוח תקין"
                     }
                 }
             }
@@ -482,6 +482,7 @@ private fun OrderBox(
         }
     }
 }
+
 
 
 @Composable
