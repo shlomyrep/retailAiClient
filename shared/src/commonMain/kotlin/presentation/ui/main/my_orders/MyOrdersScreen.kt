@@ -305,7 +305,10 @@ private fun OrderBox(
 ) {
     var customerId by remember { mutableStateOf(order.customerId) }
     var customerIdError by remember { mutableStateOf<String?>(null) }
+    var isPdfReady by remember { mutableStateOf(false) } // State to track if the PDF is ready
+    var showPreparingMessage by remember { mutableStateOf(false) } // State to control preparing message visibility
     val orderIdSaved by viewModel.orderIdSaved.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Column(
@@ -332,7 +335,7 @@ private fun OrderBox(
                         events(MyOrdersEvent.OnEditOrder(order.orderId))
                     }
                 ) {
-                    //TODO remove remark when edit order is working
+                    // TODO remove remark when edit order is working
 //                    Box(
 //                        modifier = Modifier
 //                            .size(40.dp)
@@ -445,9 +448,14 @@ private fun OrderBox(
                         .padding(end = 5.dp),
                     text = stringResource(Res.string.created_pdf)
                 ) {
-                    events(MyOrdersEvent.OnSendQuote(2, order))
+                    // Show message and start PDF generation
+                    coroutineScope.launch {
+                        showPreparingMessage = true // Show preparing message only after clicking the button
+                        isPdfReady = false // PDF is not ready yet
+                        // Simulate PDF generation; replace this with your actual event
+                        events(MyOrdersEvent.OnSendQuote(2, order))
+                    }
                 }
-
                 DefaultButton(
                     modifier = Modifier
                         .weight(1f)
@@ -457,32 +465,40 @@ private fun OrderBox(
                 ) {
                     if (order.customerId.isNotEmpty()) {
                         events(MyOrdersEvent.OnSendQuote(1, order))
-                    }else{
+                    } else {
                         customerIdError = "יש להזין מספר לקוח תקין"
                     }
                 }
             }
             Spacer_8dp()
 
-            val pdf = order.pdf.ifEmpty { state.orderPdf }
-            if (pdf.isNotEmpty()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 5.dp)
-                ) {
+            // Text to display PDF status
+            when {
+                order.pdf.isNotEmpty() || isPdfReady -> {
                     ClickableTextWithCopy(
                         displayText = "${stringResource(Res.string.show_pdf)}  ${order.firstName} ${order.lastName}",
-                        url = pdf,
+                        url = order.pdf, // Link to the actual PDF
                         onClick = {
-                            viewModel.openPdf(pdf)
+                            viewModel.openPdf(order.pdf) // Open the PDF when ready
                         },
                         snackbarHostState = snackbarHostState
+                    )
+                }
+                showPreparingMessage -> {
+                    // Display the loading state text in black without underline
+                    Text(
+                        text = "אנא המתן בזמן שאנו מכינים עבורך את קובץ ה-PDF",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = Color.Black,
+                            textDecoration = TextDecoration.None
+                        ),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                     )
                 }
             }
         }
     }
+
     LaunchedEffect(orderIdSaved) {
         if (orderIdSaved) {
             navigateToEditOrder()
@@ -490,6 +506,7 @@ private fun OrderBox(
         }
     }
 }
+
 
 
 
