@@ -473,13 +473,14 @@ private fun OrderBox(
             Spacer_8dp()
 
             // Text to display PDF status
+            val pdf = order.pdf.ifEmpty { state.orderPdf }
             when {
-                order.pdf.isNotEmpty() || isPdfReady -> {
+                pdf.isNotEmpty() || isPdfReady -> {
                     ClickableTextWithCopy(
                         displayText = "${stringResource(Res.string.show_pdf)}  ${order.firstName} ${order.lastName}",
-                        url = order.pdf, // Link to the actual PDF
+                        url = pdf, // Link to the actual PDF
                         onClick = {
-                            viewModel.openPdf(order.pdf) // Open the PDF when ready
+                            viewModel.openPdf(pdf) // Open the PDF when ready
                         },
                         snackbarHostState = snackbarHostState
                     )
