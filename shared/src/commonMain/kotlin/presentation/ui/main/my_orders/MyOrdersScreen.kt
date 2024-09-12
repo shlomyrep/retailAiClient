@@ -305,8 +305,8 @@ private fun OrderBox(
 ) {
     var customerId by remember { mutableStateOf(order.customerId) }
     var customerIdError by remember { mutableStateOf<String?>(null) }
-    var isPdfReady by remember { mutableStateOf(false) } // State to track if the PDF is ready
-    var showPreparingMessage by remember { mutableStateOf(false) } // State to control preparing message visibility
+    var isPdfReady by remember { mutableStateOf(false) }
+    var showFailureMessage by remember { mutableStateOf(false) }
     val orderIdSaved by viewModel.orderIdSaved.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -450,7 +450,7 @@ private fun OrderBox(
                 ) {
                     // Show message and start PDF generation
                     coroutineScope.launch {
-                        showPreparingMessage = true // Show preparing message only after clicking the button
+                        showFailureMessage = true // Show preparing message only after clicking the button
                         isPdfReady = false // PDF is not ready yet
                         // Simulate PDF generation; replace this with your actual event
                         events(MyOrdersEvent.OnSendQuote(2, order))
@@ -485,10 +485,10 @@ private fun OrderBox(
                         snackbarHostState = snackbarHostState
                     )
                 }
-                showPreparingMessage -> {
+                showFailureMessage -> {
                     // Display the loading state text in black without underline
                     Text(
-                        text = "אנא המתן בזמן שאנו מכינים עבורך את קובץ ה-PDF",
+                      text = "כשל ביצירת pdf אנא נסה מאוחר יותר",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             color = Color.Black,
                             textDecoration = TextDecoration.None
