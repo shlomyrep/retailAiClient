@@ -36,8 +36,8 @@ android {
         applicationId = "com.digitup.retailai.android"
         minSdk = (findProperty("android.minSdk") as String).toInt()
         targetSdk = (findProperty("android.targetSdk") as String).toInt()
-        versionCode = 1002
-        versionName = "1.2"
+        versionCode = 1003
+        versionName = "1.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
