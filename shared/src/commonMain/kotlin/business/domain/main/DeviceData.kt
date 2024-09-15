@@ -11,6 +11,14 @@ data class DeviceData (
     var fcm: String = "",
     var deviceType: String = "",
     var modelName: String = "",
-    var lastInteractionTime: Long = 0,
-    var versionCode: Int = 0
+    var lastInteractionTime: Long = 0
+)
+
+@Serializable
+data class PlatformData (
+    var uuid: String = "",
+    var name: String = "",
+    var version: String = "",
+    var deviceType: String = "",
+    var modelName: String = ""
 )

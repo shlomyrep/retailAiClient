@@ -31,40 +31,35 @@ struct ContentView: View {
 }
 
 func fetchDeviceData() {
-//     Collect device data
-    let uuid = UIDevice.current.identifierForVendor?.uuidString ?? "" 
-    let username = "YourUsername" // Replace with actual username if available
+    NSLog("TAMIR --> fetchDeviceData --> Starting data collection")
+    
+    let uuid = UIDevice.current.identifierForVendor?.uuidString ?? ""
     let name = UIDevice.current.model
-    let fcm = ""
     let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "Unknown"
     let deviceType = "iOS"
-    let lastInteractionTime = Date().timeIntervalSince1970
-    let versionCode = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "0"
     let modelName = getDeviceModelName()
+    
+    NSLog("TAMIR --> fetchDeviceData --> Collected Data - UUID: \(uuid), Name: \(name), Version: \(version), Device Type: \(deviceType), Model Name: \(modelName)")
 
-    let deviceData = DeviceData(
+    let platformData = PlatformData(
         uuid: uuid,
-        username: username,
         name: name,
         version: version,
-        fcm:fcm,
         deviceType: deviceType,
-        modelName:modelName,
-        lastInteractionTime: Int64(lastInteractionTime),
-        versionCode: Int32(versionCode) ?? 0
+        modelName: modelName
     )
-
-    DeviceDataBridge.shared.handleDeviceDataResult?(deviceData)
-    NSLog("TAMIR --> fetchDeviceData --> uuid : \(uuid)")
-    NSLog("TAMIR --> fetchDeviceData --> username : \(username)")
-    NSLog("TAMIR --> fetchDeviceData --> name : \(name)")
-    NSLog("TAMIR --> fetchDeviceData --> fcm : \(fcm)")
-    NSLog("TAMIR --> fetchDeviceData --> version : \(version)")
-    NSLog("TAMIR --> fetchDeviceData --> deviceType : \(deviceType)")
-    NSLog("TAMIR --> fetchDeviceData --> modelName : \(modelName)")
-    NSLog("TAMIR --> fetchDeviceData --> lastInteractionTime : \(lastInteractionTime)")
-    NSLog("TAMIR --> fetchDeviceData --> versionCode : \(versionCode)")
+    
+    // Confirm the callback is being set and invoked
+    if let handleDeviceDataResult = DeviceDataBridge.shared.handleDeviceDataResult {
+        NSLog("TAMIR --> fetchDeviceData --> Sending data to Kotlin")
+        handleDeviceDataResult(platformData)
+    } else {
+        NSLog("TAMIR --> fetchDeviceData --> handleDeviceDataResult callback is not set")
+    }
 }
+
+
+
 
 func openScannerScreenFromSwift(skuRegex: String) {
     DispatchQueue.main.async {

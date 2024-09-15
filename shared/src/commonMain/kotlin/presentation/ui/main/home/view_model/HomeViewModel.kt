@@ -17,6 +17,7 @@ import business.interactors.main.LikeInteractor
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -257,27 +258,54 @@ class HomeViewModel(
             val name = user?.username ?: ""
 
             appDataStoreManager.fetchDeviceData(this) { result ->
-
                 println("DeviceData, uuid: ${result.uuid}")
                 println("DeviceData, username: $username")
                 println("DeviceData, name: $name")
                 println("DeviceData, version: ${result.version}")
                 println("DeviceData, deviceType: ${result.deviceType}")
                 println("DeviceData, modelName: ${result.modelName}")
-                println("DeviceData, lastInteractionTime: ${result.lastInteractionTime}")
-                println("DeviceData, versionCode: ${result.versionCode}")
-                
-                deviceDataInteractor.execute(
-                    result.uuid,
-                    username,
-                    name,
-                    result.version,
-                    result.deviceType,
-                    result.modelName,
-                    result.lastInteractionTime,
-                    result.versionCode
-                )
+                println("DeviceData, lastInteractionTime: ${Clock.System.now().toEpochMilliseconds()}")
+//
+
+                // Collecting the flow emitted by execute function
+                launch {
+                    deviceDataInteractor.execute(
+                        result.uuid ?: "",
+                        username,
+                        name ?: "",
+                        result.version ?: "",
+                        result.deviceType ?: "",
+                        result.modelName ?: "",
+                        Clock.System.now().toEpochMilliseconds()
+                    ).collect { dataState ->
+                        // Handle the emitted states here
+                        when (dataState) {
+                            is DataState.Loading -> {
+                                println("DeviceData, loading state: ${dataState.progressBarState}")
+                                // Handle loading state
+                            }
+
+                            is DataState.NetworkStatus -> {
+                                println("DeviceData, network status: ${dataState.networkState}")
+                                // Handle network status
+                            }
+
+                            is DataState.Data -> {
+                                println("DeviceData, data received")
+                                // Handle successful data
+                            }
+
+                            else -> {
+                                println("DeviceData, unknown state")
+                                // Handle other cases
+                            }
+                        }
+                    }
+                }
+
+                println("DeviceData, after execute")
             }
         }
     }
+
 }

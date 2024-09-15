@@ -97,6 +97,7 @@ class MainServiceImpl(
         token: String,
         deviceData: DeviceData,
     ): MainGenericResponse<JRNothing> {
+        println("DeviceData, sendClientData")
         return httpClient.post {
             url {
                 headers {

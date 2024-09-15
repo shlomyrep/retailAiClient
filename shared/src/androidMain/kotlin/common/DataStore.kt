@@ -13,7 +13,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import business.core.APP_DATASTORE
-import business.domain.main.DeviceData
+import business.domain.main.PlatformData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -54,28 +54,22 @@ actual fun Context.pdfOpener(url: String) {
 }
 
 @SuppressLint("HardwareIds")
-actual fun Context.deviceDataFetcher(scope: CoroutineScope, onDeviceDataFetched: (DeviceData) -> Unit) {
+actual fun Context.deviceDataFetcher(scope: CoroutineScope, onDeviceDataFetched: (PlatformData) -> Unit) {
     DeviceDataBridge.getDeviceData?.invoke()
 
     scope.launch {
         val uuid = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         val name = Build.MODEL
         val deviceType = "Android"
-        val lastInteractionTime = System.currentTimeMillis()
-        val versionCode = packageManager.getPackageInfo(packageName, 0).versionCode
 
-        val deviceData = DeviceData(
+        val platformData = PlatformData(
             uuid = uuid,
-            username = "username",
-            name = name,
             version = getAppVersion(this@deviceDataFetcher),
+            name = name,
             deviceType = deviceType,
             modelName = Build.MODEL,
-            lastInteractionTime = lastInteractionTime,
-            versionCode = versionCode
         )
-
-        onDeviceDataFetched(deviceData)
+        onDeviceDataFetched(platformData)
     }
 }
 

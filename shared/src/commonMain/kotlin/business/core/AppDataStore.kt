@@ -1,6 +1,6 @@
 package business.core
 
-import business.domain.main.DeviceData
+import business.domain.main.PlatformData
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -17,5 +17,5 @@ interface AppDataStore {
 
     fun openActivity(skuRegex: String,onScanResult: (String) -> Unit)
     fun openPdfUrl(url:String)
-    fun fetchDeviceData(scope: CoroutineScope, onDeviceDataFetched: (DeviceData) -> Unit)
+    fun fetchDeviceData(scope: CoroutineScope, onDeviceDataFetched: (PlatformData) -> Unit)
 }

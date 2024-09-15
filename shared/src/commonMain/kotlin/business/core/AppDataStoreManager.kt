@@ -1,6 +1,6 @@
 package business.core
 
-import business.domain.main.DeviceData
+import business.domain.main.PlatformData
 import common.Context
 import common.deviceDataFetcher
 import common.getData
@@ -34,7 +34,7 @@ class AppDataStoreManager(val context: Context) : AppDataStore {
         context.pdfOpener(url)
     }
 
-    override fun fetchDeviceData(scope: CoroutineScope, onDeviceDataFetched: (DeviceData) -> Unit) {
+    override fun fetchDeviceData(scope: CoroutineScope, onDeviceDataFetched: (PlatformData) -> Unit) {
         context.deviceDataFetcher(scope, onDeviceDataFetched)
     }
 }

@@ -1,6 +1,6 @@
 package common
 
-import business.domain.main.DeviceData
+import business.domain.main.PlatformData
 import kotlinx.coroutines.CoroutineScope
 
 expect suspend fun Context.putData(key: String, `object`: String)
@@ -18,10 +18,10 @@ object PdfOpenerBridge {
     var openPdfFunc: ((String) -> Unit)? = null
 }
 
-expect fun Context.deviceDataFetcher(scope: CoroutineScope, onDeviceDataFetched: (DeviceData) -> Unit)
+expect fun Context.deviceDataFetcher(scope: CoroutineScope, onDeviceDataFetched: (PlatformData) -> Unit)
 
 object DeviceDataBridge {
     var getDeviceData: (() -> Unit)? = null
-    var handleDeviceDataResult: ((DeviceData) -> Unit)? = null
+    var handleDeviceDataResult: ((PlatformData) -> Unit)? = null
 }
 
