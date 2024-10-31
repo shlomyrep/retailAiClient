@@ -3,6 +3,7 @@ package presentation.navigation
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import retailai.shared.generated.resources.Res
+import retailai.shared.generated.resources.barcode_scanner
 import retailai.shared.generated.resources.cart
 import retailai.shared.generated.resources.cart_border
 import retailai.shared.generated.resources.heart2
@@ -24,7 +25,12 @@ sealed class MainNavigation (
         selectedIcon = Res.drawable.home,
         unSelectedIcon = Res.drawable.home_border
     )
-
+    // New Scanner Item
+    data object Scanner : MainNavigation(
+        route = "Scanner", title = "Scan",
+        selectedIcon = Res.drawable.barcode_scanner,   // Replace with the actual scanner icon drawable
+        unSelectedIcon = Res.drawable.barcode_scanner  // Use the same or different icon as needed
+    )
    data object Wishlist : MainNavigation(
         route = "Wishlist", title = "Wishlist",
         selectedIcon = Res.drawable.heart2,

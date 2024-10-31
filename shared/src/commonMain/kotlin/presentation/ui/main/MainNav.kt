@@ -24,10 +24,13 @@ import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.rememberNavigator
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
+import presentation.navigation.HomeNavigation
 import presentation.navigation.MainNavigation
 import presentation.theme.DefaultNavigationBarItemTheme
 import presentation.ui.main.cart.CartNav
 import presentation.ui.main.home.HomeNav
+import presentation.ui.main.home.view_model.HomeViewModel
 import presentation.ui.main.profile.ProfileNav
 import presentation.ui.main.wishlist.WishlistNav
 
@@ -67,6 +70,8 @@ fun MainNav(logout: () -> Unit) {
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun BottomNavigationUI(navigator: Navigator) {
+    val viewModel: HomeViewModel = koinInject()
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(10.dp),
@@ -80,31 +85,44 @@ fun BottomNavigationUI(navigator: Navigator) {
             contentColor = MaterialTheme.colorScheme.background,
             tonalElevation = 8.dp
         ) {
-
+            // Add the items, including a new Scanner item in the middle
             val items = listOf(
                 MainNavigation.Home,
                 MainNavigation.Wishlist,
+                MainNavigation.Scanner,  // New Scanner button added here
                 MainNavigation.Cart,
                 MainNavigation.Profile,
             )
-            items.forEach {
-                NavigationBarItem(label = { Text(text = it.title) },
+
+            // Iterate through items and add them to the NavigationBar
+            items.forEach { item ->
+                NavigationBarItem(
+                    label = { Text(text = item.title) },
                     colors = DefaultNavigationBarItemTheme(),
-                    selected = it.route == currentRoute(navigator),
+                    selected = item.route == currentRoute(navigator),
                     icon = {
                         Icon(
-                            painterResource(if (it.route == currentRoute(navigator)) it.selectedIcon else it.unSelectedIcon),
-                            it.title
+                            painter = painterResource(item.selectedIcon),
+                            contentDescription = item.title
                         )
                     },
                     onClick = {
-                        navigator.navigate(
-                            it.route,
-                            NavOptions(
-                                launchSingleTop = true,
-                            ),
-                        )
-                    })
+                        // We will define the action later; right now, we just add the button.
+                        if (item is MainNavigation.Scanner) {
+                            // Scanner action will be defined here later.
+                            viewModel.openBarcodeScanner { productSku, isSKU: Boolean ->
+                                navigator.navigate(
+                                    HomeNavigation.Detail.route.plus("/$productSku").plus("/$isSKU")
+                                )
+                            }
+                        } else {
+                            navigator.navigate(
+                                item.route,
+                                NavOptions(launchSingleTop = true)
+                            )
+                        }
+                    }
+                )
             }
         }
     }
