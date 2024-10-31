@@ -53,20 +53,13 @@ fun MainNav(logout: () -> Unit) {
                     println("Navigating to Home without parameters")
 
                     HomeNav(
-                        logout = logout,
-                        navigateToDetailId = null,
-                        navigateToDetailIsSKU = null
+                        logout = logout
                     )
                 }
-                scene(route = "${MainNavigation.Home.route}/{productSku}/{isSKU}") { backStackEntry ->
-                    val productSku: String? = backStackEntry.path<String>("productSku")
-                    val isSKU: Boolean? = backStackEntry.path<Boolean>("isSKU")
-                    println("Navigating to Home with parameters: productSku=$productSku, isSKU=$isSKU")
-
+                scene(route = "${MainNavigation.Home.route}/{productSku}") { backStackEntry ->
                     HomeNav(
                         logout = logout,
-                        navigateToDetailId = productSku,
-                        navigateToDetailIsSKU = if (productSku != null) isSKU else null
+                        scan = true,
                     )
                 }
                 scene(route = MainNavigation.Wishlist.route) {
@@ -128,16 +121,12 @@ fun BottomNavigationUI(navigator: Navigator) {
                         // We will define the action later; right now, we just add the button.
                         if (item is MainNavigation.Scanner) {
                             // Scanner action will be defined here later.
-                            viewModel.openBarcodeScanner { productSku, isSKU ->
                                 // Navigate to Home with parameters
-                                println("Shlomy $productSku -- --- ")
-                                val route = "${MainNavigation.Home.route}/$productSku/$isSKU"
-
+                                val route = "${MainNavigation.Home.route}/scan"
                                 navigator.navigate(
                                     route,
-                                    NavOptions(launchSingleTop = true)
+                                    NavOptions(launchSingleTop = false)
                                 )
-                            }
                         } else {
                             navigator.navigate(
                                 item.route,

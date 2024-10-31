@@ -1,6 +1,7 @@
 package presentation.ui.main.home
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.path
@@ -19,19 +20,14 @@ import presentation.ui.main.settings.view_model.SettingsViewModel
 @Composable
 fun HomeNav(
     logout: () -> Unit,
-    navigateToDetailId: String? = null,
-    navigateToDetailIsSKU: Boolean? = null
+    scan: Boolean? = null
 ) {
     val navigator = rememberNavigator()
-    println("Shlomy $navigateToDetailId $navigateToDetailIsSKU")
+
     // Automatically navigate to Detail if parameters are provided
-    if (navigateToDetailId != null && navigateToDetailIsSKU != null) {
+    if (scan == true) {
         // Trigger navigation to Detail with the given parameters
-        navigator.navigate(
-            HomeNavigation.Detail.route.plus("/$navigateToDetailId")
-                .plus("/$navigateToDetailIsSKU"),
-            NavOptions(launchSingleTop = true)
-        )
+
     }
 
 
@@ -41,6 +37,16 @@ fun HomeNav(
     ) {
         scene(route = HomeNavigation.Home.route) {
             val viewModel: HomeViewModel = koinInject()
+
+            // Define the getBarcode function
+            val getBarcode: () -> Unit = {
+                viewModel.openBarcodeScanner { productSku, isSKU: Boolean ->
+                    navigator.navigate(
+                        HomeNavigation.Detail.route.plus("/$productSku").plus("/$isSKU")
+                    )
+                }
+            }
+
             HomeScreen(
                 state = viewModel.state.value,
                 getBarcode = {
@@ -68,6 +74,12 @@ fun HomeNav(
                 navigator.navigate(
                     HomeNavigation.Search.route.plus("/${categoryId}").plus("/${sort}")
                 )
+            }
+            // Use LaunchedEffect to call getBarcode when scan == true
+            LaunchedEffect(scan) {
+                if (scan == true) {
+                    getBarcode()
+                }
             }
         }
 
