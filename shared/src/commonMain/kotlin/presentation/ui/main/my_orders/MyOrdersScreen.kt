@@ -162,8 +162,9 @@ private fun MyOrdersList(
         )
     }
 
+    // Reverse the list order to display the newest orders at the top
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
-        items(list, key = { order ->
+        items(list.reversed(), key = { order ->
             // Use orderId if not null or empty; otherwise, use a fallback unique key
             val uniqueKey = if (!order.orderId.isNullOrEmpty()) {
                 order.orderId
@@ -184,6 +185,7 @@ private fun MyOrdersList(
         }
     }
 }
+
 
 
 @OptIn(ExperimentalResourceApi::class)
@@ -450,8 +452,8 @@ private fun OrderBox(
                 ) {
                     // Show message and start PDF generation
                     coroutineScope.launch {
-                        showFailureMessage = true // Show preparing message only after clicking the button
-                        isPdfReady = false // PDF is not ready yet
+                        showFailureMessage = true
+                        isPdfReady = false
                         // Simulate PDF generation; replace this with your actual event
                         events(MyOrdersEvent.OnSendQuote(2, order))
                     }
@@ -463,7 +465,7 @@ private fun OrderBox(
                         .padding(start = 5.dp),
                     text = stringResource(Res.string.created_bid)
                 ) {
-                    if (order.customerId.isNotEmpty()) {
+                    if (customerId.isNotEmpty()) {
                         events(MyOrdersEvent.OnSendQuote(1, order))
                     } else {
                         customerIdError = "יש להזין מספר לקוח תקין"
