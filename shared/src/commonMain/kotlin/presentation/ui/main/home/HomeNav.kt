@@ -2,6 +2,7 @@ package presentation.ui.main.home
 
 import androidx.compose.runtime.Composable
 import moe.tlaster.precompose.navigation.NavHost
+import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.path
 import moe.tlaster.precompose.navigation.rememberNavigator
 import org.koin.compose.koinInject
@@ -16,8 +17,24 @@ import presentation.ui.main.settings.SettingsScreen
 import presentation.ui.main.settings.view_model.SettingsViewModel
 
 @Composable
-fun HomeNav(logout: () -> Unit) {
+fun HomeNav(
+    logout: () -> Unit,
+    navigateToDetailId: String? = null,
+    navigateToDetailIsSKU: Boolean? = null
+) {
     val navigator = rememberNavigator()
+    println("Shlomy $navigateToDetailId $navigateToDetailIsSKU")
+    // Automatically navigate to Detail if parameters are provided
+    if (navigateToDetailId != null && navigateToDetailIsSKU != null) {
+        // Trigger navigation to Detail with the given parameters
+        navigator.navigate(
+            HomeNavigation.Detail.route.plus("/$navigateToDetailId")
+                .plus("/$navigateToDetailIsSKU"),
+            NavOptions(launchSingleTop = true)
+        )
+    }
+
+
     NavHost(
         navigator = navigator,
         initialRoute = HomeNavigation.Home.route,
@@ -28,7 +45,9 @@ fun HomeNav(logout: () -> Unit) {
                 state = viewModel.state.value,
                 getBarcode = {
                     viewModel.openBarcodeScanner { productSku, isSKU: Boolean ->
-                        navigator.navigate(HomeNavigation.Detail.route.plus("/$productSku").plus("/$isSKU"))
+                        navigator.navigate(
+                            HomeNavigation.Detail.route.plus("/$productSku").plus("/$isSKU")
+                        )
                     }
                 },
                 events = viewModel::onTriggerEvent,

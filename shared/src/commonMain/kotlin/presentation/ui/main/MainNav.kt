@@ -21,6 +21,7 @@ import common.ChangeStatusBarColors
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.path
 import moe.tlaster.precompose.navigation.rememberNavigator
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -49,7 +50,24 @@ fun MainNav(logout: () -> Unit) {
                 initialRoute = MainNavigation.Home.route,
             ) {
                 scene(route = MainNavigation.Home.route) {
-                    HomeNav(logout = logout)
+                    println("Navigating to Home without parameters")
+
+                    HomeNav(
+                        logout = logout,
+                        navigateToDetailId = null,
+                        navigateToDetailIsSKU = null
+                    )
+                }
+                scene(route = "${MainNavigation.Home.route}/{productSku}/{isSKU}") { backStackEntry ->
+                    val productSku: String? = backStackEntry.path<String>("productSku")
+                    val isSKU: Boolean? = backStackEntry.path<Boolean>("isSKU")
+                    println("Navigating to Home with parameters: productSku=$productSku, isSKU=$isSKU")
+
+                    HomeNav(
+                        logout = logout,
+                        navigateToDetailId = productSku,
+                        navigateToDetailIsSKU = if (productSku != null) isSKU else null
+                    )
                 }
                 scene(route = MainNavigation.Wishlist.route) {
                     WishlistNav()
@@ -110,9 +128,14 @@ fun BottomNavigationUI(navigator: Navigator) {
                         // We will define the action later; right now, we just add the button.
                         if (item is MainNavigation.Scanner) {
                             // Scanner action will be defined here later.
-                            viewModel.openBarcodeScanner { productSku, isSKU: Boolean ->
+                            viewModel.openBarcodeScanner { productSku, isSKU ->
+                                // Navigate to Home with parameters
+                                println("Shlomy $productSku -- --- ")
+                                val route = "${MainNavigation.Home.route}/$productSku/$isSKU"
+
                                 navigator.navigate(
-                                    HomeNavigation.Detail.route.plus("/$productSku").plus("/$isSKU")
+                                    route,
+                                    NavOptions(launchSingleTop = true)
                                 )
                             }
                         } else {
