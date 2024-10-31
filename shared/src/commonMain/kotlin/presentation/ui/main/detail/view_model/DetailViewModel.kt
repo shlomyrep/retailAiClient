@@ -130,14 +130,12 @@ class DetailViewModel(
     private fun onUpdatePermissionDialog(value: UIComponentState) {
         state.value = state.value.copy(permissionDialog = value)
     }
-
     private fun makeSelection(selection: Selection, selectedId: String) {
         // Step 1: Copy the current product
         val currentProduct = state.value.product
 
         // Step 2: Get customization steps (flat list of selections)
-        val customizationSteps =
-            getCustomizationSteps(currentProduct, mutableListOf(), currentProduct)
+        val customizationSteps = getCustomizationSteps(currentProduct, mutableListOf(), currentProduct)
 
         // Step 3: Find and update the specific selection in the customization steps
         customizationSteps.find { it == selection }?.let { foundSelection ->
@@ -147,7 +145,32 @@ class DetailViewModel(
 
         // Step 4: Update the state with the new product
         state.value = state.value.copy(product = currentProduct, lastSelection = selectedId)
+
+        // Step 5: Trigger inventory status update based on the selected product, color, or size
+        val supplierId = currentProduct.supplier.supplierId
+        val sku = currentProduct.getCalculatedSku()
+        if (supplierId != null && sku.isNotEmpty()) {
+            getProductInventory(supplierId, sku)
+        }
     }
+
+//    private fun makeSelection(selection: Selection, selectedId: String) {
+//        // Step 1: Copy the current product
+//        val currentProduct = state.value.product
+//
+//        // Step 2: Get customization steps (flat list of selections)
+//        val customizationSteps =
+//            getCustomizationSteps(currentProduct, mutableListOf(), currentProduct)
+//
+//        // Step 3: Find and update the specific selection in the customization steps
+//        customizationSteps.find { it == selection }?.let { foundSelection ->
+//            foundSelection.selector?.selected =
+//                foundSelection.selectionList?.firstOrNull { it._id == selectedId }
+//        }
+//
+//        // Step 4: Update the state with the new product
+//        state.value = state.value.copy(product = currentProduct, lastSelection = selectedId)
+//    }
 
 
 //    private fun selectColor(colorSelectable: String, product: ProductSelectable) {

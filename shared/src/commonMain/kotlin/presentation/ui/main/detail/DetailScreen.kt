@@ -483,30 +483,49 @@ fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Prod
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(selection.selectionList.orEmpty()) { color ->
-                Box(
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable {
-                            color._id?.let { it1 ->
-                                events(DetailEvent.MakeSelection(it1, selection))
-                            }
-                        }
-                        .padding(5.dp)
-                        .border(
-                            width = 2.dp,
-                            color = if ((selection.selector.selected as ColorSelectable)._id == color._id) Black else GrayBgOp,
-                            shape = MaterialTheme.shapes.small
-                        )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(5.dp)
                 ) {
-                    ColorBox(
-                        (color as ColorSelectable).hex,
-                        color.img
-                    )  // Now passing the image URL as well
+                    Box(
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                color._id?.let { it1 ->
+                                    events(DetailEvent.MakeSelection(it1, selection))
+                                }
+                            }
+                            .border(
+                                width = 2.dp,
+                                color = if ((selection.selector.selected as ColorSelectable)._id == color._id) Black else GrayBgOp,
+                                shape = MaterialTheme.shapes.small
+                            )
+                    ) {
+                        ColorBox(
+                            (color as ColorSelectable).hex,
+                            color.img
+                        )  // Now passing the image URL as well
+                    }
+
+                    // Display color name below only if the color is selected
+                    if ((selection.selector.selected as ColorSelectable)._id == color._id) {
+                        Text(
+                            text = (color as ColorSelectable).name  ?: "",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
             }
         }
     }
 }
+
 
 
 @Composable
