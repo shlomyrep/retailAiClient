@@ -13,6 +13,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,13 +23,16 @@ import common.ChangeStatusBarColors
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
+import moe.tlaster.precompose.navigation.path
 import moe.tlaster.precompose.navigation.rememberNavigator
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import presentation.navigation.HomeNavigation
 import presentation.navigation.MainNavigation
 import presentation.theme.DefaultNavigationBarItemTheme
 import presentation.ui.main.cart.CartNav
+import presentation.ui.main.detail.DetailNav
 import presentation.ui.main.home.HomeNav
 import presentation.ui.main.home.view_model.HomeViewModel
 import presentation.ui.main.profile.ProfileNav
@@ -56,10 +60,31 @@ fun MainNav(logout: () -> Unit) {
                     )
                 }
                 scene(route = "${MainNavigation.Home.route}/{productSku}") { backStackEntry ->
-                    HomeNav(
-                        logout = logout,
-                        scan = true,
-                    )
+                    // Extract the scanned SKU from the route.
+                    val productSku = backStackEntry.path<String>("productSku")
+                    // Use LaunchedEffect so that the navigation happens only once.
+                    LaunchedEffect(productSku) {
+                        if (!productSku.isNullOrEmpty()) {
+                            // Navigate to the Detail screen with the scanned SKU.
+                            navigator.navigate(
+                                HomeNavigation.Detail.route.plus("/$productSku/true"),
+                                NavOptions(launchSingleTop = true)
+                            )
+                            // Immediately remove this scanned route from the back stack.
+                            navigator.popBackStack()
+                        }
+                    }
+                    // Optionally, you could render an empty UI here (or a loading indicator)
+                }
+
+                scene(route = HomeNavigation.Detail.route.plus("/{id}/{isSKU}")) { backStackEntry ->
+                    val id: String? = backStackEntry.path<String>("id")
+                    val isSKU: Boolean = backStackEntry.path<Boolean>("isSKU") ?: false
+                    id?.let {
+                        DetailNav(it, isSKU) {
+                            navigator.popBackStack()
+                        }
+                    }
                 }
                 scene(route = MainNavigation.Wishlist.route) {
                     WishlistNav()
@@ -126,9 +151,8 @@ fun BottomNavigationUI(navigator: Navigator) {
                         // We will define the action later; right now, we just add the button.
                         if (item is MainNavigation.Scanner) {
                             viewModel.openBarcodeScanner { result, _ ->
-                                // Navigate to Home with the scanned product SKU as parameter.
                                 navigator.navigate(
-                                    "${MainNavigation.Home.route}/$result",
+                                    HomeNavigation.Detail.route.plus("/$result/true"),
                                     NavOptions(launchSingleTop = true)
                                 )
                             }
