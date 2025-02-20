@@ -16,17 +16,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import common.ChangeStatusBarColors
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
-import moe.tlaster.precompose.navigation.path
 import moe.tlaster.precompose.navigation.rememberNavigator
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import presentation.navigation.HomeNavigation
 import presentation.navigation.MainNavigation
 import presentation.theme.DefaultNavigationBarItemTheme
 import presentation.ui.main.cart.CartNav
@@ -98,17 +97,23 @@ fun BottomNavigationUI(navigator: Navigator) {
         ) {
             // Add the items, including a new Scanner item in the middle
             val items = listOf(
-                MainNavigation.Home,
-                MainNavigation.Wishlist,
-                MainNavigation.Scanner,  // New Scanner button added here
-                MainNavigation.Cart,
                 MainNavigation.Profile,
+                MainNavigation.Cart,
+                MainNavigation.Scanner,
+                MainNavigation.Wishlist,
+                MainNavigation.Home
             )
 
             // Iterate through items and add them to the NavigationBar
             items.forEach { item ->
                 NavigationBarItem(
-                    label = { Text(text = item.title) },
+                    label = {
+                        Text(
+                            text = item.title,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                        )
+                    },
                     colors = DefaultNavigationBarItemTheme(),
                     selected = item.route == currentRoute(navigator),
                     icon = {
@@ -121,12 +126,12 @@ fun BottomNavigationUI(navigator: Navigator) {
                         // We will define the action later; right now, we just add the button.
                         if (item is MainNavigation.Scanner) {
                             // Scanner action will be defined here later.
-                                // Navigate to Home with parameters
-                                val route = "${MainNavigation.Home.route}/scan"
-                                navigator.navigate(
-                                    route,
-                                    NavOptions(launchSingleTop = false)
-                                )
+                            // Navigate to Home with parameters
+                            val route = "${MainNavigation.Home.route}/scan"
+                            navigator.navigate(
+                                route,
+                                NavOptions(launchSingleTop = false)
+                            )
                         } else {
                             navigator.navigate(
                                 item.route,

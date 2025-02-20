@@ -14,37 +14,39 @@ import retailai.shared.generated.resources.profile
 import retailai.shared.generated.resources.profile_border
 
 @OptIn(ExperimentalResourceApi::class)
-sealed class MainNavigation (
+sealed class MainNavigation(
     val route: String,
     val title: String,
     val selectedIcon: DrawableResource,
-    val unSelectedIcon: DrawableResource,
+    val unSelectedIcon: DrawableResource
 ) {
-   data object Home : MainNavigation(
-        route = "Home", title = "Home",
+    data object Home : MainNavigation(
+        route = "Home", title = "בית",
         selectedIcon = Res.drawable.home,
         unSelectedIcon = Res.drawable.home_border
     )
+
     // New Scanner Item
     data object Scanner : MainNavigation(
-        route = "Scanner", title = "Scan",
-        selectedIcon = Res.drawable.barcode_scanner,   // Replace with the actual scanner icon drawable
-        unSelectedIcon = Res.drawable.barcode_scanner  // Use the same or different icon as needed
+        route = "Scanner", title = "סריקה",
+        selectedIcon = Res.drawable.barcode_scanner,
+        unSelectedIcon = Res.drawable.barcode_scanner
     )
-   data object Wishlist : MainNavigation(
-        route = "Wishlist", title = "Wishlist",
+
+    data object Wishlist : MainNavigation(
+        route = "Wishlist", title = "מועדפים",
         selectedIcon = Res.drawable.heart2,
         unSelectedIcon = Res.drawable.heart_border2
     )
 
-   data object Cart : MainNavigation(
-        route = "Cart", title = "Cart",
+    data object Cart : MainNavigation(
+        route = "Cart", title = "סל\nמוצרים",
         selectedIcon = Res.drawable.cart,
-        unSelectedIcon = Res.drawable.cart_border
+        unSelectedIcon = Res.drawable.cart_border,
     )
 
    data object Profile : MainNavigation(
-        route = "Profile", title = "Profile",
+        route = "Profile", title = "אזור אישי",
         selectedIcon = Res.drawable.profile,
         unSelectedIcon = Res.drawable.profile_border
     )

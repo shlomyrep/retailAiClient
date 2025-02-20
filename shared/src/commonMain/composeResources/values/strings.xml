@@ -28,7 +28,7 @@
     <string name="price">מחיר</string>
     <string name="home">בית</string>
     <string name="wishlist">מועדפים</string>
-    <string name="cart">עגלת</string>
+    <string name="cart">סל מוצרים</string>
     <string name="delete">מחק</string>
     <string name="total_cost">סה״כ</string>
     <string name="save_spec">שמור מפרט</string>
@@ -72,7 +72,7 @@
     <string name="inventory_list">רשימת מלאי</string>
     <string name="vat_included">כולל מע״מ</string>
     <string name="vat_not_included">לא כולל מע״מ</string>
-    <string name="edit_profile">איזור אישי</string>
+    <string name="edit_profile">פרטים אישיים</string>
     <string name="select">בחר</string>
     <string name="age">גיל</string>
     <string name="roll">תפקיד</string>

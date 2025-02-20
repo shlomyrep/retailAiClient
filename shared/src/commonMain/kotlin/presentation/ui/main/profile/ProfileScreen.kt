@@ -39,13 +39,11 @@ import presentation.ui.main.profile.view_model.ProfileState
 import retailai.shared.generated.resources.Res
 import retailai.shared.generated.resources.arrow_left
 import retailai.shared.generated.resources.edit_profile
-import retailai.shared.generated.resources.help_center
 import retailai.shared.generated.resources.order
 import retailai.shared.generated.resources.orders
 import retailai.shared.generated.resources.profile2
 import retailai.shared.generated.resources.setting2
 import retailai.shared.generated.resources.settings
-import retailai.shared.generated.resources.warning
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -113,9 +111,8 @@ fun ProfileScreen(
                     ProfileItemBox(title = stringResource(Res.string.settings), image = Res.drawable.setting2) {
                         navigateToSettings()
                     }
-                    ProfileItemBox(title = stringResource(Res.string.help_center), image = Res.drawable.warning, isLastItem = true) {}
+//                    ProfileItemBox(title = stringResource(Res.string.help_center), image = Res.drawable.warning, isLastItem = true) {}
                 }
-
             }
         }
     }
