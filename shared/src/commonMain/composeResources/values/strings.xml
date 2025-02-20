@@ -60,6 +60,7 @@
     <string name="batch">אצווה</string>
     <string name="inventory">מלאי</string>
     <string name="supplier">ספק</string>
+    <string name="suppliers">ספקים</string>
     <string name="available">זמין</string>
     <string name="held_inventory">מוחזק מלאי</string>
     <string name="color">גוון</string>

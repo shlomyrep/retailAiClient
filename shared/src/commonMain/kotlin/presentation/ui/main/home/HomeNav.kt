@@ -3,7 +3,6 @@ package presentation.ui.main.home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import moe.tlaster.precompose.navigation.NavHost
-import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.path
 import moe.tlaster.precompose.navigation.rememberNavigator
 import org.koin.compose.koinInject
@@ -16,6 +15,7 @@ import presentation.ui.main.notifications.view_model.NotificationsViewModel
 import presentation.ui.main.search.SearchNav
 import presentation.ui.main.settings.SettingsScreen
 import presentation.ui.main.settings.view_model.SettingsViewModel
+import presentation.ui.main.suppliers.SuppliersNav
 
 @Composable
 fun HomeNav(
@@ -63,6 +63,9 @@ fun HomeNav(
                 navigateToCategories = {
                     navigator.navigate(HomeNavigation.Categories.route)
                 },
+                navigateToSuppliers = {
+                    navigator.navigate(HomeNavigation.Suppliers.route)
+                },
                 navigateToSetting = {
                     navigator.navigate(HomeNavigation.Settings.route)
                 },
@@ -99,6 +102,14 @@ fun HomeNav(
             route = HomeNavigation.Categories.route
         ) {
             CategoriesNav {
+                navigator.popBackStack()
+            }
+        }
+
+        scene(
+            route = HomeNavigation.Suppliers.route
+        ) {
+            SuppliersNav {
                 navigator.popBackStack()
             }
         }

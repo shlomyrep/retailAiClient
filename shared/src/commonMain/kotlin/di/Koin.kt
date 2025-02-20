@@ -56,6 +56,7 @@ import presentation.ui.main.payment_method.view_model.PaymentMethodViewModel
 import presentation.ui.main.profile.view_model.ProfileViewModel
 import presentation.ui.main.search.view_model.SearchViewModel
 import presentation.ui.main.settings.view_model.SettingsViewModel
+import presentation.ui.main.suppliers.view_model.SuppliersViewModel
 import presentation.ui.main.wishlist.view_model.WishlistViewModel
 import presentation.ui.splash.view_model.LoginViewModel
 
@@ -73,6 +74,7 @@ fun appModule(context: Context) = module {
     factory { HomeViewModel(get(),get(), get(), get()) }
     factory { AddressViewModel(get(), get()) }
     factory { CategoriesViewModel(get()) }
+    factory { SuppliersViewModel (get()) }
     factory { ProfileViewModel(get()) }
     factory { EditOrderViewModel(get(),get()) }
     factory { SettingsViewModel(get()) }

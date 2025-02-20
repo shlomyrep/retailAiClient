@@ -77,6 +77,7 @@ import retailai.shared.generated.resources.most_sale
 import retailai.shared.generated.resources.newest_products
 import retailai.shared.generated.resources.search
 import retailai.shared.generated.resources.see_all
+import retailai.shared.generated.resources.suppliers
 
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalResourceApi::class)
@@ -89,6 +90,7 @@ fun HomeScreen(
     navigateToNotifications: () -> Unit = {},
     navigateToSetting: () -> Unit = {},
     navigateToCategories: () -> Unit = {},
+    navigateToSuppliers: () -> Unit = {},
     navigateToSearch: (String?, Int?) -> Unit = { _, _ -> },
 ) {
     val pagerState = rememberPagerState { state.home.banners.size }
@@ -242,6 +244,28 @@ fun HomeScreen(
                             totalDots = state.home.banners.size,
                             selectedIndex = pagerState.currentPage,
                             dotSize = 8.dp
+                        )
+                    }
+
+                    Spacer_16dp()
+
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            stringResource(Res.string.suppliers),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Text(
+                            stringResource(Res.string.see_all),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.noRippleClickable {
+                                navigateToSuppliers()
+                            }
                         )
                     }
 
