@@ -4,7 +4,6 @@ import business.core.NetworkState
 import business.core.UIComponent
 import business.core.UIComponentState
 import business.domain.main.Category
-import business.domain.main.Supplier
 
 sealed class SearchEvent {
 
@@ -13,7 +12,7 @@ sealed class SearchEvent {
         val minPrice: Int? = null,
         val maxPrice: Int? = null,
         val categories: List<Category>? = null,
-        val suppliers: List<Supplier>? = null,
+        val supplier: String? = null,
     ) : SearchEvent()
 
    data object GetNextPage : SearchEvent()
@@ -30,7 +29,7 @@ sealed class SearchEvent {
 
     data class OnUpdateFilterDialogState(val value: UIComponentState) : SearchEvent()
 
-    data class OnUpdateSelectedSupplier(val suppliers: List<Supplier>) : SearchEvent()
+    data class OnUpdateSelectedSupplier(val supplier: String) : SearchEvent()
 
 
     data object OnRemoveHeadFromQueue : SearchEvent()

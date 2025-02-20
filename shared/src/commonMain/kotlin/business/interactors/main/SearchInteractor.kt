@@ -10,7 +10,6 @@ import business.datasource.network.main.MainService
 import business.datasource.network.main.responses.toSearch
 import business.domain.main.Category
 import business.domain.main.Search
-import business.domain.main.Supplier
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -25,7 +24,7 @@ class SearchInteractor(
         minPrice: Int? = null,
         maxPrice: Int? = null,
         categories: List<Category>? = null,
-        suppliers: List<Supplier>? = null,
+        supplier: String? = null,
         sort: Int?,
         page: Int,
     ): Flow<DataState<Search>> = flow {
@@ -36,7 +35,6 @@ class SearchInteractor(
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
 
             val categoriesId = categories?.map { it.id }?.filter { it.isNotEmpty() }?.joinToString(",")
-            val suppliersId = suppliers?.map { it.supplierId }?.filter { it.isNotEmpty() }?.joinToString(",")
 
             val apiResponse = service.search(
                 token = token,
@@ -44,7 +42,7 @@ class SearchInteractor(
                 maxPrice = maxPrice,
                 sort = sort,
                 categoriesId = if (categoriesId.isNullOrEmpty()) null else categoriesId,
-                suppliersId = if (suppliersId.isNullOrEmpty()) null else suppliersId,
+                suppliersId = if (supplier.isNullOrEmpty()) null else supplier,
                 page = page
             )
 

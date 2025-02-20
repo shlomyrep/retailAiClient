@@ -4,7 +4,6 @@ package presentation.ui.main.search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import business.domain.main.Category
-import business.domain.main.Supplier
 import moe.tlaster.precompose.navigation.NavHost
 import moe.tlaster.precompose.navigation.path
 import moe.tlaster.precompose.navigation.rememberNavigator
@@ -24,24 +23,29 @@ fun SearchNav(categoryId: String?, supplierId: String?, sort: Int?, popUp: () ->
         scene(route = SearchNavigation.Search.route) {
             val viewModel: SearchViewModel = koinInject()
             LaunchedEffect(categoryId, supplierId, sort) {
+                // Sanitize categoryId
                 val categories = categoryId
                     ?.takeIf { it.isNotEmpty() && it != "null" }
                     ?.let { listOf(Category(id = it)) }
+                    ?: emptyList()
 
+                // Sanitize supplierId
                 val suppliers = supplierId
                     ?.takeIf { it.isNotEmpty() && it != "null" }
-                    ?.let { listOf(Supplier(supplierId = it)) }
+                    ?.let { it }
+                    ?: ""
 
+                // Update sort if it's not -1
                 sort?.takeIf { it != -1 }?.let {
                     viewModel.onTriggerEvent(SearchEvent.OnUpdateSelectedSort(it))
                 }
 
-                if (categories != null || suppliers != null || sort != null) {
-                    viewModel.onTriggerEvent(
-                        SearchEvent.Search(categories = categories, suppliers = suppliers)
-                    )
-                }
+                // Trigger Search event with both categories and suppliers
+                viewModel.onTriggerEvent(
+                    SearchEvent.Search(categories = categories, supplier = suppliers)
+                )
             }
+
 
             SearchScreen(
                 state = viewModel.state.value,
