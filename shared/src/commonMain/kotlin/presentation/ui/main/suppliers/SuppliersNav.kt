@@ -35,8 +35,8 @@ fun SuppliersNav(popup: () -> Unit) {
             route = SuppliersNavigation.Search.route
                 .plus(SuppliersNavigation.Search.objectPath)
         ) { backStackEntry ->
-            val categoryId: String? = backStackEntry.path<String>(SuppliersNavigation.Search.objectName)
-            SearchNav(categoryId = categoryId, sort = null) {
+            val supplierId: String? = backStackEntry.path<String>(SuppliersNavigation.Search.objectName)
+            SearchNav(categoryId = "", supplierId = supplierId, sort = null) {
                 navigator.popBackStack()
             }
         }

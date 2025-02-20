@@ -17,5 +17,6 @@ fun SupplierDto.toSupplier() = Supplier(
     companyName = companyName ?: "",
     supplierId = supplierId ?: "",
     shouldAddVatToPrice = shouldAddVatToPrice ?: false,
+    image = image ?: ""
 )
 

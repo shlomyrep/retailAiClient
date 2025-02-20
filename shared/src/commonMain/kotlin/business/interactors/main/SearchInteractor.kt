@@ -24,25 +24,27 @@ class SearchInteractor(
         minPrice: Int? = null,
         maxPrice: Int? = null,
         categories: List<Category>? = null,
+        supplier: String? = null,
         sort: Int?,
         page: Int,
     ): Flow<DataState<Search>> = flow {
 
         try {
-
             emit(DataState.Loading(progressBarState = ProgressBarState.ScreenLoading))
 
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
+
+            val categoriesId = categories?.map { it.id }?.filter { it.isNotEmpty() }?.joinToString(",")
 
             val apiResponse = service.search(
                 token = token,
                 minPrice = minPrice,
                 maxPrice = maxPrice,
                 sort = sort,
-                categoriesId = categories?.map { it.id }?.joinToString(","),
+                categoriesId = if (categoriesId.isNullOrEmpty()) null else categoriesId,
+                suppliersId = if (supplier.isNullOrEmpty()) null else supplier,
                 page = page
             )
-
 
             apiResponse.alert?.let { alert ->
                 emit(
@@ -56,7 +58,6 @@ class SearchInteractor(
 
             val result = apiResponse.result?.toSearch()
 
-
             emit(DataState.Data(result))
 
         } catch (e: Exception) {
@@ -66,9 +67,5 @@ class SearchInteractor(
         } finally {
             emit(DataState.Loading(progressBarState = ProgressBarState.Idle))
         }
-
-
     }
-
-
 }

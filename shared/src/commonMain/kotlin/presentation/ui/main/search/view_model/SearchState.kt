@@ -11,6 +11,7 @@ import business.domain.main.SearchFilter
 
 data class SearchState(
     val selectedCategory: List<Category> = listOf(),
+    val selectedSupplier: String = "",
     val selectedRange: ClosedFloatingPointRange<Float> = 0f..10f,
     val page: Int = 1,
     val hasNextPage: Boolean = true,

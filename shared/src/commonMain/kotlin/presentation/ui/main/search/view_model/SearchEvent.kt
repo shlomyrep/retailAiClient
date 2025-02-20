@@ -12,6 +12,7 @@ sealed class SearchEvent {
         val minPrice: Int? = null,
         val maxPrice: Int? = null,
         val categories: List<Category>? = null,
+        val supplier: String? = null,
     ) : SearchEvent()
 
    data object GetNextPage : SearchEvent()
@@ -28,7 +29,10 @@ sealed class SearchEvent {
 
     data class OnUpdateFilterDialogState(val value: UIComponentState) : SearchEvent()
 
-   data object OnRemoveHeadFromQueue : SearchEvent()
+    data class OnUpdateSelectedSupplier(val supplier: String) : SearchEvent()
+
+
+    data object OnRemoveHeadFromQueue : SearchEvent()
 
     data class Error(
         val uiComponent: UIComponent

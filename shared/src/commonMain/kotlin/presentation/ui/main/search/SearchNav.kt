@@ -14,7 +14,7 @@ import presentation.ui.main.search.view_model.SearchEvent
 import presentation.ui.main.search.view_model.SearchViewModel
 
 @Composable
-fun SearchNav(categoryId: String?, sort: Int?, popUp: () -> Unit) {
+fun SearchNav(categoryId: String?, supplierId: String?, sort: Int?, popUp: () -> Unit) {
     val navigator = rememberNavigator()
     NavHost(
         navigator = navigator,
@@ -22,15 +22,31 @@ fun SearchNav(categoryId: String?, sort: Int?, popUp: () -> Unit) {
     ) {
         scene(route = SearchNavigation.Search.route) {
             val viewModel: SearchViewModel = koinInject()
-            LaunchedEffect(sort, categoryId) {
-                val categories = if (categoryId != null) listOf(Category(id = categoryId)) else null
-                sort?.let {
-                    viewModel.onTriggerEvent(SearchEvent.OnUpdateSelectedSort(sort))
+            LaunchedEffect(categoryId, supplierId, sort) {
+                // Sanitize categoryId
+                val categories = categoryId
+                    ?.takeIf { it.isNotEmpty() && it != "null" }
+                    ?.let { listOf(Category(id = it)) }
+                    ?: emptyList()
+
+                // Sanitize supplierId
+                val suppliers = supplierId
+                    ?.takeIf { it.isNotEmpty() && it != "null" }
+                    ?.let { it }
+                    ?: ""
+
+                // Update sort if it's not -1
+                sort?.takeIf { it != -1 }?.let {
+                    viewModel.onTriggerEvent(SearchEvent.OnUpdateSelectedSort(it))
                 }
-                if (categoryId != null || sort != null) {
-                    viewModel.onTriggerEvent(SearchEvent.Search(categories = categories))
-                }
+
+                // Trigger Search event with both categories and suppliers
+                viewModel.onTriggerEvent(
+                    SearchEvent.Search(categories = categories, supplier = suppliers)
+                )
             }
+
+
             SearchScreen(
                 state = viewModel.state.value,
                 events = viewModel::onTriggerEvent,
@@ -44,10 +60,13 @@ fun SearchNav(categoryId: String?, sort: Int?, popUp: () -> Unit) {
         scene(route = SearchNavigation.Detail.route.plus(SearchNavigation.Detail.objectPath)) { backStackEntry ->
             val id: String? = backStackEntry.path<String>(SearchNavigation.Detail.objectName)
             id?.let {
-                DetailNav(it,false){
+                DetailNav(it, false) {
                     navigator.popBackStack()
                 }
             }
         }
     }
 }
+
+
+

@@ -22,7 +22,6 @@ class SearchViewModel(
 ) : ViewModel() {
 
 
-
     val state: MutableState<SearchState> = mutableStateOf(SearchState())
 
 
@@ -34,7 +33,9 @@ class SearchViewModel(
                     minPrice = event.minPrice,
                     maxPrice = event.maxPrice,
                     categories = event.categories,
+                    supplier = event.supplier
                 )
+                state.value = state.value.copy(selectedSupplier = event.supplier?:"")
             }
 
             is SearchEvent.OnUpdateSelectedSort -> {
@@ -80,6 +81,12 @@ class SearchViewModel(
             is SearchEvent.OnUpdateNetworkState -> {
                 onUpdateNetworkState(event.networkState)
             }
+
+            is SearchEvent.OnUpdateSelectedSupplier -> {
+                onUpdateSelectedSupplier(event.supplier)
+            }
+
+
         }
     }
 
@@ -106,6 +113,10 @@ class SearchViewModel(
 
     private fun onUpdateSearchText(value: String) {
         state.value = state.value.copy(searchText = value)
+    }
+
+    private fun onUpdateSelectedSupplier(supplier: String) {
+        state.value = state.value.copy(selectedSupplier = supplier)
     }
 
     private fun getSearchFilter() {
@@ -140,6 +151,7 @@ class SearchViewModel(
         minPrice: Int? = null,
         maxPrice: Int? = null,
         categories: List<Category>? = null,
+        supplier: String? = state.value.selectedSupplier
     ) {
         resetPaging()
         searchInteractor.execute(
@@ -147,6 +159,7 @@ class SearchViewModel(
             minPrice = minPrice,
             maxPrice = maxPrice,
             categories = categories,
+            supplier = supplier,  // Consistent usage
             sort = state.value.selectedSort,
         )
             .onEach { dataState ->
@@ -158,18 +171,18 @@ class SearchViewModel(
 
                     is DataState.Data -> {
                         dataState.data?.let {
-                            state.value =
-                                state.value.copy(search = it)
+                            state.value = state.value.copy(search = it)
                         }
                     }
 
                     is DataState.Loading -> {
-                        state.value =
-                            state.value.copy(progressBarState = dataState.progressBarState)
+                        state.value = state.value.copy(progressBarState = dataState.progressBarState)
                     }
                 }
             }.launchIn(viewModelScope)
     }
+
+
 
     private fun resetPaging() {
         state.value = state.value.copy(page = 1)
@@ -183,6 +196,7 @@ class SearchViewModel(
             minPrice = state.value.selectedRange.start.toInt(),
             maxPrice = state.value.selectedRange.endInclusive.toInt(),
             categories = state.value.selectedCategory,
+            supplier = state.value.selectedSupplier,
             sort = state.value.selectedSort,
         )
             .onEach { dataState ->

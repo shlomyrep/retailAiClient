@@ -33,7 +33,6 @@ import presentation.ui.main.search.view_model.SearchState
 import retailai.shared.generated.resources.Res
 import retailai.shared.generated.resources.category
 import retailai.shared.generated.resources.filter
-import retailai.shared.generated.resources.reset
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
@@ -46,8 +45,12 @@ fun FilterDialog(
     var selectedRange by remember {
         mutableStateOf(state.selectedRange)
     }
+    var selectedSupplier by remember {
+        mutableStateOf(state.selectedSupplier)
+    }
 
     val selectedCategories = state.selectedCategory.toMutableStateList()
+
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         BasicAlertDialog(
@@ -56,7 +59,7 @@ fun FilterDialog(
             },
             modifier = Modifier
                 .fillMaxWidth(0.9f)
-                .clip(RoundedCornerShape(16.dp)) 
+                .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ) {
@@ -129,22 +132,30 @@ fun FilterDialog(
                 Spacer_32dp()
 
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                    DefaultButton(modifier = Modifier.weight(1f), text = stringResource(Res.string.reset)) {
-                        events(SearchEvent.OnUpdateSelectedCategory(listOf()))
-                        events(SearchEvent.OnUpdatePriceRange(0f..10f))
-                        events(SearchEvent.OnUpdateFilterDialogState(UIComponentState.Hide))
-                        events(SearchEvent.Search())
-                    }
+//                    DefaultButton(modifier = Modifier.weight(1f), text = stringResource(Res.string.reset)) {
+//                        events(SearchEvent.OnUpdateSelectedCategory(listOf()))
+//                        // Example of updating the supplier
+//                        selectedSupplier = "newSupplierId" // Use the actual supplier ID here
+//                        events(SearchEvent.OnUpdateSelectedSupplier(selectedSupplier))
+//                        events(SearchEvent.OnUpdatePriceRange(0f..10f))
+//                        events(SearchEvent.OnUpdateFilterDialogState(UIComponentState.Hide))
+//                        events(SearchEvent.Search())
+//                    }
                     Spacer_16dp()
-                    DefaultButton(modifier = Modifier.weight(1f), text = stringResource(Res.string.filter)) {
+                    DefaultButton(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(Res.string.filter)
+                    ) {
                         events(SearchEvent.OnUpdateSelectedCategory(selectedCategories))
+                        events(SearchEvent.OnUpdateSelectedSupplier(selectedSupplier))
                         events(SearchEvent.OnUpdatePriceRange(selectedRange))
                         events(SearchEvent.OnUpdateFilterDialogState(UIComponentState.Hide))
                         events(
                             SearchEvent.Search(
                                 minPrice = selectedRange.start.toInt(),
                                 maxPrice = selectedRange.endInclusive.toInt(),
-                                categories = selectedCategories
+                                categories = selectedCategories,
+                                supplier = selectedSupplier
                             )
                         )
                     }

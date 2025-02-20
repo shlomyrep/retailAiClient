@@ -197,6 +197,7 @@ class MainServiceImpl(
         maxPrice: Int?,
         sort: Int?,
         categoriesId: String?,
+        suppliersId: String?,
         page: Int
     ): MainGenericResponse<SearchDTO> {
         return httpClient.get {
@@ -207,7 +208,13 @@ class MainServiceImpl(
                 takeFrom(BASE_URL)
                 encodedPath += MainService.SEARCH
 
-                parameter("categories_id", categoriesId)
+                // Add both parameters even if one is null or "null" (as string)
+                categoriesId?.takeIf { it.isNotEmpty() && it != "null" }?.let {
+                    parameter("categories_id", it)
+                }
+                suppliersId?.takeIf { it.isNotEmpty() && it != "null" }?.let {
+                    parameter("suppliers_id", it)
+                }
                 parameter("sort", sort)
                 parameter("page", page)
                 parameter("min_price", minPrice)
@@ -216,6 +223,8 @@ class MainServiceImpl(
             contentType(ContentType.Application.Json)
         }.body()
     }
+
+
 
     override suspend fun getSearchFilter(
         token: String,
