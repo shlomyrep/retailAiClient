@@ -125,13 +125,13 @@ fun BottomNavigationUI(navigator: Navigator) {
                     onClick = {
                         // We will define the action later; right now, we just add the button.
                         if (item is MainNavigation.Scanner) {
-                            // Scanner action will be defined here later.
-                            // Navigate to Home with parameters
-                            val route = "${MainNavigation.Home.route}/scan"
-                            navigator.navigate(
-                                route,
-                                NavOptions(launchSingleTop = false)
-                            )
+                            viewModel.openBarcodeScanner { result, _ ->
+                                // Navigate to Home with the scanned product SKU as parameter.
+                                navigator.navigate(
+                                    "${MainNavigation.Home.route}/$result",
+                                    NavOptions(launchSingleTop = true)
+                                )
+                            }
                         } else {
                             navigator.navigate(
                                 item.route,

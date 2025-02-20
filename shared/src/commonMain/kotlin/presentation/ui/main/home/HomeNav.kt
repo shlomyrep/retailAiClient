@@ -24,28 +24,12 @@ fun HomeNav(
 ) {
     val navigator = rememberNavigator()
 
-    // Automatically navigate to Detail if parameters are provided
-    if (scan == true) {
-        // Trigger navigation to Detail with the given parameters
-
-    }
-
-
     NavHost(
         navigator = navigator,
         initialRoute = HomeNavigation.Home.route,
     ) {
         scene(route = HomeNavigation.Home.route) {
             val viewModel: HomeViewModel = koinInject()
-
-            // Define the getBarcode function
-            val getBarcode: () -> Unit = {
-                viewModel.openBarcodeScanner { productSku, isSKU: Boolean ->
-                    navigator.navigate(
-                        HomeNavigation.Detail.route.plus("/$productSku").plus("/$isSKU")
-                    )
-                }
-            }
 
             HomeScreen(
                 state = viewModel.state.value,
@@ -77,12 +61,6 @@ fun HomeNav(
                 navigator.navigate(
                     HomeNavigation.Search.route.plus("/${categoryId}").plus("/${sort}")
                 )
-            }
-            // Use LaunchedEffect to call getBarcode when scan == true
-            LaunchedEffect(scan) {
-                if (scan == true) {
-                    getBarcode()
-                }
             }
         }
 

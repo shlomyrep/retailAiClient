@@ -125,6 +125,7 @@ import retailai.shared.generated.resources.no
 import retailai.shared.generated.resources.no_inventory_for_this_product
 import retailai.shared.generated.resources.open_product_page
 import retailai.shared.generated.resources.permission_required_dialog_title
+import retailai.shared.generated.resources.price
 import retailai.shared.generated.resources.product_details
 import retailai.shared.generated.resources.product_diff_level
 import retailai.shared.generated.resources.settings
@@ -682,13 +683,21 @@ fun BuyButtonBox(product: ProductSelectable, onClick: () -> Unit) {
                 Text(stringResource(Res.string.sku), style = MaterialTheme.typography.titleMedium)
                 Text(product.getCalculatedSku(), style = MaterialTheme.typography.titleLarge)
             }
-
             DefaultButton(
                 modifier = Modifier.fillMaxWidth(.7f).height(DEFAULT__BUTTON_SIZE),
                 text = stringResource(Res.string.add_to_cart)
             ) {
                 onClick()
             }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(.2f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(stringResource(Res.string.price), style = MaterialTheme.typography.titleMedium)
+            Text(product.getProductPrice(), style = MaterialTheme.typography.titleLarge)
         }
     }
 }

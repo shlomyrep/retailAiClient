@@ -47,6 +47,96 @@ data class ProductSelectable(
         const val type = "product"
     }
 
+
+
+    /**
+     * Public method that calculates the final product price.
+     * It starts by getting this product's own price, then adds
+     * any additional price from customization steps.
+     */
+    fun getProductPrice(): String {
+        var totalPrice = getPrice(useUpgradePrice = false)
+        // Retrieve all customization selections recursively.
+        getCustomizationStepsForPrice(originalProduct = this).forEach { selection ->
+            if (selection.selector?.selectionType == ProductSelectable.type) {
+                (selection.selector?.selected as? ProductSelectable)?.let { childProduct ->
+                    totalPrice += childProduct.getPrice(useUpgradePrice = this.priceIncludeSubProducts)
+                }
+            }
+        }
+        return totalPrice.toString()
+    }
+
+    /**
+     * Private helper method to calculate the base price of this product,
+     * taking into account the priceType and optionally using the upgrade price.
+     */
+    private fun getPrice(useUpgradePrice: Boolean = false): Int {
+        return when (this.priceType) {
+            PriceType.SINGLE_PRICE.toString() -> {
+                if (useUpgradePrice) this.upgradePrice.toInt() else this.basePrice.toInt()
+            }
+            PriceType.SIZES_PRICE.toString() -> {
+                this.selections.firstOrNull { it.selector?.selectionType == SizeSelectable.type }
+                    ?.let { selection ->
+                        if (useUpgradePrice)
+                            (selection.selector?.selected?.upgradePrice ?: 0.0).toInt()
+                        else
+                            (selection.selector?.selected?.basePrice ?: 0.0).toInt()
+                    } ?: 0
+            }
+            PriceType.COLOR_SIZES_PRICE.toString(), PriceType.COLOR_PRICE.toString() -> {
+                val selectedColor = this.selections.firstOrNull { it.selector?.selectionType == ColorSelectable.type }?.selector?.selected
+                this.selections.firstOrNull { it.selector?.selectionType == SizeSelectable.type }
+                    ?.let { selection ->
+                        val sizeSelectable = selection.selector?.selected as? SizeSelectable
+                        val colorsMap = sizeSelectable?.colors
+                        if (colorsMap != null && selectedColor != null) {
+                            if (useUpgradePrice)
+                                colorsMap[selectedColor._id]?.upgradePrice?.toInt() ?: 0
+                            else
+                                colorsMap[selectedColor._id]?.basePrice?.toInt() ?: 0
+                        } else 0
+                    } ?: 0
+            }
+            else -> 0
+        }
+    }
+
+    /**
+     * Private recursive helper method to retrieve all customization selections
+     * that might affect the final price. It uses the original product to match
+     * inherited sizes.
+     */
+    private fun getCustomizationStepsForPrice(
+        selections: MutableList<Selection> = mutableListOf(),
+        originalProduct: ProductSelectable
+    ): MutableList<Selection> {
+        this.selections.forEach { s ->
+            if (this.inheritsSize && s.selector?.selectionType == SizeSelectable.type) {
+                originalProduct.selections.firstOrNull { it.selector?.selectionType == SizeSelectable.type }
+                    ?.let { originalSizeSelection ->
+                        originalSizeSelection.selector?.selected?.let { selectedOriginal ->
+                            val currentSelected = s.selector?.selected as? SizeSelectable
+                            if (currentSelected != null && !currentSelected.modified) {
+                                s.selectionList?.firstOrNull { sizeListItem ->
+                                    (sizeListItem as? SizeSelectable)?.size == (selectedOriginal as? SizeSelectable)?.size
+                                }?.let { pickMe ->
+                                    s.selector?.selected = pickMe
+                                }
+                            }
+                        }
+                    }
+            }
+            selections.add(s)
+            if (s.selector?.selectionType == ProductSelectable.type) {
+                (s.selector?.selected as? ProductSelectable)?.getCustomizationStepsForPrice(selections, originalProduct)
+            }
+        }
+        return selections
+    }
+
+
     fun getPrice() = "$ $price"
 
     fun getCalculatedSku(): String {
