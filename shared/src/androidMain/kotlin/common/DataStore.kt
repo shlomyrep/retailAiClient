@@ -17,7 +17,8 @@ import business.domain.main.PlatformData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(APP_DATASTORE)
 
@@ -31,15 +32,19 @@ actual suspend fun Context.putData(key: String, `object`: String) {
     }
 }
 
-actual fun Context.openNativeScreen(skuRegex: String, onScanResult: (String) -> Unit) {
+actual fun Context.openNativeScreen(skuRegex: List<String>, onScanResult: (String) -> Unit) {
     ScannerOpenerBridge.handleScanResult = onScanResult
 
+    // Convert the List<String> to JSON
+    val skuRegexJson = Json.encodeToString(skuRegex)
+
     val intent = Intent(this, ScannerActivity::class.java).apply {
-        putExtra("SKU_REGEX", skuRegex)
+        putExtra("SKU_REGEX", skuRegexJson)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     startActivity(intent)
 }
+
 
 actual fun Context.pdfOpener(url: String) {
     val intent = Intent(Intent.ACTION_VIEW).apply {

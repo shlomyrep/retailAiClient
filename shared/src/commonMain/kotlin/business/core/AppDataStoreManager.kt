@@ -26,7 +26,7 @@ class AppDataStoreManager(val context: Context) : AppDataStore {
         return context.getData(key)
     }
 
-    override fun openActivity(skuRegex: String, onScanResult: (String) -> Unit) {
+    override fun openActivity(skuRegex: List<String>, onScanResult: (String) -> Unit) {
         context.openNativeScreen(skuRegex,onScanResult)
     }
 

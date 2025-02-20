@@ -29,6 +29,7 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import kotlinx.serialization.json.Json
 
 
 class ScannerActivity : AppCompatActivity() {
@@ -41,6 +42,7 @@ class ScannerActivity : AppCompatActivity() {
     private lateinit var barcodeButtonContainer: LinearLayout
     private lateinit var progressBar: ProgressBar
     private var skuRegex: String = ""
+    private var skuRegexList: List<String> = listOf()
 
     companion object {
         const val CAMERA_PERMISSION_REQUEST_CODE = 101
@@ -54,7 +56,10 @@ class ScannerActivity : AppCompatActivity() {
         barcodeButtonContainer = findViewById(R.id.barcodeButtonContainer)
         progressBar = findViewById(R.id.progressBar)
 
-        skuRegex = intent.getStringExtra("SKU_REGEX") as String
+        skuRegex = intent.getStringExtra("SKU_REGEX") ?: "[]"
+         skuRegexList = Json.decodeFromString(skuRegex)
+
+        Log.i("TAMIRRRR", "Parsed skuRegexList: $skuRegexList")
         Log.i("TAMIRRRR", "onCreate: $skuRegex")
 
         if (allPermissionsGranted()) {
@@ -143,23 +148,23 @@ class ScannerActivity : AppCompatActivity() {
     }
 
     private fun handleTextRecognitionResult(texts: com.google.mlkit.vision.text.Text) {
-        val nineDigitPattern = Regex(skuRegex)
         val matchedTexts = texts.textBlocks.mapNotNull { it.text }
-            .filter { nineDigitPattern.matches(it) }
+            .filter { text ->
+                // Check against all regex patterns
+                skuRegexList.any { pattern -> Regex(pattern).matches(text) }
+            }
 
         matchedTexts.forEach { matchedText ->
-            // Update the occurrences count for the matched text
             val count = numberOccurrencesMap[matchedText] ?: 0
             numberOccurrencesMap[matchedText] = count + 1
 
-            // If the number is seen at least three times, create the button
             if ((numberOccurrencesMap[matchedText] ?: 0) >= 3) {
                 createTextButton(matchedText)
-                // Reset the count after creating the button
                 numberOccurrencesMap[matchedText] = 0
             }
         }
     }
+
 
     private fun createTextButton(text: String) {
         val existingButton = barcodeButtonContainer.findViewWithTag<TextView>(text)
@@ -194,13 +199,13 @@ class ScannerActivity : AppCompatActivity() {
         barcodeButtonContainer.addView(buttonLayout)
     }
 
-    @SuppressLint("SetTextI18n")
     private fun createBarcodeButtons(barcodes: List<Barcode>) {
         isProcessingEnabled = false
-        val skuPattern = Regex(skuRegex)
         barcodes.forEach { barcode ->
             val barcodeValue = barcode.rawValue ?: ""
-            if (barcodeValue.length > 7 && skuPattern.matches(barcodeValue)) {
+
+            // Check against all regex patterns
+            if (skuRegexList.any { pattern -> Regex(pattern).matches(barcodeValue) }) {
                 val buttonLayout = createButtonLayout()
 
                 val barcodeButton = TextView(this).apply {
@@ -228,6 +233,7 @@ class ScannerActivity : AppCompatActivity() {
             }
         }
     }
+
 
 
     private fun createButtonLayout(): FrameLayout {

@@ -14,7 +14,7 @@ import Foundation
     var buttonsStackView: UIStackView!
     var numberOccurrencesMap = [String: Int]()
     var textRecognitionRequest: VNRecognizeTextRequest!
-    var skuRegex: String!
+    var skuRegexes: [String]!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -144,21 +144,27 @@ import Foundation
     }
 
     private func handleTextRecognitionResults(_ texts: [String]) {
-        guard let skuRegex = skuRegex else { return }
-        let regex = try! NSRegularExpression(pattern: skuRegex, options: [])
-        for text in texts {
-            let range = NSRange(location: 0, length: text.utf16.count)
-            if regex.firstMatch(in: text, options: [], range: range) != nil {
-                let count = numberOccurrencesMap[text] ?? 0
-                numberOccurrencesMap[text] = count + 1
-
-                if numberOccurrencesMap[text]! >= 3 {
-                    createBarcodeButton(barcode: text)
-                    numberOccurrencesMap[text] = 0
-                }
-            }
-        }
-    }
+           // Ensure we have regex patterns
+           guard let skuRegexes = skuRegexes else { return }
+           for text in texts {
+               // Check against each regex pattern.
+               for regexPattern in skuRegexes {
+                   let regex = try! NSRegularExpression(pattern: regexPattern, options: [])
+                   let range = NSRange(location: 0, length: text.utf16.count)
+                   if regex.firstMatch(in: text, options: [], range: range) != nil {
+                       let count = numberOccurrencesMap[text] ?? 0
+                       numberOccurrencesMap[text] = count + 1
+                       
+                       if numberOccurrencesMap[text]! >= 3 {
+                           createBarcodeButton(barcode: text)
+                           numberOccurrencesMap[text] = 0
+                           // Once one regex matches, no need to check the others.
+                           break
+                       }
+                   }
+               }
+           }
+       }
 
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard isProcessingEnabled else { return }
@@ -169,26 +175,33 @@ import Foundation
     }
 
     @objc func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
-        guard isProcessingEnabled else { return }
-        
-        if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
-           let stringValue = metadataObject.stringValue {
-            
-            // Validate the barcode with the regex
-            if let skuRegex = skuRegex {
-                let regex = try! NSRegularExpression(pattern: skuRegex, options: [])
-                let range = NSRange(location: 0, length: stringValue.utf16.count)
-                if regex.firstMatch(in: stringValue, options: [], range: range) != nil {
-                    AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-                    createBarcodeButton(barcode: stringValue)
-                }
-            } else {
-                // Fallback if skuRegex is not set
-                AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-                createBarcodeButton(barcode: stringValue)
-            }
-        }
-    }
+          guard isProcessingEnabled else { return }
+          
+          if let metadataObject = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
+             let stringValue = metadataObject.stringValue {
+              
+              // If regex patterns are provided, check against each.
+              if let skuRegexes = skuRegexes {
+                  var matched = false
+                  for regexPattern in skuRegexes {
+                      let regex = try! NSRegularExpression(pattern: regexPattern, options: [])
+                      let range = NSRange(location: 0, length: stringValue.utf16.count)
+                      if regex.firstMatch(in: stringValue, options: [], range: range) != nil {
+                          matched = true
+                          break
+                      }
+                  }
+                  if matched {
+                      AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+                      createBarcodeButton(barcode: stringValue)
+                  }
+              } else {
+                  // Fallback behavior if no regexes are provided.
+                  AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+                  createBarcodeButton(barcode: stringValue)
+              }
+          }
+      }
 
     private func createBarcodeButton(barcode: String) {
         guard !seenBarcodes.contains(barcode) else { return }

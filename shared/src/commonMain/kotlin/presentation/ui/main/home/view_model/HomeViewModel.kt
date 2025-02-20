@@ -232,7 +232,7 @@ class HomeViewModel(
     }
 
     fun openBarcodeScanner(navigateToDetail: (String, Boolean) -> Unit) {
-        var skuRegex: String
+        var skuRegex: List<String>
         viewModelScope.launch {
             val jsonSettings = appDataStoreManager.readValue(DataStoreKeys.CUSTOMER_CONFIG)
             val customerConfig = jsonSettings?.takeIf { it.isNotEmpty() }?.let {
@@ -243,7 +243,7 @@ class HomeViewModel(
                     null
                 }
             }
-            skuRegex = customerConfig?.skuRegex ?: "^\\d{9}$"
+            skuRegex = customerConfig?.skuRegex?: listOf()
             appDataStoreManager.openActivity(skuRegex) { result ->
                 navigateToDetail(result, true)
             }

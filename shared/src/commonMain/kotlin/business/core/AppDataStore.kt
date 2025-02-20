@@ -15,7 +15,7 @@ interface AppDataStore {
         key: String,
     ): String?
 
-    fun openActivity(skuRegex: String,onScanResult: (String) -> Unit)
+    fun openActivity(skuRegex: List<String>,onScanResult: (String) -> Unit)
     fun openPdfUrl(url:String)
     fun fetchDeviceData(scope: CoroutineScope, onDeviceDataFetched: (PlatformData) -> Unit)
 }

@@ -14,22 +14,20 @@ struct ContentView: View {
     var body: some View {
         ComposeView()
             .onAppear {
-                ScannerOpenerBridge.shared.openScannerScreenFunc = { (skuRegex: String) in
-                    openScannerScreenFromSwift(skuRegex: skuRegex)
+                // Now the callback receives an array of regex patterns.
+                ScannerOpenerBridge.shared.openScannerScreenFunc = { (skuRegexes: [String]) in
+                    openScannerScreenFromSwift(skuRegexes: skuRegexes)
                 }
                 PdfOpenerBridge.shared.openPdfFunc = { (url: String) in
                     openPdfFromSwift(url: url)
                 }
-                
                 DeviceDataBridge.shared.getDeviceData = {
                     fetchDeviceData()
                 }
-                
             }
-            .ignoresSafeArea(.all, edges: .bottom) // Compose has own keyboard handler
+            .ignoresSafeArea(.all, edges: .bottom)
     }
 }
-
 func fetchDeviceData() {
     NSLog("TAMIR --> fetchDeviceData --> Starting data collection")
     
@@ -61,17 +59,16 @@ func fetchDeviceData() {
 
 
 
-func openScannerScreenFromSwift(skuRegex: String) {
+func openScannerScreenFromSwift(skuRegexes: [String]) {
     DispatchQueue.main.async {
         let rootViewController = UIApplication.shared.windows.first { $0.isKeyWindow }?.rootViewController
         let scannerViewController = ScannerViewController()
         
-        // Set the skuRegex
-        scannerViewController.skuRegex = skuRegex
+        // Pass the array of regex patterns to the view controller.
+        scannerViewController.skuRegexes = skuRegexes
         
         // Set the callback that Kotlin will use to handle the scan result.
         scannerViewController.didFindCode = { scannedCode in
-            // Pass the result back to Kotlin using the handleScanResult closure
             ScannerOpenerBridge.shared.handleScanResult?(scannedCode)
             print("Scanned Code: \(scannedCode)")
             NSLog("TAMIR --> openScannerScreenFromSwift --> Scanned Code: \(scannedCode)")

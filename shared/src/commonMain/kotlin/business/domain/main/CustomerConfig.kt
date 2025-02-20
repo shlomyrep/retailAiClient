@@ -8,5 +8,5 @@ data class CustomerConfig(
     @SerialName("customer_id_regex")
     var customerIdRegex: String = "^(|[45]\\d{7})$",
     @SerialName("sku_regex")
-    var skuRegex: String = "^\\d{9}$",
+    var skuRegex: List<String> = listOf("^\\d{9}$")
 )
