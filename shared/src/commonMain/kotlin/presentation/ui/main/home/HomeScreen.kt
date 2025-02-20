@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import business.constants.Sort
 import business.domain.main.Category
+import business.domain.main.Supplier
 import coil3.compose.AsyncImage
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -91,7 +92,7 @@ fun HomeScreen(
     navigateToSetting: () -> Unit = {},
     navigateToCategories: () -> Unit = {},
     navigateToSuppliers: () -> Unit = {},
-    navigateToSearch: (String?, Int?) -> Unit = { _, _ -> },
+    navigateToSearch: (String?, String?, Int?) -> Unit = { _, _, _ -> }
 ) {
     val pagerState = rememberPagerState { state.home.banners.size }
 
@@ -168,7 +169,7 @@ fun HomeScreen(
                         Box(
                             modifier = Modifier.fillMaxWidth(.8f).height(DEFAULT__BUTTON_SIZE)
                                 .border(1.dp, BorderColor, MaterialTheme.shapes.small)
-                                .noRippleClickable { navigateToSearch(null, null) }
+                                .noRippleClickable { navigateToSearch(null, null, null) }
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxSize().padding(8.dp),
@@ -248,8 +249,6 @@ fun HomeScreen(
                     }
 
                     Spacer_16dp()
-
-
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -267,6 +266,16 @@ fun HomeScreen(
                                 navigateToSuppliers()
                             }
                         )
+                    }
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentPadding = PaddingValues(8.dp)
+                    ) {
+                        items(state.home.suppliers.sortedBy { it.companyName }, key = { it.supplierId }) {
+                            SupplierBox(supplier = it) {
+                                navigateToSearch(null, it.supplierId, null)
+                            }
+                        }
                     }
 
                     Spacer_16dp()
@@ -297,16 +306,11 @@ fun HomeScreen(
                     ) {
                         items(state.home.categories.sortedBy { it.name }, key = { it.id }) {
                             CategoryBox(category = it) {
-                                navigateToSearch(it.id, null)
+                                navigateToSearch(it.id,null, null)
                             }
                         }
                     }
-
-
-
                     Spacer_16dp()
-
-
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -359,7 +363,7 @@ fun HomeScreen(
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.noRippleClickable {
-                                navigateToSearch(null, Sort.MOST_SALE)
+                                navigateToSearch(null, null, Sort.MOST_SALE)
                             }
                         )
                     }
@@ -396,7 +400,7 @@ fun HomeScreen(
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.noRippleClickable {
-                                navigateToSearch(null, Sort.NEWEST)
+                                navigateToSearch(null, null, Sort.NEWEST)
                             }
                         )
                     }
@@ -479,6 +483,40 @@ fun TimerBox(state: HomeState) {
         }
     }
 
+}
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+private fun SupplierBox(supplier: Supplier, onSupplierClick: () -> Unit) {
+    Box(modifier = Modifier.padding(horizontal = 8.dp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.width(75.dp).noRippleClickable {
+                onSupplierClick()
+            }
+        ) {
+            Box(
+                modifier = Modifier.size(75.dp).padding(2.dp).clip(RoundedCornerShape(12.dp))
+            ) {
+                AsyncImage(
+                    supplier.image, null,
+                    modifier = Modifier.fillMaxSize().size(65.dp),
+                    contentScale = ContentScale.Crop,
+                    error = painterResource(Res.drawable.default_image_loader),
+                    placeholder = painterResource(Res.drawable.default_image_loader)
+                )
+            }
+            Spacer_8dp()
+            Text(
+                supplier.companyName,
+                style = MaterialTheme.typography.labelMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.Black
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalResourceApi::class)

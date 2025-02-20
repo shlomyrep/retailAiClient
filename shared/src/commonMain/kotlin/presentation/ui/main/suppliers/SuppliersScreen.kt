@@ -91,7 +91,7 @@ private fun SupplierBox(supplier: Supplier, modifier: Modifier, onSupplierClick:
                 modifier = Modifier.size(75.dp).padding(2.dp).clip(RoundedCornerShape(12.dp))
             ) {
                 Image(
-                    painter = rememberAsyncImagePainter(supplier.companyName),
+                    painter = rememberAsyncImagePainter(supplier.image),
                     null,
                     modifier = Modifier.fillMaxSize().size(65.dp),
                     contentScale = ContentScale.Crop

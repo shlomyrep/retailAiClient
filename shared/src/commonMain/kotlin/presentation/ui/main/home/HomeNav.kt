@@ -73,9 +73,12 @@ fun HomeNav(
                     navigator.popBackStack()
                     navigator.navigate(HomeNavigation.Detail.route.plus("/$id").plus("/$isSKU"))
                 })
-            { categoryId, sort ->
+            { categoryId, supplierId, sort ->
                 navigator.navigate(
-                    HomeNavigation.Search.route.plus("/${categoryId}").plus("/${sort}")
+                    HomeNavigation.Search.route
+                        .plus("/${categoryId ?: "null"}")
+                        .plus("/${supplierId ?: "null"}")
+                        .plus("/${sort ?: -1}")
                 )
             }
             // Use LaunchedEffect to call getBarcode when scan == true
@@ -117,13 +120,21 @@ fun HomeNav(
             route = HomeNavigation.Search.route
                 .plus(HomeNavigation.Search.objectPath)
                 .plus(HomeNavigation.Search.objectPath2)
+                .plus(HomeNavigation.Search.objectPath3)
         ) { backStackEntry ->
             val categoryId: String? = backStackEntry.path<String>(HomeNavigation.Search.objectName)
-            val sort: Int? = backStackEntry.path<Int>(HomeNavigation.Search.objectName2)
-            SearchNav(categoryId = categoryId, sort = sort) {
+            val supplierId: String? = backStackEntry.path<String>(HomeNavigation.Search.objectName2)
+            val sort: Int? = backStackEntry.path<Int>(HomeNavigation.Search.objectName3)
+
+            SearchNav(
+                categoryId = categoryId,
+                supplierId = supplierId,
+                sort = sort
+            ) {
                 navigator.popBackStack()
             }
         }
+
         scene(route = HomeNavigation.Detail.route.plus("/{id}/{isSKU}")) { backStackEntry ->
             val id: String? = backStackEntry.path<String>("id")
             val isSKU: Boolean = backStackEntry.path<Boolean>("isSKU") ?: false

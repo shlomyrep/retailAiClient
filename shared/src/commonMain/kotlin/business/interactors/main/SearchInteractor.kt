@@ -10,6 +10,7 @@ import business.datasource.network.main.MainService
 import business.datasource.network.main.responses.toSearch
 import business.domain.main.Category
 import business.domain.main.Search
+import business.domain.main.Supplier
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -24,25 +25,28 @@ class SearchInteractor(
         minPrice: Int? = null,
         maxPrice: Int? = null,
         categories: List<Category>? = null,
+        suppliers: List<Supplier>? = null,
         sort: Int?,
         page: Int,
     ): Flow<DataState<Search>> = flow {
 
         try {
-
             emit(DataState.Loading(progressBarState = ProgressBarState.ScreenLoading))
 
             val token = appDataStoreManager.readValue(DataStoreKeys.TOKEN) ?: ""
+
+            val categoriesId = categories?.map { it.id }?.filter { it.isNotEmpty() }?.joinToString(",")
+            val suppliersId = suppliers?.map { it.supplierId }?.filter { it.isNotEmpty() }?.joinToString(",")
 
             val apiResponse = service.search(
                 token = token,
                 minPrice = minPrice,
                 maxPrice = maxPrice,
                 sort = sort,
-                categoriesId = categories?.map { it.id }?.joinToString(","),
+                categoriesId = if (categoriesId.isNullOrEmpty()) null else categoriesId,
+                suppliersId = if (suppliersId.isNullOrEmpty()) null else suppliersId,
                 page = page
             )
-
 
             apiResponse.alert?.let { alert ->
                 emit(
@@ -56,7 +60,6 @@ class SearchInteractor(
 
             val result = apiResponse.result?.toSearch()
 
-
             emit(DataState.Data(result))
 
         } catch (e: Exception) {
@@ -66,9 +69,5 @@ class SearchInteractor(
         } finally {
             emit(DataState.Loading(progressBarState = ProgressBarState.Idle))
         }
-
-
     }
-
-
 }

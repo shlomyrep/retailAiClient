@@ -197,6 +197,7 @@ class MainServiceImpl(
         maxPrice: Int?,
         sort: Int?,
         categoriesId: String?,
+        suppliersId: String?,
         page: Int
     ): MainGenericResponse<SearchDTO> {
         return httpClient.get {
@@ -208,6 +209,7 @@ class MainServiceImpl(
                 encodedPath += MainService.SEARCH
 
                 parameter("categories_id", categoriesId)
+                parameter("suppliers_id", suppliersId)
                 parameter("sort", sort)
                 parameter("page", page)
                 parameter("min_price", minPrice)

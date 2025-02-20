@@ -1,6 +1,5 @@
 package presentation.ui.main.search
 
-//import business.domain.main.Product
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

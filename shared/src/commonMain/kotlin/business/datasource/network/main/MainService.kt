@@ -90,6 +90,7 @@ interface MainService {
         maxPrice: Int?,
         sort: Int?,
         categoriesId: String?,
+        suppliersId: String?,
         page: Int,
     ): MainGenericResponse<SearchDTO>
 
