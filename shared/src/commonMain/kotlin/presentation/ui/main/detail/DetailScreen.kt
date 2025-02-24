@@ -125,7 +125,6 @@ import retailai.shared.generated.resources.no
 import retailai.shared.generated.resources.no_inventory_for_this_product
 import retailai.shared.generated.resources.open_product_page
 import retailai.shared.generated.resources.permission_required_dialog_title
-import retailai.shared.generated.resources.price
 import retailai.shared.generated.resources.product_details
 import retailai.shared.generated.resources.product_diff_level
 import retailai.shared.generated.resources.settings
@@ -339,12 +338,12 @@ fun DetailScreen(
                                     onDismiss = viewModel::dismiss
                                 )
                             }
-                            Text(
-                                text = viewModel.getProductPrice(state.product),
-                                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 14.sp),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
+//                            Text(
+//                                text = viewModel.getProductPrice(state.product),
+//                                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 14.sp),
+//                                maxLines = 1,
+//                                overflow = TextOverflow.Ellipsis
+//                            )
                         }
 
 
@@ -382,10 +381,11 @@ fun DetailScreen(
                 }
                 Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
                     BuyButtonBox(
+                        viewModel,
                         state.product,
                         state.showPrice
                     ) {
-                        events(DetailEvent.AddBasket(state.product,""))
+                        events(DetailEvent.AddBasket(state.product, ""))
                     }
                 }
             }
@@ -512,7 +512,7 @@ fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Prod
                     // Display color name below only if the color is selected
                     if ((selection.selector.selected as ColorSelectable)._id == color._id) {
                         Text(
-                            text = (color as ColorSelectable).name  ?: "",
+                            text = (color as ColorSelectable).name ?: "",
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium
@@ -527,7 +527,6 @@ fun ColorGrid(selection: Selection, events: (DetailEvent) -> Unit, product: Prod
         }
     }
 }
-
 
 
 @Composable
@@ -662,7 +661,7 @@ fun ColorBox(colorHex: String?, imageUrl: String? = null) {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun BuyButtonBox(product: ProductSelectable,showPrice: Map<String,Boolean>, onClick: () -> Unit) {
+fun BuyButtonBox(viewModel: DetailViewModel, product: ProductSelectable, showPrice: Map<String, Boolean>, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(8.dp),
@@ -693,12 +692,10 @@ fun BuyButtonBox(product: ProductSelectable,showPrice: Map<String,Boolean>, onCl
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(.2f),
+            modifier = Modifier.fillMaxWidth(.6f).padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(stringResource(Res.string.price), style = MaterialTheme.typography.titleMedium)
-
             showPrice.forEach { (key, value) ->
                 println("DetailScreen --> Supplier Key: $key, Show Price: $value")
             }
@@ -709,7 +706,12 @@ fun BuyButtonBox(product: ProductSelectable,showPrice: Map<String,Boolean>, onCl
             val shouldShowPrice = supplierId?.let { showPrice[it] } ?: false
 
             if (shouldShowPrice) {
-                Text(product.getProductPrice(), style = MaterialTheme.typography.titleLarge)
+                Text(
+                    text = viewModel.getProductPrice(product),
+                    style = MaterialTheme.typography.headlineLarge.copy(fontSize = 14.sp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             } else {
                 // You can also show a placeholder or nothing if the flag is false.
                 Text("", style = MaterialTheme.typography.titleLarge)
@@ -717,7 +719,6 @@ fun BuyButtonBox(product: ProductSelectable,showPrice: Map<String,Boolean>, onCl
         }
     }
 }
-
 
 
 @Composable
