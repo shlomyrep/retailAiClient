@@ -15,7 +15,8 @@ data class Quote(
 )
 @Serializable
 data class OrderResponse(
-    var orderPdf: String = ""
+    var orderPdf: String = "",
+    var suppliersPdfs: Map<String, String>? = null
 )
 @Serializable
 data class EmailData(
