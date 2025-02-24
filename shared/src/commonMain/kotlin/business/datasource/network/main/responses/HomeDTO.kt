@@ -17,7 +17,8 @@ data class HomeDTO(
     @SerialName("flash_sale") val flashSale: FlashSaleDTO?,
     @SerialName("most_sale") val mostSale: List<ProductSelectable>?,
     @SerialName("newest_product") val newestProduct: List<ProductSelectable>?,
-    @SerialName("config") val config: CustomerConfig
+    @SerialName("config") val config: CustomerConfig,
+    @SerialName("show_price") val showPrice: Map<String, Boolean> = emptyMap()
 )
 
 fun HomeDTO.toHome() = Home(

@@ -24,6 +24,7 @@ data class EmailData(
     var title: String = "",
     var date: String = "",
     var address: String = "",
+    var split_by_supplier: Boolean = false // new field
 )
 @Serializable
 data class OrderProduct(
