@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -117,10 +116,10 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
-                            Text(
-                                stringResource(Res.string.location),
-                                style = MaterialTheme.typography.labelSmall,
-                            )
+//                            Text(
+//                                stringResource(Res.string.location),
+//                                style = MaterialTheme.typography.labelSmall,
+//                            )
                             Spacer_4dp()
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -212,217 +211,215 @@ fun HomeScreen(
                 Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
 
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
-                    ) {
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.Start
+//                    ) {
 //                    Text(
 //                        stringResource(Res.string.special_for_you),
 //                        style = MaterialTheme.typography.titleLarge
 //                    )
-                        /* Text(
-                         "See All",
-                         style = MaterialTheme.typography.labelMedium,
-                         color = MaterialTheme.colorScheme.primary
-                     )*/
-                    }
-
-
-                    HorizontalPager(
-                        state = pagerState,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) { page ->
-                        BannerImage(state.home.banners.getOrNull(page)?.banner ?: "")
-                    }
-
-
-
-                    Spacer_8dp()
-
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        DotsIndicator(
-                            totalDots = state.home.banners.size,
-                            selectedIndex = pagerState.currentPage,
-                            dotSize = 8.dp
-                        )
-                    }
-
-                    Spacer_16dp()
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            stringResource(Res.string.suppliers),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Text(
-                            stringResource(Res.string.see_all),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.noRippleClickable {
-                                navigateToSuppliers()
-                            }
-                        )
-                    }
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(8.dp)
-                    ) {
-                        items(state.home.suppliers.sortedBy { it.companyName }, key = { it.supplierId }) {
-                            SupplierBox(supplier = it) {
-                                navigateToSearch(null, it.supplierId, null)
-                            }
-                        }
-                    }
-
-                    Spacer_16dp()
-
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            stringResource(Res.string.category),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Text(
-                            stringResource(Res.string.see_all),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.noRippleClickable {
-                                navigateToCategories()
-                            }
-                        )
-                    }
-
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(8.dp)
-                    ) {
-                        items(state.home.categories.sortedBy { it.name }, key = { it.id }) {
-                            CategoryBox(category = it) {
-                                navigateToSearch(it.id,null, null)
-                            }
-                        }
-                    }
-                    Spacer_16dp()
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                stringResource(Res.string.flash_sale),
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                            TimerBox(state = state)
-                        }
-                        /* Text(
-                         "See All",
-                         style = MaterialTheme.typography.labelMedium,
-                         color = MaterialTheme.colorScheme.primary
-                     )*/
-                    }
-
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(8.dp),
-                    ) {
-                        items(state.home.flashSale.products, key = { it.id }) {
-                            ProductBox(product = it, onLikeClick = {
-                                events(HomeEvent.Like(it.id))
-                            }) { navigateToDetail(it.id, false) }
-                        }
-                    }
-
-
-
-                    Spacer_16dp()
-
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            stringResource(Res.string.most_sale),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Text(
-                            stringResource(Res.string.see_all),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.noRippleClickable {
-                                navigateToSearch(null, null, Sort.MOST_SALE)
-                            }
-                        )
-                    }
-
-
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(8.dp)
-                    ) {
-                        items(state.home.mostSale, key = { it.id }) {
-                            ProductBox(product = it, onLikeClick = {
-                                events(HomeEvent.Like(it.id))
-                            }) { navigateToDetail(it.id, false) }
-                        }
-                    }
-
-
-
-
-                    Spacer_16dp()
-
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            stringResource(Res.string.newest_products),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Text(
-                            stringResource(Res.string.see_all),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.noRippleClickable {
-                                navigateToSearch(null, null, Sort.NEWEST)
-                            }
-                        )
-                    }
-
-
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentPadding = PaddingValues(8.dp)
-                    ) {
-                        items(state.home.newestProduct, key = { it.id }) {
-                            ProductBox(product = it, onLikeClick = {
-                                events(HomeEvent.Like(it.id))
-                            }) { navigateToDetail(it.id, false) }
-                        }
-                    }
-
+                    /* Text(
+                     "See All",
+                     style = MaterialTheme.typography.labelMedium,
+                     color = MaterialTheme.colorScheme.primary
+                 )*/
                 }
+
+
+//                    HorizontalPager(
+//                        state = pagerState,
+//                        verticalAlignment = Alignment.CenterVertically
+//                    ) { page ->
+//                        BannerImage(state.home.banners.getOrNull(page)?.banner ?: "")
+//                    }
+//
+//
+//
+//                    Spacer_8dp()
+//
+//                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                        DotsIndicator(
+//                            totalDots = state.home.banners.size,
+//                            selectedIndex = pagerState.currentPage,
+//                            dotSize = 8.dp
+//                        )
+//                    }
+
+                Spacer_16dp()
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        stringResource(Res.string.suppliers),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        stringResource(Res.string.see_all),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.noRippleClickable {
+                            navigateToSuppliers()
+                        }
+                    )
+                }
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    items(state.home.suppliers.sortedBy { it.companyName }, key = { it.supplierId }) {
+                        SupplierBox(supplier = it) {
+                            navigateToSearch(null, it.supplierId, null)
+                        }
+                    }
+                }
+
+                Spacer_16dp()
+
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        stringResource(Res.string.category),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        stringResource(Res.string.see_all),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.noRippleClickable {
+                            navigateToCategories()
+                        }
+                    )
+                }
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    items(state.home.categories.sortedBy { it.name }, key = { it.id }) {
+                        CategoryBox(category = it) {
+                            navigateToSearch(it.id, null, null)
+                        }
+                    }
+                }
+                Spacer_16dp()
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            stringResource(Res.string.flash_sale),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        TimerBox(state = state)
+                    }
+                    /* Text(
+                     "See All",
+                     style = MaterialTheme.typography.labelMedium,
+                     color = MaterialTheme.colorScheme.primary
+                 )*/
+                }
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(8.dp),
+                ) {
+                    items(state.home.flashSale.products, key = { it.id }) {
+                        ProductBox(product = it, onLikeClick = {
+                            events(HomeEvent.Like(it.id))
+                        }) { navigateToDetail(it.id, false) }
+                    }
+                }
+
+
+
+                Spacer_16dp()
+
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        stringResource(Res.string.most_sale),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        stringResource(Res.string.see_all),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.noRippleClickable {
+                            navigateToSearch(null, null, Sort.MOST_SALE)
+                        }
+                    )
+                }
+
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    items(state.home.mostSale, key = { it.id }) {
+                        ProductBox(product = it, onLikeClick = {
+                            events(HomeEvent.Like(it.id))
+                        }) { navigateToDetail(it.id, false) }
+                    }
+                }
+
+
+
+
+                Spacer_16dp()
+
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        stringResource(Res.string.newest_products),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    Text(
+                        stringResource(Res.string.see_all),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.noRippleClickable {
+                            navigateToSearch(null, null, Sort.NEWEST)
+                        }
+                    )
+                }
+
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(8.dp)
+                ) {
+                    items(state.home.newestProduct, key = { it.id }) {
+                        ProductBox(product = it, onLikeClick = {
+                            events(HomeEvent.Like(it.id))
+                        }) { navigateToDetail(it.id, false) }
+                    }
+                }
+
             }
         }
     }
 }
-
 
 @Composable
 fun TimerBox(state: HomeState) {

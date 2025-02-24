@@ -19,6 +19,7 @@ data class OrderDTO(
     @SerialName("address") val address: AddressDTO?,
     @SerialName("products") val products: List<ProductSelectable>?,
     @SerialName("pdf") val orderPdf: String?,
+    @SerialName("suppliers_pdfs") val suppliersPdfs: Map<String, String>?,
     @SerialName("order_id") val orderId: String?
 
 )
@@ -34,6 +35,7 @@ fun OrderDTO.toOrder() = Order(
     address = address?.toAddress() ?: Address(),
     products = products ?: listOf(),
     pdf = orderPdf ?: "",
+    suppliersPdfs = suppliersPdfs,
     orderId = orderId ?: ""
 )
 

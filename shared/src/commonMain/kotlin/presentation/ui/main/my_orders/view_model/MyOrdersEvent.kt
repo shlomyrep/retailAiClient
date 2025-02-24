@@ -15,7 +15,8 @@ sealed class MyOrdersEvent {
     data object OnRetryNetwork : MyOrdersEvent()
     data class OnSendQuote(
         val orderType: Int,
-        val order: Order
+        val order: Order,
+        val shouldSplitPdf: Boolean
     ) : MyOrdersEvent()
 
     data class OnUpdateNetworkState(

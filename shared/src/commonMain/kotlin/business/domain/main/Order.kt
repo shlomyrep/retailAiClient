@@ -13,5 +13,6 @@ data class Order(
     val address: Address,
     val shippingType: ShippingType,
     val pdf: String,
+    var suppliersPdfs: Map<String, String>?,
     val orderId: String
 )

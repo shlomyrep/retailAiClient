@@ -14,5 +14,6 @@ data class MyOrdersState(
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf()),
     val quote: Quote = Quote(),
     val orderPdf: String = "",
+    val suppliersPdfs: Map<String, String>? = mapOf(),
     val customerIdRegex: String = "",
 )

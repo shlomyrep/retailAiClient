@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -187,7 +188,6 @@ private fun MyOrdersList(
 }
 
 
-
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun CollapsibleOrderBox(
@@ -294,7 +294,6 @@ fun OrderDetailsDialog(
 }
 
 
-
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun OrderBox(
@@ -338,21 +337,6 @@ private fun OrderBox(
                     }
                 ) {
                     // TODO remove remark when edit order is working
-//                    Box(
-//                        modifier = Modifier
-//                            .size(40.dp)
-//                            .background(
-//                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-//                                shape = CircleShape
-//                            ),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-////                        Icon(
-////                            imageVector = Icons.Default.Edit,
-////                            contentDescription = stringResource(Res.string.edit_order),
-////                            tint = MaterialTheme.colorScheme.primary
-////                        )
-//                    }
                 }
             }
             Row(
@@ -424,8 +408,8 @@ private fun OrderBox(
             ) {
                 items(order.products) {
                     AsyncImage(
-                        it.image,
-                        null,
+                        model = it.image,
+                        contentDescription = null,
                         modifier = Modifier
                             .size(55.dp)
                             .padding(horizontal = 4.dp),
@@ -434,6 +418,25 @@ private fun OrderBox(
                         placeholder = painterResource(Res.drawable.default_image_loader)
                     )
                 }
+            }
+            Spacer_8dp()
+            // Add a checkbox with the text "פיצול PDF"
+            var splitPdf by remember { mutableStateOf(false) }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                androidx.compose.material3.Checkbox(
+                    checked = splitPdf,
+                    onCheckedChange = { splitPdf = it }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "פיצול PDF",
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
             Spacer_8dp()
             Row(
@@ -454,8 +457,7 @@ private fun OrderBox(
                     coroutineScope.launch {
                         showFailureMessage = true
                         isPdfReady = false
-                        // Simulate PDF generation; replace this with your actual event
-                        events(MyOrdersEvent.OnSendQuote(2, order))
+                        events(MyOrdersEvent.OnSendQuote(2, order, splitPdf))
                     }
                 }
                 DefaultButton(
@@ -466,7 +468,7 @@ private fun OrderBox(
                     text = stringResource(Res.string.created_bid)
                 ) {
                     if (customerId.isNotEmpty()) {
-                        events(MyOrdersEvent.OnSendQuote(1, order))
+                        events(MyOrdersEvent.OnSendQuote(1, order, false))
                     } else {
                         customerIdError = "יש להזין מספר לקוח תקין"
                     }
@@ -474,31 +476,52 @@ private fun OrderBox(
             }
             Spacer_8dp()
 
-            // Text to display PDF status
-            val pdf = order.pdf.ifEmpty { state.orderPdf }
-            when {
-                pdf.isNotEmpty() || isPdfReady -> {
-                    ClickableTextWithCopy(
-                        displayText = "${stringResource(Res.string.show_pdf)}  ${order.firstName} ${order.lastName}",
-                        url = pdf, // Link to the actual PDF
-                        onClick = {
-                            viewModel.openPdf(pdf) // Open the PDF when ready
-                        },
-                        snackbarHostState = snackbarHostState
-                    )
+            // PDF display section: Show main PDF and supplier PDFs (one line per PDF)
+// PDF display section: Show main PDF and supplier PDFs (one line per PDF)
+            Column {
+                // Main PDF line
+                val mainPdf = order.pdf.ifEmpty { state.orderPdf }
+                when {
+                    mainPdf.isNotEmpty() || isPdfReady -> {
+                        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                            ClickableTextWithCopy(
+                                displayText = "${stringResource(Res.string.show_pdf)}  ${order.firstName} ${order.lastName}",
+                                url = mainPdf,
+                                onClick = { viewModel.openPdf(mainPdf) },
+                                snackbarHostState = snackbarHostState
+                            )
+                        }
+                    }
+                    showFailureMessage -> {
+                        Text(
+                            text = "כשל ביצירת pdf אנא נסה מאוחר יותר",
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = Color.Black,
+                                textDecoration = TextDecoration.None
+                            ),
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                        )
+                    }
                 }
-                showFailureMessage -> {
-                    // Display the loading state text in black without underline
-                    Text(
-                      text = "כשל ביצירת pdf אנא נסה מאוחר יותר",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = Color.Black,
-                            textDecoration = TextDecoration.None
-                        ),
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
-                    )
+
+                // Use order.suppliersPdfs if available; otherwise, use state.suppliersPdfs.
+                val suppliersPdfs = order.suppliersPdfs?: state.suppliersPdfs
+
+                // Display additional supplier PDFs, one line per entry
+                suppliersPdfs?.forEach { (supplierKey, supplierPdfUrl) ->
+                    if (supplierPdfUrl.isNotEmpty()) {
+                        Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                            ClickableTextWithCopy(
+                                displayText = supplierKey,
+                                url = supplierPdfUrl,
+                                onClick = { viewModel.openPdf(supplierPdfUrl) },
+                                snackbarHostState = snackbarHostState
+                            )
+                        }
+                    }
                 }
             }
+
         }
     }
 
@@ -509,7 +532,6 @@ private fun OrderBox(
         }
     }
 }
-
 
 
 

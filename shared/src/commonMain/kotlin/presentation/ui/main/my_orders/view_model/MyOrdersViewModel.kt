@@ -66,7 +66,8 @@ class MyOrdersViewModel(
             is MyOrdersEvent.OnSendQuote -> {
                 onSendQuote(
                     event.orderType,
-                    event.order
+                    event.order,
+                    event.shouldSplitPdf
                 )
             }
 
@@ -76,9 +77,9 @@ class MyOrdersViewModel(
         }
     }
 
-    private fun onUpdatePdfUrl(pdfUrl: String) {
+    private fun onUpdatePdfUrl(pdfUrl: String, suppliersPdfs: Map<String, String>?) {
         state.value = state.value.copy(orderPdf = pdfUrl)
-
+        state.value = state.value.copy(suppliersPdfs = suppliersPdfs)
     }
 
     private fun onEditOrder(orderId: String) {
@@ -95,7 +96,7 @@ class MyOrdersViewModel(
         _orderIdSaved.value = false
     }
 
-    private fun onSendQuote(orderType: Int, order: Order) {
+    private fun onSendQuote(orderType: Int, order: Order, shouldSplitPdf: Boolean) {
         var erpCodeID = ""
         viewModelScope.launch {
             val jsonSalesMan = appDataStoreManager.readValue(DataStoreKeys.SALES_MAN)
@@ -107,7 +108,7 @@ class MyOrdersViewModel(
             orderType,
             order.customerId,
             erpCodeID,
-            setEmailDataObject(order.firstName, order.lastName, order)
+            setEmailDataObject(order.firstName, order.lastName, order, shouldSplitPdf)
         )
         sendQuote(quote)
     }
@@ -149,8 +150,10 @@ class MyOrdersViewModel(
                 }
 
                 is DataState.Data -> {
-                    if (dataState.data?.orderPdf?.isNotEmpty() == true) {
-                        onUpdatePdfUrl(dataState.data.orderPdf)
+                    dataState.data?.let { data ->
+                        if (data.orderPdf.isNotEmpty() || data.suppliersPdfs?.isNotEmpty() == true) {
+                            onUpdatePdfUrl(data.orderPdf, data.suppliersPdfs)
+                        }
                     }
                 }
 
@@ -199,9 +202,11 @@ class MyOrdersViewModel(
     fun setEmailDataObject(
         firstName: String,
         lastName: String,
-        order: Order
+        order: Order,
+        shouldSplitPdf: Boolean
     ): EmailData {
         val emailData = EmailData()
+        emailData.split_by_supplier = shouldSplitPdf
         val products = mutableListOf<OrderProduct>()
         emailData.title = "$firstName $lastName"
         emailData.date = order.createdAt
@@ -246,6 +251,7 @@ class MyOrdersViewModel(
                                 lineList.add(Line(assets = assetList, text = text))
                             }
                         }
+
                         is ProductSelectable -> {
                             contentList.add(Content(lineList.toMutableList(), selected.sku))
                             lineList.clear()
@@ -256,13 +262,21 @@ class MyOrdersViewModel(
                                         assetList.add(img.url)
                                     }
                                 }
-                                lineList.add(Line(assets = assetList, text = selected.name, longDescription = selected.longDescription))
+                                lineList.add(
+                                    Line(
+                                        assets = assetList,
+                                        text = selected.name,
+                                        longDescription = selected.longDescription
+                                    )
+                                )
                             }
                         }
+
                         is SizeSelectable -> {
                             if (selected.size?.isNotEmpty() == true) {
                                 val assetList = arrayListOf<String>()
-                                val mainProductSize = (product.selections.firstOrNull { s -> s.selector?.selected is SizeSelectable })?.selector?.selected as? SizeSelectable
+                                val mainProductSize =
+                                    (product.selections.firstOrNull { s -> s.selector?.selected is SizeSelectable })?.selector?.selected as? SizeSelectable
                                 var ld = ""
                                 if (selected == mainProductSize) {
                                     ld = product.longDescription
