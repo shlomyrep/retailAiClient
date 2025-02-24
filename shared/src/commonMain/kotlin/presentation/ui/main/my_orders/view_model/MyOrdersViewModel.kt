@@ -203,224 +203,71 @@ class MyOrdersViewModel(
     ): EmailData {
         val emailData = EmailData()
         val products = mutableListOf<OrderProduct>()
-        val orderProduct = OrderProduct()
         emailData.title = "$firstName $lastName"
         emailData.date = order.createdAt
-
-        // טובול לוגו
         emailData.header_image = "https://www.retailai.shop/images/tuboul.png"
 
         order.products.forEach { product ->
+            // Create a new OrderProduct for each product to avoid reusing the same instance
+            val orderProduct = OrderProduct()
             val contentList = mutableListOf<Content>()
             val imagesList = mutableSetOf<String>()
             val shortDesc = product.shortDescription
-//            val price = if (product.supplier.shouldAddVatToPrice == true) {
-//                val originalPriceStr = getProductPrice(product) // This should be a String
-//                try {
-//                    val originalPrice = BigDecimal(originalPriceStr)
-//                    val vatRate = BigDecimal("0.17")
-//                    val vatAmount = originalPrice.multiply(vatRate)
-//                    originalPrice.add(vatAmount).setScale(2, RoundingMode.HALF_UP).toPlainString()
-//                } catch (e: NumberFormatException) {
-//                    // Handle the exception if the original price string is not a valid number
-//                    "Invalid price"
-//                }
-//            } else {
-//                getProductPrice(specProduct.product)
-//            }
-
-//            val notes = product.notes
             val roomName = product.roomName
             val supplier = product.supplier.companyName
-
-//            val imagesSku = KitCatRepo.getImageSku()
-//            var sku = getStoreSku(
-//                specProduct.product.getCalculatedSku() ?: ""
-//            )
             val sku = product.getCalculatedSku()
-            // Check if sku exists in imageSku and add distinct images
-//            imagesSku[sku]?.let { skuImages ->
-//                val newImages = skuImages.map { imageUrl ->
-//                    Image(imageUrl, false)
-//                }.filterNot { specProduct.product.images.contains(it) }
-//                val combinedImages = mutableListOf<Image>().apply {
-//                    addAll(newImages)
-//                    addAll(specProduct.product.images)
-//                }
-//                combinedImages.firstOrNull()?.let {
-//                    imagesList.add(it.url)
-//                }
-//            }
-            // ADD the Main picture
-            product.images.firstOrNull()?.let {
-                if (imagesList.isEmpty()) {
-                    imagesList.add(it.url)
-                }
-            }
 
-            // Add the sketch
+            // Add the main image if available
+            product.images.firstOrNull()?.let {
+                imagesList.add(it.url)
+            }
+            // Add the sketch image if available
             product.images.firstOrNull { it.is_sketch }?.let {
                 imagesList.add(it.url)
             }
 
-            val customizationSteps = getCustomizationSteps(
-                product = product, originalProduct = product
-            )
-
+            val customizationSteps = getCustomizationSteps(product = product, originalProduct = product)
             val lineList = mutableListOf<Line>()
-            val productTitle = product.title
+            lineList.add(Line(text = product.title))
+            lineList.add(Line(text = product.name))
+            lineList.add(Line(text = sku))
 
-            val productTitleLine = Line(
-                text = productTitle,
-            )
-            lineList.add(productTitleLine)
-
-            val productName = product.name
-            val productNameLine = Line(
-                text = productName,
-            )
-            lineList.add(productNameLine)
-//            Log.i("TEST", "1: $sku")
-//            sku = getSupplierToStoreSku(sku)
-//            Log.i("TEST", "2: $sku")
-            val skuLine = Line(
-                text =  sku,
-            )
-            lineList.add(skuLine)
-//            Log.i("TEST", "3: $sku")
-            customizationSteps.map {
-
-                // Prepare a new line
-                it.selector?.selected?.let { selected ->
+            customizationSteps.forEach { step ->
+                step.selector?.selected?.let { selected ->
                     when (selected) {
                         is ColorSelectable -> {
-
-                            val selectionDesc = it.selector.selectionDesc
-                            val text =
-                                "$selectionDesc: ${selected.name}"
-
+                            val text = "${step.selector.selectionDesc}: ${selected.name}"
                             if (selected.name?.isNotEmpty() == true) {
-                                val colorAsset =
-                                    if (selected.hex?.isNotEmpty() == true) selected.hex else selected.img
+                                val colorAsset = if (selected.hex?.isNotEmpty() == true) selected.hex else selected.img
                                 val assetList = arrayListOf<String>()
                                 if (colorAsset != null) {
                                     assetList.add(colorAsset)
                                 }
-                                val line = Line(
-                                    assets = assetList,
-                                    text = text,
-                                )
-                                println("DIGIT ${line.text}  ${line.assets[0]}")
-                                lineList.add(line)
+                                lineList.add(Line(assets = assetList, text = text))
                             }
                         }
-
                         is ProductSelectable -> {
                             contentList.add(Content(lineList.toMutableList(), selected.sku))
                             lineList.clear()
                             if (selected.name.isNotEmpty()) {
-//                                val selectionDesc = when {
-//                                    (it.selector.selectionDesc?.contains(
-//                                        MainApplication.appContext.getString(
-//                                            R.string.surface_to_shower_closet_text
-//                                        )
-//                                    ) == true) -> {
-//                                        MainApplication.appContext.getString(R.string.surface_text_to_replace)
-//
-//                                    }
-//
-//                                    (it.selector.selectionDesc?.contains(
-//                                        MainApplication.appContext.getString(
-//                                            R.string.mirror_text_to_replace
-//                                        )
-//                                    ) == true) -> {
-//                                        MainApplication.appContext.getString(R.string.mirror_replaced_text)
-//
-//                                    }
-//
-//                                    (it.selector.selectionDesc?.contains(
-//                                        MainApplication.appContext.getString(
-//                                            R.string.service_closet_to_shower_closet_text
-//                                        )
-//                                    ) == true) -> {
-//                                        MainApplication.appContext.getString(R.string.service_closet_replaced_text)
-//                                    }
-//
-//                                    else -> {
-//                                        it.selector.selectionDesc
-//                                    }
-//                                }
-
-                                val text = selected.name
                                 val assetList = arrayListOf<String>()
                                 if (selected.isActive) {
                                     selected.images.firstOrNull()?.let { img ->
                                         assetList.add(img.url)
                                     }
                                 }
-
-                                val line = Line(
-                                    assets = assetList,
-                                    text = text,
-                                    longDescription = selected.longDescription
-                                )
-                                lineList.add(line)
-//                                Log.i("DIGIT", selectionDesc ?: "")
+                                lineList.add(Line(assets = assetList, text = selected.name, longDescription = selected.longDescription))
                             }
                         }
-
                         is SizeSelectable -> {
                             if (selected.size?.isNotEmpty() == true) {
-//                                var selectionDesc = ""
-//                                if (it.selector.selectionDesc?.contains(
-//                                        MainApplication.appContext.getString(
-//                                            R.string.closet_size_to_shower_closet_text
-//                                        )
-//                                    ) == true
-//                                ) {
-//                                    selectionDesc =
-//                                        "${
-//                                            MainApplication.appContext.getString(
-//                                                R.string.shower_closet_model_text
-//                                            )
-//                                        }${specProduct.product.name} ${
-//                                            MainApplication.appContext.getString(
-//                                                R.string.size_text
-//                                            )
-//                                        } ${selected.size}${
-//                                            MainApplication.appContext.getString(
-//                                                R.string.centimeter_text
-//                                            )
-//                                        }"
-//                                }
-
-//                                if (it.selector.selectionDesc?.contains(
-//                                        MainApplication.appContext.getString(
-//                                            R.string.mirror_size_text
-//                                        )
-//                                    ) == true
-//                                ) {
-//                                    selectionDesc =
-//                                        "${it.selector.selectionDesc}:  ${(it.selector.selected as SizeSelectable).size} ${
-//                                            MainApplication.appContext.getString(
-//                                                R.string.centimeter_text
-//                                            )
-//                                        } "
-//                                }
                                 val assetList = arrayListOf<String>()
-                                val mainProductSize =
-                                    (product.selections.firstOrNull { s -> s.selector?.selected is SizeSelectable })?.selector?.selected as? SizeSelectable
+                                val mainProductSize = (product.selections.firstOrNull { s -> s.selector?.selected is SizeSelectable })?.selector?.selected as? SizeSelectable
                                 var ld = ""
                                 if (selected == mainProductSize) {
                                     ld = product.longDescription
                                 }
-                                val line = Line(
-                                    assets = assetList,
-                                    text = selected.size,
-                                    longDescription = ld
-                                )
-//                                Log.i("DIGIT", selectionDesc)
-                                lineList.add(line)
+                                lineList.add(Line(assets = assetList, text = selected.size, longDescription = ld))
                             }
                         }
                     }
@@ -431,9 +278,6 @@ class MyOrdersViewModel(
             orderProduct.content = contentList
             orderProduct.main_images = imagesList.toMutableList()
             orderProduct.shortDescription = shortDesc
-//            orderProduct.quantity = quantity
-//            orderProduct.price = price
-//            product.notes = notes
             orderProduct.roomName = roomName
             orderProduct.supplier = supplier ?: ""
             products.add(orderProduct)
@@ -441,6 +285,7 @@ class MyOrdersViewModel(
         emailData.products = products
         return emailData
     }
+
 
     private fun getCustomerIdRegex() {
         viewModelScope.launch {
