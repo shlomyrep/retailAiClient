@@ -29,5 +29,6 @@ fun HomeDTO.toHome() = Home(
     flashSale = flashSale?.toFlashSale() ?: FlashSale(),
     mostSale = mostSale?.map { it } ?: listOf(),
     newestProduct = newestProduct?.map { it } ?: listOf(),
-    config = config
+    config = config,
+    showPrice = showPrice
 )

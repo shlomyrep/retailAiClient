@@ -382,7 +382,8 @@ fun DetailScreen(
                 }
                 Box(modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
                     BuyButtonBox(
-                        state.product
+                        state.product,
+                        state.showPrice
                     ) {
                         events(DetailEvent.AddBasket(state.product,""))
                     }
@@ -661,7 +662,7 @@ fun ColorBox(colorHex: String?, imageUrl: String? = null) {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun BuyButtonBox(product: ProductSelectable, onClick: () -> Unit) {
+fun BuyButtonBox(product: ProductSelectable,showPrice: Map<String,Boolean>, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(8.dp),
@@ -697,10 +698,27 @@ fun BuyButtonBox(product: ProductSelectable, onClick: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(stringResource(Res.string.price), style = MaterialTheme.typography.titleMedium)
-            Text(product.getProductPrice(), style = MaterialTheme.typography.titleLarge)
+
+            showPrice.forEach { (key, value) ->
+                println("DetailScreen --> Supplier Key: $key, Show Price: $value")
+            }
+
+            // Check if the supplierId exists in the map and what its value is.
+            val supplierId = product.supplier.supplierId
+            // If supplierId is null, or not in the map, default to true (show price).
+            val shouldShowPrice = supplierId?.let { showPrice[it] } ?: false
+
+            if (shouldShowPrice) {
+                Text(product.getProductPrice(), style = MaterialTheme.typography.titleLarge)
+            } else {
+                // You can also show a placeholder or nothing if the flag is false.
+                Text("", style = MaterialTheme.typography.titleLarge)
+            }
         }
     }
 }
+
+
 
 @Composable
 fun CommentBox(comment: Comment, modifier: Modifier = Modifier.width(300.dp)) {

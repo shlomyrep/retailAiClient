@@ -11,7 +11,7 @@ import business.domain.main.HeldInventoryBatch
 data class DetailState(
     val product: ProductSelectable = ProductSelectable(),
     val selectedImage: String = "",
-    val lastSelection:String = "",
+    val lastSelection: String = "",
     val progressBarState: ProgressBarState = ProgressBarState.Idle,
     val networkState: NetworkState = NetworkState.Good,
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf()),
@@ -19,5 +19,6 @@ data class DetailState(
     val productInventoryBatchText: String = "",
     val imageOptionDialog: UIComponentState = UIComponentState.Hide,
     val permissionDialog: UIComponentState = UIComponentState.Hide,
-    val galleryImages: List<String> = listOf()
-)
+    val galleryImages: List<String> = listOf(),
+    val showPrice: Map<String, Boolean> = emptyMap(),
+    )

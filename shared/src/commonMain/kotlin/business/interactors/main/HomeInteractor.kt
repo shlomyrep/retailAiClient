@@ -14,6 +14,7 @@ import business.util.createException
 import business.util.handleUseCaseException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class HomeInteractor(
@@ -31,6 +32,8 @@ class HomeInteractor(
 
             val apiResponse = service.home(token = token)
 
+
+
             if (apiResponse.status == false || apiResponse.result == null) {
                 throw Exception(
                     apiResponse.alert?.createException()
@@ -41,6 +44,13 @@ class HomeInteractor(
             if (configResult != null) {
                 val jsonConfig = Json.encodeToString(CustomerConfig.serializer(), configResult)
                 appDataStoreManager.setValue(DataStoreKeys.CUSTOMER_CONFIG, jsonConfig)
+            }
+
+            // Save showPrice map if available
+            apiResponse.result?.showPrice?.let { showPriceMap ->
+                // Serialize the map to a JSON string.
+                val jsonShowPrice = Json.encodeToString(showPriceMap)
+                appDataStoreManager.setValue(DataStoreKeys.SHOW_PRICE, jsonShowPrice)
             }
 
             val result = apiResponse.result?.toHome()

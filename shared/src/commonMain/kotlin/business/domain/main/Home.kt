@@ -10,5 +10,6 @@ data class Home(
     val flashSale: FlashSale = FlashSale(),
     val mostSale: List<ProductSelectable> = listOf(),
     val newestProduct: List<ProductSelectable> = listOf(),
-    val config: CustomerConfig = CustomerConfig()
+    val config: CustomerConfig = CustomerConfig(),
+    val showPrice: Map<String, Boolean> = emptyMap()
 )

@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import business.constants.CUSTOM_TAG
+import business.constants.DataStoreKeys
 import business.core.AppDataStore
 import business.core.DataState
 import business.core.NetworkState
@@ -27,6 +28,8 @@ import business.interactors.main.LikeInteractor
 import business.interactors.main.ProductInteractor
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -54,6 +57,9 @@ class DetailViewModel(
     var formattedQuantity = ""
     var formattedFreeQuantity = ""
 
+    init {
+        fetchShowPrice()
+    }
 
     fun show() {
         showDialog = true
@@ -506,6 +512,20 @@ class DetailViewModel(
 
     fun openPdf(url: String) {
         appDataStoreManager.openPdfUrl(url)
+    }
+
+    fun fetchShowPrice() {
+        viewModelScope.launch {
+            val showPriceJson = appDataStoreManager.readValue(DataStoreKeys.SHOW_PRICE)
+            val showPriceMap: Map<String, Boolean> = if (!showPriceJson.isNullOrEmpty()) {
+                Json.decodeFromString(showPriceJson)
+            } else {
+                emptyMap()
+            }
+            state.value = state.value.copy(showPrice = showPriceMap)
+
+            // Or pass showPriceMap to your DetailScreen as needed.
+        }
     }
 }
 
