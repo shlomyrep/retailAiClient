@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,24 +81,53 @@ fun LoginScreen(
             onRemoveHeadFromQueue = { events(LoginEvent.OnRemoveHeadFromQueue) },
             progressBarState = state.progressBarState
         ) {
+
+            var showSalesManDialog by remember { mutableStateOf(false) }
+
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Top // Arrange items from the top
             ) {
+                // Optionally add a small spacer to give some top padding if needed
+                Spacer(modifier = Modifier.height(16.dp))
                 Image(
-                    painter = painterResource(Res.drawable.retail_ai_logo), // Make sure you have this drawable in your resources.
+                    painter = painterResource(Res.drawable.retail_ai_logo),
                     contentDescription = "Retail AI Logo",
-                    modifier = Modifier
-                        .padding(top = 10.dp)
-                        .size(width = 350.dp, height = 200.dp)
+                    modifier = Modifier.size(width = 350.dp, height = 200.dp)
                 )
-                Spacer_32dp()
-                if (state.salesMans?.users?.isNotEmpty() == true) {
-                    showUserSelection(state, events, navigateToMain)
-                } else {
+                Spacer_8dp()
+                if (state.isLoginSucceeded){
+                    if (state.salesMans?.users?.isNotEmpty() == true) {
+                        showUserSelectionWithDialog(state, events, navigateToMain)
+                    } else {
+                        Spacer_32dp()
+                        Spacer_32dp()
+                        Text(
+                            text = "הזן שם מוכרן",
+                            modifier = Modifier.clickable { showSalesManDialog = true },
+                            color = Blue,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
+                    }
+                }else{
                     showLoginForm(state, events)
                 }
+            }
+            if (showSalesManDialog) {
+                InsertNameDialog(
+                    onDismissRequest = { showSalesManDialog = false },
+                    onSave = { firstName, lastName ->
+                        // Save the manually entered name
+                        events(LoginEvent.OnSaveSalesManNameManually(firstName, lastName))
+                        showSalesManDialog = false
+                        navigateToMain()
+                    }
+                )
             }
         }
     }
@@ -106,14 +136,14 @@ fun LoginScreen(
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun showUserSelection(
+fun showUserSelectionWithDialog(
     state: LoginState,
     events: (LoginEvent) -> Unit,
     navigateToMain: () -> Unit
 ) {
     var selectedSalesman by remember { mutableStateOf<SalesMan?>(null) }
+    var showInsertDialog by remember { mutableStateOf(false) }
 
-    // Wrap the main column with a scrollable box
     Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Column(
             modifier = Modifier
@@ -128,7 +158,7 @@ fun showUserSelection(
                     fontWeight = FontWeight.Bold
                 )
             )
-            Spacer_32dp()
+            Spacer(modifier = Modifier.height(32.dp))
 
             val sortedSalesmen = state.salesMans?.users?.sortedBy { it.username } ?: listOf()
 
@@ -166,9 +196,8 @@ fun showUserSelection(
                 }
             }
 
-            // Spacer with weight to push the button upwards but not out of view
-            Spacer(modifier = Modifier.weight(1f))
 
+            Spacer_32dp()
             DefaultButton(
                 progressBarState = state.progressBarState,
                 text = stringResource(Res.string.select),
@@ -177,17 +206,37 @@ fun showUserSelection(
                     .height(DEFAULT__BUTTON_SIZE_EXTRA),
                 onClick = {
                     if (selectedSalesman != null) {
-                        events(LoginEvent.SelectSalesMan(salesMan = selectedSalesman!!))
-                        navigateToMain() // Trigger the navigation after the selection is confirmed.
+                        events(LoginEvent.SelectSalesMan(selectedSalesman!!))
+                        navigateToMain()
                     }
                 },
                 enabled = selectedSalesman != null
             )
-            Spacer(Modifier.height(32.dp))
+            Spacer_32dp()
+            Text(
+                text = "הזן שם מוכרן",
+                modifier = Modifier.clickable { showInsertDialog = true },
+                color = Blue,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    textDecoration = TextDecoration.Underline
+                )
+            )
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
-}
 
+    if (showInsertDialog) {
+        InsertNameDialog(
+            onDismissRequest = { showInsertDialog = false },
+            onSave = { firstName, lastName ->
+                // Save the manually entered name
+                events(LoginEvent.OnSaveSalesManNameManually(firstName, lastName))
+                showInsertDialog = false
+                navigateToMain()
+            }
+        )
+    }
+}
 
 
 @OptIn(ExperimentalResourceApi::class)
@@ -267,3 +316,49 @@ fun showLoginForm(
         }
     }
 }
+
+@Composable
+fun InsertNameDialog(
+    onDismissRequest: () -> Unit,
+    onSave: (String, String) -> Unit
+) {
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text(text = "הזן שם מוכרן") },
+        text = {
+            Column {
+                TextField(
+                    value = firstName,
+                    onValueChange = { firstName = it },
+                    label = { Text("שם פרטי") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(
+                    value = lastName,
+                    onValueChange = { lastName = it },
+                    label = { Text("שם משפחה") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            DefaultButton(
+                text = "שמור",
+                onClick = { onSave(firstName, lastName) },
+                modifier = Modifier.padding(8.dp)
+            )
+        },
+        dismissButton = {
+            DefaultButton(
+                text = "ביטול",
+                onClick = onDismissRequest,
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+    )
+}
+

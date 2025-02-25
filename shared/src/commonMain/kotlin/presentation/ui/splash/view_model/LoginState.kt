@@ -20,5 +20,6 @@ data class LoginState(
     val networkState: NetworkState = NetworkState.Good,
     val errorQueue: Queue<UIComponent> = Queue(mutableListOf()),
     val salesMans: SalesMans? = null,
-    val selectedSalesMan: SalesMan? = null
+    val selectedSalesMan: SalesMan? = null,
+    val isLoginSucceeded: Boolean = false
 )

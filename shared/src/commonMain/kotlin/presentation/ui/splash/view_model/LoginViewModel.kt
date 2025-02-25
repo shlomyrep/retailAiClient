@@ -10,6 +10,7 @@ import business.core.NetworkState
 import business.core.Queue
 import business.core.UIComponent
 import business.domain.main.SalesMan
+import business.domain.main.SalesMans
 import business.interactors.splash.CheckTokenInteractor
 import business.interactors.splash.CheckUserInteractor
 import business.interactors.splash.LoginInteractor
@@ -75,6 +76,10 @@ class LoginViewModel(
             is LoginEvent.SelectSalesMan -> {
                 onSalesManSelected(event.salesMan)
             }
+
+            is LoginEvent.OnSaveSalesManNameManually -> {
+                onSaveSalesManNameManually(event.firstName, event.lastName)
+            }
         }
     }
 
@@ -90,6 +95,7 @@ class LoginViewModel(
                 is DataState.Response -> {
                     onTriggerEvent(LoginEvent.Error(dataState.uiComponent))
                 }
+
                 is DataState.Data -> {
                     state.value = state.value.copy(isSelectedSalesMan = dataState.data ?: false)
                 }
@@ -110,6 +116,7 @@ class LoginViewModel(
                 is DataState.Response -> {
                     onTriggerEvent(LoginEvent.Error(dataState.uiComponent))
                 }
+
                 is DataState.Data -> {
                     state.value = state.value.copy(isTokenValid = dataState.data ?: false)
                     state.value = state.value.copy(navigateToMain = dataState.data ?: false)
@@ -135,9 +142,12 @@ class LoginViewModel(
                 }
 
                 is DataState.Data -> {
-
-                    state.value =
-                        state.value.copy(salesMans = dataState.data)
+                    if (dataState.data?.users == null) {
+                        state.value = state.value.copy(salesMans = SalesMans())
+                    } else {
+                        state.value = state.value.copy(salesMans = dataState.data)
+                    }
+                    state.value = state.value.copy(isLoginSucceeded = true)
                 }
 
                 is DataState.Loading -> {
@@ -214,13 +224,25 @@ class LoginViewModel(
 
     private fun onRetryNetwork() {
     }
-    
+
     private fun onUpdateNetworkState(networkState: NetworkState) {
         state.value = state.value.copy(networkState = networkState)
     }
 
 
     private fun onSalesManSelected(salesMan: SalesMan) {
+        state.value = state.value.copy(selectedSalesMan = salesMan)
+        val jsonSalesMan = Json.encodeToString(SalesMan.serializer(), salesMan)
+        viewModelScope.launch {
+            appDataStoreManager.setValue(
+                DataStoreKeys.SALES_MAN,
+                jsonSalesMan
+            )
+        }
+    }
+
+    private fun onSaveSalesManNameManually(firstName: String, lastName: String) {
+        val salesMan = SalesMan("$firstName $lastName", "-1")
         state.value = state.value.copy(selectedSalesMan = salesMan)
         val jsonSalesMan = Json.encodeToString(SalesMan.serializer(), salesMan)
         viewModelScope.launch {

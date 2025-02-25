@@ -9,16 +9,17 @@ sealed class LoginEvent{
     data class OnUpdateNameRegister(val value: String) : LoginEvent()
     data class OnUpdateUsernameLogin(val value: String) : LoginEvent()
     data class OnUpdatePasswordLogin(val value: String) : LoginEvent()
+    data class OnSaveSalesManNameManually(val firstName: String, val lastName: String ) : LoginEvent()
 
-    object Register : LoginEvent()
-    object Login : LoginEvent()
-    object OnRemoveHeadFromQueue : LoginEvent()
+    data object Register : LoginEvent()
+    data object Login : LoginEvent()
+    data object OnRemoveHeadFromQueue : LoginEvent()
 
     data class Error(
         val uiComponent: UIComponent
     ) : LoginEvent()
 
-    object OnRetryNetwork : LoginEvent()
+    data object OnRetryNetwork : LoginEvent()
     data class OnUpdateNetworkState(
         val networkState: NetworkState
     ): LoginEvent()
