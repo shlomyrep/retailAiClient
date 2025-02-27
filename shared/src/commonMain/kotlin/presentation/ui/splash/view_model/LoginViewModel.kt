@@ -139,6 +139,7 @@ class LoginViewModel(
                 is DataState.NetworkStatus -> {}
                 is DataState.Response -> {
                     onTriggerEvent(LoginEvent.Error(dataState.uiComponent))
+                    state.value = state.value.copy(isLoginSucceeded = false)
                 }
 
                 is DataState.Data -> {
@@ -147,7 +148,11 @@ class LoginViewModel(
                     } else {
                         state.value = state.value.copy(salesMans = dataState.data)
                     }
-                    state.value = state.value.copy(isLoginSucceeded = true)
+                    if (dataState.status != null) {
+                        state.value = state.value.copy(isLoginSucceeded = true)
+                    }else{
+                        state.value = state.value.copy(isLoginSucceeded = false)
+                    }
                 }
 
                 is DataState.Loading -> {
