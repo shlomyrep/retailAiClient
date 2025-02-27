@@ -34,6 +34,8 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
+import presentation.ui.main.detail.filterProductSelections
+import presentation.ui.main.detail.formatProductPromotions
 import retailai.shared.generated.resources.Res
 import retailai.shared.generated.resources.vat_included
 import retailai.shared.generated.resources.vat_not_included
@@ -137,22 +139,26 @@ class DetailViewModel(
         state.value = state.value.copy(permissionDialog = value)
     }
     private fun makeSelection(selection: Selection, selectedId: String) {
-        // Step 1: Copy the current product
+        // Step 1: Get the current product from state
         val currentProduct = state.value.product
 
-        // Step 2: Get customization steps (flat list of selections)
+        // Step 2: Use the customization steps (a flattened list of selections) to update the chosen selection.
         val customizationSteps = getCustomizationSteps(currentProduct, mutableListOf(), currentProduct)
-
-        // Step 3: Find and update the specific selection in the customization steps
         customizationSteps.find { it == selection }?.let { foundSelection ->
             foundSelection.selector?.selected =
                 foundSelection.selectionList?.firstOrNull { it._id == selectedId }
         }
 
-        // Step 4: Update the state with the new product
+        // Step 3: Recalculate promotions based on the current product.
+        formatProductPromotions(currentProduct)
+
+        // Step 4: Recalculate available selections using the product's own embedded selection lists.
+        filterProductSelections(currentProduct.selections, currentProduct.filter)
+
+        // Step 5: Update the state with the new product data and record the last selection.
         state.value = state.value.copy(product = currentProduct, lastSelection = selectedId)
 
-        // Step 5: Trigger inventory status update based on the selected product, color, or size
+        // Step 6: If needed, trigger an inventory update using the updated calculated SKU.
         val supplierId = currentProduct.supplier.supplierId
         val sku = currentProduct.getCalculatedSku()
         if (supplierId != null && sku.isNotEmpty()) {
@@ -160,33 +166,7 @@ class DetailViewModel(
         }
     }
 
-//    private fun makeSelection(selection: Selection, selectedId: String) {
-//        // Step 1: Copy the current product
-//        val currentProduct = state.value.product
-//
-//        // Step 2: Get customization steps (flat list of selections)
-//        val customizationSteps =
-//            getCustomizationSteps(currentProduct, mutableListOf(), currentProduct)
-//
-//        // Step 3: Find and update the specific selection in the customization steps
-//        customizationSteps.find { it == selection }?.let { foundSelection ->
-//            foundSelection.selector?.selected =
-//                foundSelection.selectionList?.firstOrNull { it._id == selectedId }
-//        }
-//
-//        // Step 4: Update the state with the new product
-//        state.value = state.value.copy(product = currentProduct, lastSelection = selectedId)
-//    }
 
-
-//    private fun selectColor(colorSelectable: String, product: ProductSelectable) {
-//        state.value = colorSelectable?.let { state.value.copy(colorSelectable = it) }!!
-//        getProductInventory(product.supplier.supplierId ?: "", product.getCalculatedSku())
-//    }
-
-//    private fun selectProduct(productSelectable: String, product: ProductSelectable) {
-//        state.value = productSelectable?.let { state.value.copy(colorSelectable = it) }!!
-//    }
 
     private fun onUpdateSelectedImage(value: String) {
         state.value = state.value.copy(selectedImage = value)
@@ -514,7 +494,7 @@ class DetailViewModel(
         appDataStoreManager.openPdfUrl(url)
     }
 
-    fun fetchShowPrice() {
+   private fun fetchShowPrice() {
         viewModelScope.launch {
             val showPriceJson = appDataStoreManager.readValue(DataStoreKeys.SHOW_PRICE)
             val showPriceMap: Map<String, Boolean> = if (!showPriceJson.isNullOrEmpty()) {

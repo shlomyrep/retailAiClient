@@ -67,7 +67,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import business.core.UIComponentState
+import business.datasource.network.main.responses.ColorInfo
 import business.datasource.network.main.responses.ColorSelectable
+import business.datasource.network.main.responses.FilterTags
 import business.datasource.network.main.responses.ProductSelectable
 import business.datasource.network.main.responses.Selection
 import business.datasource.network.main.responses.SizeSelectable
@@ -1114,6 +1116,66 @@ fun CameraButton(onClick: () -> Unit) {
             tint = Color.White
         )
     }
+}
+
+fun filterProductSelections(
+    selections: List<Selection>,
+    filter: Map<String, FilterTags>
+) {
+    val without = "#ללא"
+    selections.forEach { selection ->
+        if (selection.selector?.selectionType == ProductSelectable.type) {
+            // Use the current selectionList (which should contain ProductSelectable options)
+            val currentList = selection.selectionList?.filterIsInstance<ProductSelectable>() ?: emptyList()
+            val filterTag = filter[selection.selector.categoryId]
+            val filteredList = if (filterTag?.type != null) {
+                when (filterTag.type) {
+                    "in" -> currentList.filter { prd ->
+                        prd.tags.contains(without) || prd.tags.containsAll(filterTag.values)
+                    }
+                    "ex" -> currentList.filter { prd ->
+                        prd.tags.contains(without) || filterTag.values.none { t -> prd.tags.contains(t) }
+                    }
+                    else -> currentList
+                }
+            } else {
+                currentList
+            }
+            // Replace the selection's list with the filtered list
+            selection.selectionList?.clear()
+            selection.selectionList?.addAll(filteredList)
+
+            // Recursively process sub-selections in the currently selected product, if any
+            val selectedProduct = selection.selector?.selected as? ProductSelectable
+            selectedProduct?.let {
+                filterProductSelections(it.selections, it.filter)
+            }
+        }
+    }
+}
+
+
+fun formatProductPromotions(product: ProductSelectable) {
+    product.selections.filter { it.selector?.selectionType == SizeSelectable.type }
+        .forEach { sizeSelection ->
+            sizeSelection.selectionList?.forEach { selectable ->
+                val sizeSelectable = selectable as? SizeSelectable
+                sizeSelectable?.colors?.forEach { (_, colorInfo) ->
+                    val finalSaleValue = computeFinalSale(colorInfo)
+                    if (finalSaleValue != 0) {
+                        product.finalSale = finalSaleValue
+                        sizeSelectable.finalSale = finalSaleValue
+                        println("Promotion applied with finalSale value: $finalSaleValue")
+                    }
+                }
+            }
+        }
+}
+
+
+fun computeFinalSale(colorInfo: ColorInfo): Int {
+    val upgrade = colorInfo.upgradePrice ?: return 0
+    return if (upgrade > 0) upgrade.toInt() else 0
 }
 
 
