@@ -9,6 +9,7 @@ data class Quote(
     var type: Int = Type.NONE.ordinal,
     var customerId: String = "",
     var erpCodeID: String = "",
+    var salesManName:String = "",
     @SerialName("email_data")
     var emailData: EmailData = EmailData(),
     var orderStatus: String = "",

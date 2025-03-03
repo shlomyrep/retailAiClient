@@ -254,7 +254,11 @@ class HomeViewModel(
         viewModelScope.launch {
             val username = appDataStoreManager.readValue(DataStoreKeys.EMAIL) ?: ""
             val jsonSalesMan = appDataStoreManager.readValue(DataStoreKeys.SALES_MAN)
-            val user = jsonSalesMan?.let { Json.decodeFromString(SalesMan.serializer(), it) }
+            val user = if (jsonSalesMan.isNullOrBlank()) {
+                null
+            } else {
+                Json.decodeFromString(SalesMan.serializer(), jsonSalesMan)
+            }
             val name = user?.username ?: ""
 
             appDataStoreManager.fetchDeviceData(this) { result ->
@@ -265,47 +269,36 @@ class HomeViewModel(
                 println("DeviceData, deviceType: ${result.deviceType}")
                 println("DeviceData, modelName: ${result.modelName}")
                 println("DeviceData, lastInteractionTime: ${Clock.System.now().toEpochMilliseconds()}")
-//
 
                 // Collecting the flow emitted by execute function
                 launch {
                     deviceDataInteractor.execute(
                         result.uuid ?: "",
                         username,
-                        name ?: "",
+                        name,
                         result.version ?: "",
                         result.deviceType ?: "",
                         result.modelName ?: "",
                         Clock.System.now().toEpochMilliseconds()
                     ).collect { dataState ->
-                        // Handle the emitted states here
                         when (dataState) {
                             is DataState.Loading -> {
                                 println("DeviceData, loading state: ${dataState.progressBarState}")
-                                // Handle loading state
                             }
-
                             is DataState.NetworkStatus -> {
                                 println("DeviceData, network status: ${dataState.networkState}")
-                                // Handle network status
                             }
-
                             is DataState.Data -> {
                                 println("DeviceData, data received")
-                                // Handle successful data
                             }
-
                             else -> {
                                 println("DeviceData, unknown state")
-                                // Handle other cases
                             }
                         }
                     }
                 }
-
                 println("DeviceData, after execute")
             }
         }
     }
-
 }

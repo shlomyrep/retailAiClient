@@ -98,16 +98,20 @@ class MyOrdersViewModel(
 
     private fun onSendQuote(orderType: Int, order: Order, shouldSplitPdf: Boolean) {
         var erpCodeID = ""
+        var salesManName = ""
         viewModelScope.launch {
             val jsonSalesMan = appDataStoreManager.readValue(DataStoreKeys.SALES_MAN)
             val user = jsonSalesMan?.let { Json.decodeFromString(SalesMan.serializer(), it) }
             erpCodeID = user?.erpID ?: ""
+            salesManName = user?.username?:""
         }
+
         val quote = Quote(
             order.code,
             orderType,
             order.customerId,
             erpCodeID,
+            salesManName,
             setEmailDataObject(order.firstName, order.lastName, order, shouldSplitPdf)
         )
         sendQuote(quote)
