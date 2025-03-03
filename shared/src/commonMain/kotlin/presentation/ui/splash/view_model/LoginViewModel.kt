@@ -247,7 +247,7 @@ class LoginViewModel(
     }
 
     private fun onSaveSalesManNameManually(firstName: String, lastName: String) {
-        val salesMan = SalesMan("$firstName $lastName", "-1")
+        val salesMan = SalesMan("$firstName $lastName", ("$firstName$lastName").hashCode().toString())
         state.value = state.value.copy(selectedSalesMan = salesMan)
         val jsonSalesMan = Json.encodeToString(SalesMan.serializer(), salesMan)
         viewModelScope.launch {
