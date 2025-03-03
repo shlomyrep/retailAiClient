@@ -417,7 +417,7 @@ fun getCustomizationSteps(
                     }
                 }
             }
-            if (!product.isSizeCustomizable) {
+            if (product!=originalProduct && !product.isSizeCustomizable) {
                 shouldAdd = false
             }
         }
