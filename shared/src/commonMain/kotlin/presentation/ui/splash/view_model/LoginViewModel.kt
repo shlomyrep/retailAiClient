@@ -148,7 +148,7 @@ class LoginViewModel(
                     } else {
                         state.value = state.value.copy(salesMans = dataState.data)
                     }
-                    if (dataState.status != null) {
+                    if (dataState.status != null && dataState.status == true) {
                         state.value = state.value.copy(isLoginSucceeded = true)
                     }else{
                         state.value = state.value.copy(isLoginSucceeded = false)
