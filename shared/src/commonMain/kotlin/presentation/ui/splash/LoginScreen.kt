@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
@@ -326,44 +325,89 @@ fun InsertNameDialog(
 ) {
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
+    var firstNameError by remember { mutableStateOf(false) }
+    var lastNameError by remember { mutableStateOf(false) }
     val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+
+    // Compute validity
+    val isValid = firstName.trim().isNotEmpty() && lastName.trim().isNotEmpty()
 
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismissRequest,
         title = { Text(text = "הזן שם מוכרן") },
         text = {
             Column {
+                // First Name Field
                 TextField(
                     value = firstName,
-                    onValueChange = { firstName = it },
+                    onValueChange = { value ->
+                        firstName = value
+                        if (value.trim().isNotEmpty()) {
+                            firstNameError = false
+                        }
+                    },
                     label = { Text("שם פרטי") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(
-                        onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                        onNext = { focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Down) }
                     )
                 )
+                if (firstNameError) {
+                    Text(
+                        text = "יש להזין שם פרטי תקין",
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
+                // Last Name Field
                 TextField(
                     value = lastName,
-                    onValueChange = { lastName = it },
+                    onValueChange = { value ->
+                        lastName = value
+                        if (value.trim().isNotEmpty()) {
+                            lastNameError = false
+                        }
+                    },
                     label = { Text("שם משפחה") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(
                         onDone = {
                             focusManager.clearFocus()
-                            onSave(firstName, lastName)
+                            if (!isValid) {
+                                if (firstName.trim().isEmpty()) firstNameError = true
+                                if (lastName.trim().isEmpty()) lastNameError = true
+                            } else {
+                                onSave(firstName, lastName)
+                            }
                         }
                     )
                 )
+                if (lastNameError) {
+                    Text(
+                        text = "יש להזין שם משפחה תקין",
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         },
         confirmButton = {
             DefaultButton(
                 text = "שמור",
-                onClick = { onSave(firstName, lastName) },
-                modifier = Modifier.padding(8.dp)
+                onClick = {
+                    // Validate both fields before saving.
+                    if (!isValid) {
+                        if (firstName.trim().isEmpty()) firstNameError = true
+                        if (lastName.trim().isEmpty()) lastNameError = true
+                    } else {
+                        onSave(firstName, lastName)
+                    }
+                },
+                modifier = Modifier.padding(8.dp),
+                enabled = isValid
             )
         },
         dismissButton = {
@@ -375,5 +419,7 @@ fun InsertNameDialog(
         }
     )
 }
+
+
 
 
