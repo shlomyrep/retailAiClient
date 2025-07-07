@@ -66,10 +66,11 @@ fun MainNav(logout: () -> Unit) {
                     LaunchedEffect(productSku) {
                         if (!productSku.isNullOrEmpty()) {
                             // Navigate to the Detail screen with the scanned SKU.
-                            navigator.popBackStack()
                             navigator.navigate(
                                 HomeNavigation.Detail.route.plus("/$productSku/true")
                             )
+                            // Immediately remove this scanned route from the back stack.
+                            navigator.popBackStack()
                         }
                     }
                     // Optionally, you could render an empty UI here (or a loading indicator)
@@ -149,7 +150,6 @@ fun BottomNavigationUI(navigator: Navigator) {
                         // We will define the action later; right now, we just add the button.
                         if (item is MainNavigation.Scanner) {
                             viewModel.openBarcodeScanner { result, _ ->
-                                navigator.popBackStack()
                                 navigator.navigate(
                                     HomeNavigation.Detail.route.plus("/$result/true")
                                 )
