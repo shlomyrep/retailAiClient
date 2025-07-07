@@ -81,7 +81,7 @@ actual fun Context.deviceDataFetcher(scope: CoroutineScope, onDeviceDataFetched:
 fun getAppVersion(context: Context): String {
     return try {
         val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-        packageInfo.versionName
+        packageInfo.versionName.toString()
     } catch (e: Exception) {
         "Unknown"
     }
